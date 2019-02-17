@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteRule ^([0-9.]+)(/?)$ /linux/packages/index.php?release=$1
+RewriteRule ^([0-9.]+)/([a-zA-z0-9.]+)(/?)$ /linux/packages/package.php?release=$1&package=$2
+RewriteRule ^([0-9.]+)/([a-zA-z0-9.]+)/install(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2
+
