@@ -1,5 +1,5 @@
 <?php
 $db_config['database']='ulfs';
 $db_config['user']='ulfs';
-$db_config['password']='VKkvvS1eCtLkmxIb';
+$db_config['password']='secret';
 $db_config['server']='127.0.0.1';

@@ -2,11 +2,11 @@
 
 include "inc/main.site.php";
 
-echo "<h1>ULFS Package info</h1>";
+echo "<h1>UmVirt LFS Package info</h1>";
 
 
-$release=@$_REQUEST['release'];
-$package=@$_REQUEST['package'];
+$release=@addslashes($_REQUEST['release']);
+$package=@addslashes($_REQUEST['package']);
 
 $sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, build, install from packages p
 left join releases r on p.release=r.id
@@ -39,7 +39,7 @@ echo "Package md5-checksum URL: $linkmd5<br>";
 
 $dependances=dependances($release, $v['code']);
 foreach($dependances as $dep){
-$depends[]="<a href=".$_SERVER['SCRIPT_URI']."?release=$release&package=$dep>$dep</a>";
+$depends[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$dep.">$dep</a>";
 }
 
 
@@ -78,3 +78,5 @@ echo "Install script:
 //echo "Available packages: <table>".join ($pkgs)."</table>";
 
 }
+include "inc/template.php";
+

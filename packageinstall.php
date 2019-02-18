@@ -2,8 +2,8 @@
 
 include "inc/main.site.php";
 
-$release=@$_REQUEST['release'];
-$package=@$_REQUEST['package'];
+$release=@addslashes($_REQUEST['release']);
+$package=@addslashes($_REQUEST['package']);
 
 $sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, build, install from packages p
 left join releases r on p.release=r.id
@@ -158,3 +158,7 @@ echo "Install script:
 */
 
 }
+
+
+include "inc/template.php";
+
