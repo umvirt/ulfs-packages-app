@@ -1,7 +1,7 @@
 <?php
 
 include "inc/main.site.php";
-
+ob_end_clean();
 $release=@addslashes($_REQUEST['release']);
 $package=@addslashes($_REQUEST['package']);
 
@@ -160,5 +160,4 @@ echo "Install script:
 }
 
 
-include "inc/template.php";
 
