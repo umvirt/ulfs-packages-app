@@ -76,10 +76,27 @@ return $v;
 }
 
 function download_url($release,$file){
-$dir=$file[0];
-return "http://umvirt.com/linux/downloads/$release/packages/".$dir."/".$file;
+$x=file_exists("../downloads/$release/packages/python-modules/$file");
+//var_dump($x);
+if($x){
+return "http://umvirt.com/linux/downloads/$release/packages/python-modules/".$file;
+}
+$x=file_exists("../downloads/$release/packages/Xorg/$file");
+//var_dump($x);
+if($x){
+return "http://umvirt.com/linux/downloads/$release/packages/Xorg/".$file;
 }
 
+$x=file_exists("../downloads/$release/packages/Xorg/lib/$file");
+//var_dump($x);
+if($x){
+return "http://umvirt.com/linux/downloads/$release/packages/Xorg/lib/".$file;
+}
+
+$dir=strtolower($file[0]);
+return "http://umvirt.com/linux/downloads/$release/packages/".$dir."/".$file;
+
+}
 
 function patch_url($release,$file){
 return "http://umvirt.com/linux/downloads/$release/patches/$file";
