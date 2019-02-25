@@ -138,3 +138,21 @@ return $deps;
 
 }
 
+function addons($release,$package){
+
+global $db;
+$sql="select a.filename from addons a
+inner join packages p on a.package=p.id
+inner join `releases` r on r.id=p.release 
+where p.code=\"$package\" and r.release=\"$release\"";
+//var_dump($sql);
+$db->execute($sql);
+$deps=array();
+$x=$db->dataset;
+foreach($x as $k=>$v){
+        $deps[]=$v['filename'];
+}
+return $deps;
+
+}
+

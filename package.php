@@ -58,11 +58,28 @@ $url=patch_url($release,$pat);
 $pats[]="<a href=\"$url\">$pat</a>";
 }
 
-
 if(count($patches)){
 echo "Patches: ".join($pats,", ").".<br>";
 }else{
 echo "Patches: *** NO PATCHES FOUND *** <br>";
+}
+
+
+$addons=addons($release,$v['code']);
+
+
+foreach($addons as $addn){
+$url=download_url($release,$addn);
+$addns[]="<a href=\"$url\">$addn</a>";
+}
+
+
+
+
+if(count($addons)){
+echo "Addons: ".join($addns,", ").".<br>";
+}else{
+echo "Addons: *** NO ADDONS FOUND *** <br>";
 }
 
 

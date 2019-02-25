@@ -26,6 +26,16 @@ $purl=patch_url($release,$pat);
 $pats[]=$purl;
 }
 
+$addons=addons($release,$v['code']);
+
+
+foreach($addons as $addn){
+$aurl=download_url($release,$addn);
+$addns[]=$aurl;
+}
+
+
+
 $dependances=dependances($release, $v['code']);
 
 $packagesdir="/var/cache/ulfs-packages";
@@ -64,6 +74,16 @@ echo "      fi\n";
 
 echo "#Downloading source package archive...\n";
 echo "wget --no-check-certificate -nc $url\n";
+
+
+if(count($addons)){
+echo "#Downloadning add-ons...\n";
+foreach ($addns as $addn){
+echo "wget --no-check-certificate -nc $addn\n";
+}
+}
+
+
 
 if(count($patches)){
 echo "#Downloadning patches...\n";
