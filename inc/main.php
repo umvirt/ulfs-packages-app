@@ -86,15 +86,26 @@ $x=file_exists("../downloads/$release/packages/Xorg/$file");
 if($x){
 return "http://umvirt.com/linux/downloads/$release/packages/Xorg/".$file;
 }
-
 $x=file_exists("../downloads/$release/packages/Xorg/lib/$file");
 //var_dump($x);
 if($x){
 return "http://umvirt.com/linux/downloads/$release/packages/Xorg/lib/".$file;
 }
 
-$dir=strtolower($file[0]);
-return "http://umvirt.com/linux/downloads/$release/packages/".$dir."/".$file;
+$x=file_exists("../downloads/$release/packages/Xorg/app/$file");
+//var_dump($x);
+if($x){
+return "http://umvirt.com/linux/downloads/$release/packages/Xorg/app/".$file;
+}
+
+$x=file_exists("../downloads/$release/packages/Xorg/font/$file");
+//var_dump($x);
+if($x){
+return "http://umvirt.com/linux/downloads/$release/packages/Xorg/font/".$file;
+}
+
+$dir=strtolower($file[0]); return 
+"http://umvirt.com/linux/downloads/$release/packages/".$dir."/".$file;
 
 }
 
