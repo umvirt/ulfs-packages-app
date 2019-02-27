@@ -71,10 +71,10 @@ echo "      fi\n";
 }
 
 
-
+if($v['sourcefile']){
 echo "#Downloading source package archive...\n";
 echo "wget --no-check-certificate -nc $url\n";
-
+}
 
 if(count($addons)){
 echo "#Downloadning add-ons...\n";
@@ -93,6 +93,7 @@ echo "wget --no-check-certificate -nc $pat\n";
 }
 
  
+if($v['sourcefile']){
 echo "#Extracting source package archive...\n";
 echo "tar -xf ".$v['sourcefile']."\n";
 echo "#Going to source package directory...\n";
@@ -105,6 +106,7 @@ echo "patch -Np1 -i ../$pat\n";
 }
 }
 
+}
 echo "#Running configuration script...\n";
 echo configuration_script($v['configure'])."\n";
 

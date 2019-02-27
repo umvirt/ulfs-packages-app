@@ -26,6 +26,7 @@ $s=$v['code'];
 
 echo "<h2>".$v['code']."</h2>";
 
+if($v['sourcefile']){
 $url=download_url($release, $v['sourcefile']);
 
 $link="<a href=$url>$url</a>";
@@ -36,6 +37,10 @@ echo "Source file: ".$v['sourcefile']."<br>";
 echo "Source directory: ".$v['sourcedir']."<br>";
 echo "Package URL: $link<br>";
 echo "Package md5-checksum URL: $linkmd5<br>";
+}else{
+echo "Codename: ".$v['code']."<br>";
+
+}
 
 $dependances=dependances($release, $v['code']);
 foreach($dependances as $dep){
