@@ -94,8 +94,15 @@ echo "wget --no-check-certificate -nc $pat\n";
 
  
 if($v['sourcefile']){
-echo "#Extracting source package archive...\n";
+if(preg_match("/zip$/",$v['sourcefile'])){
+echo "#Extracting zip source package archive...\n";
+echo "unzip ".$v['sourcefile']." -d ".$v['sourcedir']."\n";
+
+}else{
+echo "#Extracting tar source package archive...\n";
 echo "tar -xf ".$v['sourcefile']."\n";
+}
+
 echo "#Going to source package directory...\n";
 echo "cd ".$v['sourcedir']."\n";
 
