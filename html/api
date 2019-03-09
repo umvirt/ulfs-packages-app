@@ -1,0 +1,24 @@
+<h2>Application programming interface</h2>
+<p>In order to help maintainers in package operations "UmVirt LFS Packages" service is offering API.</p>
+<p>Everybody can execute comands via GET HTTP-requests via browser or other applications.</p>
+<h3>List of releases</h3>
+<p>To get list of releases just load one of followed URL:</p>
+<ul>
+<li><a href="https://umvirt.com/linux/packages/xml">https://umvirt.com/linux/packages/xml<a> - XML-format
+<li><a href="https://umvirt.com/linux/packages/json">https://umvirt.com/linux/packages/json</a> - JSON-format
+</ul>
+
+<h3>List of packages</h3>
+<p>To get list of all packages of specific release ("0.1" for example) just load one of followed URL:</p>
+<ul>
+<li><a href="https://umvirt.com/linux/packages/xml/0.1/">https://umvirt.com/linux/packages/xml/0.1/</a> - XML-format
+<li><a href="https://umvirt.com/linux/packages/json/0.1/">https://umvirt.com/linux/packages/json/0.1/</a> - JSON-format
+</ul>
+
+<h3>Package information</h3>
+<p>To get information about specific package ("wget" for example) in specific release ("0.1" for example) just load one of followed URL:</p>
+<ul>
+<li><a href="https://umvirt.com/linux/packages/xml/0.1/wget">https://umvirt.com/linux/packages/xml/0.1/wget</a> - XML-format
+<li><a href="https://umvirt.com/linux/packages/json/0.1/wget">https://umvirt.com/linux/packages/json/0.1/wget</a> - JSON-format
+</ul>
+

@@ -1,0 +1,59 @@
+<h2>How it works?</h2>
+<h3>Service Environment</h3>
+<p>Invironment is simple:
+<ul>
+<li>Arch: X86-64
+<li>OS: GNU/Linux
+<li>Web-server: Apache HTTPd + mod_rewrite
+<li>CGI: PHP7 + mysqli
+<li>Database-server: MariaDB (MySQL)
+</ul>
+</p>
+<h3>Service Web-application</h3>
+Application contain three parts:
+<ul>
+<li>Database
+<li>Site
+<li>File storage
+</ul>
+
+<h4>Database</h4>
+<p>Database is storage for all packages information: 
+<ol>
+<li>source package file (typicaly "%package_name%.tar.gz"), 
+<li>source package directory (directory with source package files, can be not trivial to define), 
+<li>patches (source code fixes which not included in package), 
+<li>addons (extra downloads, additional files), 
+<li>dependances (packages which chould be installed before), 
+<li>configure command(s) (typicaly "./configure --prefix=/usr"), 
+<li>build command(s) (typicaly "make"),
+<li>install commands(s) (typicaly "make install")
+</ol>
+</p>
+<p>In order to work with different versions of packages they splited on releases. Release is set of packages with specific versions. Version 0.1 contain packages of LFS v. 8.3.</p>
+<h4>File storage</h4>
+<p>All source packages are stored localy with splitting by releases.</p>
+<p>All packages files within release  directory are also splited by folders:
+<ul>
+<li>Xorg source packages
+<ul>
+<li>Xlibs
+<li>Xapps
+<li>Xfonts
+</ul>
+<li>Python modules
+<li>Perl modules
+<li>First lowcased character (digit/letter) of package folders (0,1,2...a,b,c,...z)
+</ul>
+</p>
+<h4>Site</h4>
+<p>Site is brain of application it get data from other aplication parts and produce HTML-pages, JSON-files, XML-files, and produce install scripts for packages.</p>
+
+<h3>Client environment</h3>
+<p>Client environment is Linux From Scratch with next assumptions:
+<ul>
+<li>Environment variable $XORG_PREFIX contain path to Xorg files. Defined according BLFS book.
+<li>It is allowed to write empty files with installed packages names in directory "/var/cache/ulfs-package".
+<li>Folder /sources exists. All operations with source packages is performed within this directory.
+</ul>
+</p>
