@@ -4,6 +4,6 @@ $db_config['user']='ulfs';
 $db_config['password']='secret';
 $db_config['server']='127.0.0.1';
 
-$config['packages_url']="https://umvirt.com/linux/packages";
-$config['downloads_url']="https://umvirt.com/linux/downloads";
+$config['packages_url']="https://umvirt.com/linux/packages/";
+$config['downloads_url']="https://umvirt.com/linux/downloads/";
 
