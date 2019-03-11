@@ -2,14 +2,18 @@
 
 include "inc/main.site.php";
 
+
+$release=@addslashes($_REQUEST['release']);
+
 echo "<h1>UmVirt LFS Packages</h1>";
 //var_dump($_SERVER);
+
+if(!$release){
 echo "<h2>About</h2>";
 echo "<p>Every GNU/Linux distro is provide software packages to install additional applications. Umvirt LFS is not exception.</p>";
 echo "<p>Main purpose of \"UmVirt LFS Packages\" service is package installing assistance. Linux from scratch is not typical distro where binary source packages offered to user. LFS offers source packages without compilation automation. User have to download, unpack, configure, build and install packages manualy.";
 echo "\"UmVirt LFS Packages\" service is help users to install packages and all it dependaces like in other distros.";
-$release=@addslashes($_REQUEST['release']);
-
+}
 
 $format=@addslashes($_REQUEST['format']);
 
@@ -156,7 +160,7 @@ foreach ($x as $k=>$v){
 
 $s=$v['code'];
 
-$pkgs[]="<tr><td><a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$v['code'].">".$s."</a></td><td>".$v['sourcefile']."</td></tr>";
+$pkgs[]="<tr><td>".$v['id']."</td><td><a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$v['code'].">".$s."</a></td><td>".$v['sourcefile']."</td></tr>";
 }
 
 echo "<h2>Packages(".count($x).")</h2>";
