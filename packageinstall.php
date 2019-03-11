@@ -39,14 +39,18 @@ $addns[]=$aurl;
 $dependances=dependances($release, $v['code']);
 
 $packagesdir="/var/cache/ulfs-packages";
-$installurl="https://umvirt.com/linux/packages";
+$installurl=$config['packages_url'];
 
 header("Content-type: text/plain");
 echo "#!/bin/bash\n";
-echo "#UMVIRT LINUX FROM SCRATCH\n";
-echo "#=========================\n";
-echo "#Compilation script\n";
-echo "#=========================\n\n";
+echo "#===========================\n";
+echo "# UMVIRT LINUX FROM SCRATCH\n";
+echo "#===========================\n";
+echo "# Compilation script\n";
+echo "#===========================\n";
+echo "# Release: $release\n";
+echo "# Package: $package\n";
+echo "#===========================\n\n";
 
 echo "#Going to source directory...\n";
 echo "cd /sources\n";

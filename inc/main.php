@@ -76,41 +76,43 @@ return $v;
 }
 
 function download_url($release,$file){
+global $config;
 $x=file_exists("../downloads/$release/packages/python-modules/$file");
 //var_dump($x);
 if($x){
-return "http://umvirt.com/linux/downloads/$release/packages/python-modules/".$file;
+return $config['downloads_url']."/$release/packages/python-modules/".$file;
 }
 $x=file_exists("../downloads/$release/packages/Xorg/$file");
 //var_dump($x);
 if($x){
-return "http://umvirt.com/linux/downloads/$release/packages/Xorg/".$file;
+return $config['downloads_url']."/$release/packages/Xorg/".$file;
 }
 $x=file_exists("../downloads/$release/packages/Xorg/lib/$file");
 //var_dump($x);
 if($x){
-return "http://umvirt.com/linux/downloads/$release/packages/Xorg/lib/".$file;
+return $config['downloads_url']."/$release/packages/Xorg/lib/".$file;
 }
 
 $x=file_exists("../downloads/$release/packages/Xorg/app/$file");
 //var_dump($x);
 if($x){
-return "http://umvirt.com/linux/downloads/$release/packages/Xorg/app/".$file;
+return $config['downloads_url']."/$release/packages/Xorg/app/".$file;
 }
 
 $x=file_exists("../downloads/$release/packages/Xorg/font/$file");
 //var_dump($x);
 if($x){
-return "http://umvirt.com/linux/downloads/$release/packages/Xorg/font/".$file;
+return $config['downloads_url']."/$release/packages/Xorg/font/".$file;
 }
 
 $dir=strtolower($file[0]); return 
-"http://umvirt.com/linux/downloads/$release/packages/".$dir."/".$file;
+$config['downloads_url']."/$release/packages/".$dir."/".$file;
 
 }
 
 function patch_url($release,$file){
-return "http://umvirt.com/linux/downloads/$release/patches/$file";
+global $config;
+return $config['downloads_url']."/$release/patches/$file";
 }
 
 function dependances($release,$package){

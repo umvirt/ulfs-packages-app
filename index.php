@@ -74,7 +74,7 @@ echo "Please select release to get packages list: ".join ($releases,', ');
 
 echo "<h2>How to install package?</h2>";
 echo "<p>To download, unpack, compile, build and install \"Midnight Commander\" package with all dependances just type:</p>
-<p><tt>wget --no-check-cerificate https://umvirt.com/linux/packages/0.1/mc/install -O - | bash</tt>
+<p><tt>wget --no-check-cerificate ".$config['packages_url']."/0.1/mc/install -O - | bash</tt>
 </p>";
 
 
