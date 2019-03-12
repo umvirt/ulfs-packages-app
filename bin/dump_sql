@@ -1,0 +1,38 @@
+#!/usr/bin/env php
+<?php
+include "../inc/main.php";
+
+function showct($table){
+global $db;
+$sql="show create table $table";
+
+$db->execute($sql);
+$x=$db->dataset;
+if(count($x)){
+//var_dump($x);
+foreach($x as $v){
+return $v["Create Table"].";";
+}
+}
+}
+
+$tables=array(
+'releases',
+'packages',
+'patches',
+'addons',
+'dependances',
+'commands'
+);
+
+$ct=array();
+
+$ct[]="set foreign_key_checks=0;";
+
+foreach ($tables as $v){
+$ct[]=showct($v);
+}
+
+$ct[]="set foreign_key_checks=1;";
+
+echo join($ct, "\n#SQLDELIMETER\n");

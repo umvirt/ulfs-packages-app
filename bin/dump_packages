@@ -1,0 +1,195 @@
+#!/usr/bin/env php
+<?php
+//==================
+//Export Packages DB
+//==================
+
+
+$shortopts  = "";
+$longopts  = array(
+"url:",
+"release:",
+"format:"
+);
+
+$options = getopt($shortopts, $longopts);
+//var_dump($options);
+/*
+$url="http://umvirt.com/linux/packages";
+$format="json";
+$release="0.1";
+*/
+
+
+
+$url=@$options["url"];
+$format=@$options["format"];
+$release=@$options["release"];
+$outdir="../tmp/$release";
+
+echo "UmVirt LFS Packages dumper\n\n";
+
+if(!$url | !$format | !$release){
+echo "USAGE:\n\n";
+echo "        $argv[0] --url=<instance_url> --release=<release> --format=<xml|json>\n\n";
+exit;
+}
+
+echo "Instance URL: $url\n";
+echo "Release: $release\n";
+echo "Format: $format\n\n";
+
+//exit;
+//Create directories
+mkdir($outdir);
+mkdir($outdir."/packages/");
+mkdir($outdir."/commands/");
+echo "Dumping packages info... ";
+$packages=file_get_contents("$url/packages/$format/$release");
+if(strlen($packages)){
+file_put_contents($outdir."/packages.".$format, $packages);
+echo "Ok\n\n";
+}else{
+echo "Error\n\n";
+exit;
+}
+
+echo "Dumping commands info... ";
+$commands=file_get_contents("$url/assistant/$format/$release");
+if(strlen($packages)){
+file_put_contents($outdir."/commands.".$format, $commands);
+echo "Ok\n\n";
+}else{
+echo "Error\n\n";
+exit;
+}
+
+echo "Dumping packages...\n";
+
+if($format=="xml"){
+$xpackages=simplexml_load_string ($packages);
+//var_dump($xpackages->packages->package);
+$c=0;
+
+$xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
+for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
+$package=$xmlIterator->current();
+
+echo "Dumping package \"$package\"... ";
+//foreach($xpackages->packages as $package){
+$data=file_get_contents("$url/packages/$format/$release/$package");
+if(strlen($data)){
+file_put_contents($outdir."/packages/$package.$format",$data);
+$c++;
+echo "Ok\n";
+sleep(1);
+}else{
+echo "Error\n";
+break;
+}
+}
+}
+
+if($format=="json"){
+$jpackages=json_decode($packages);
+$c=0;
+
+//echo $packages;
+//var_dump($jpackages);
+foreach($jpackages->packages as $package){
+echo "Dumping package \"$package\"... ";
+//foreach($xpackages->packages as $package){
+$data=file_get_contents("$url/packages/$format/$release/$package");
+if(strlen($data)){
+file_put_contents($outdir."/packages/$package.$format",$data);
+$c++;
+echo "Ok\n";
+sleep(1);
+}else{
+echo "Error\n";
+break;
+}
+}
+}
+
+if($format=="xml"){
+$count=$xpackages->packages->children()->count();
+}
+if($format=="json"){
+$count=count($jpackages->packages);
+}
+
+if($c<$count){
+$status="aborted";
+}else{
+$status="completed";
+}
+echo "\nDump $status: $c/$count packages.\n\n";
+
+
+#-------------
+echo "Dumping commands...\n";
+
+if($format=="xml"){
+$xcommands=simplexml_load_string ($commands);
+//var_dump($xcommands->commands->command);
+$c=0;
+
+$xmlIterator = new SimpleXMLIterator($xcommands->commands->asXML());
+for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
+$command=$xmlIterator->current();
+
+echo "Dumping command \"$command\"... ";
+//foreach($xpackages->packages as $package){
+$data=file_get_contents("$url/assistant/$format/$release/$command");
+if(strlen($data)){
+file_put_contents($outdir."/commands/$command.$format",$data);
+$c++;
+echo "Ok\n";
+sleep(1);
+}else{
+echo "Error\n";
+break;
+}
+}
+}
+
+if($format=="json"){
+$jcommands=json_decode($commands);
+$c=0;
+
+//echo $packages;
+//var_dump($jpackages);
+foreach($jcommands->commands as $command){
+echo "Dumping command \"$command\"... ";
+//foreach($xpackages->packages as $package){
+$data=file_get_contents("$url/assistant/$format/$release/$command");
+if(strlen($data)){
+file_put_contents($outdir."/commands/$command.$format",$data);
+$c++;
+echo "Ok\n";
+sleep(1);
+}else{
+echo "Error\n";
+break;
+}
+}
+}
+
+if($format=="xml"){
+$count=$xcommands->commands->children()->count();
+}
+if($format=="json"){
+$count=count($jcommands->commands);
+}
+
+if($c<$count){
+$status="aborted";
+}else{
+$status="completed";
+}
+echo "\nDump $status: $c/$count commands.\n\n";
+
+
+
+
