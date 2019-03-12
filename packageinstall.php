@@ -5,6 +5,11 @@ ob_end_clean();
 $release=@addslashes($_REQUEST['release']);
 $package=@addslashes($_REQUEST['package']);
 
+$localinstall=false;
+if(@$_REQUEST['type']=="local"){
+$localinstall=true;
+}
+
 $sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, build, install from packages p
 left join releases r on p.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
@@ -17,12 +22,17 @@ $x=$db->dataset;
 $pkgs=array();
 foreach ($x as $k=>$v){
 $url=download_url($release, $v['sourcefile']);
+$filepath=file_path($release, $v['sourcefile']);
 
 $patches=patches($release,$v['code']);
 
 
 foreach($patches as $pat){
+if($localinstall){
+$purl=patch_path($release,$pat);
+}else{
 $purl=patch_url($release,$pat);
+}
 $pats[]=$purl;
 }
 
@@ -30,7 +40,11 @@ $addons=addons($release,$v['code']);
 
 
 foreach($addons as $addn){
+if($localinstall){
+$aurl=file_path($release,$addn);
+}else{
 $aurl=download_url($release,$addn);
+}
 $addns[]=$aurl;
 }
 
@@ -40,13 +54,20 @@ $dependances=dependances($release, $v['code']);
 
 $packagesdir="/var/cache/ulfs-packages";
 $installurl=$config['packages_url'];
+$localpath=$config['localpath'];
+
+$mode="Network mode.";
+if($localinstall){
+$mode="Local mode.";
+}
 
 header("Content-type: text/plain");
 echo "#!/bin/bash\n";
 echo "#===========================\n";
-echo "# UMVIRT LINUX FROM SCRATCH\n";
+echo "# UMVIRT LINUX FROM SCRATCH \n";
 echo "#===========================\n";
-echo "# Compilation script\n";
+echo "# Compilation script.\n" ;
+echo "# $mode \n";
 echo "#===========================\n";
 echo "# Release: $release\n";
 echo "# Package: $package\n";
@@ -63,7 +84,11 @@ foreach($dependances as $dep){
 echo "      #Checking $dep...\n";
 echo "      if [ ! -f $packagesdir/$dep ]; then\n";
 echo "           echo \"Dependance \\\"$dep\\\" not found. Trying to install...\";\n";
+if($localinstall){
+echo "           cat $localpath/packages/$release/$dep.sh -O - | bash\n";
+}else{
 echo "           wget --no-check-certificate $installurl/$release/$dep/install -O - | bash\n";
+}
 echo "           if [ ! -f $packagesdir/$dep ]; then\n";
 echo "	             echo \"Dependance \\\"$dep\\\" is not installed. Exiting...\"\n";
 echo "               exit\n";
@@ -76,23 +101,40 @@ echo "      fi\n";
 
 
 if($v['sourcefile']){
+if($localinstall){
+echo "#Copying source package archive...\n";
+echo "cp $filepath . \n";
+}else{
 echo "#Downloading source package archive...\n";
 echo "wget --no-check-certificate -nc $url\n";
 }
+}
 
 if(count($addons)){
-echo "#Downloadning add-ons...\n";
 foreach ($addns as $addn){
+if($localinstall){
+echo "#Copying add-ons...\n";
+echo "cp $addn .\n";
+}else{
+echo "#Downloadning add-ons...\n";
 echo "wget --no-check-certificate -nc $addn\n";
+}
 }
 }
 
 
 
 if(count($patches)){
-echo "#Downloadning patches...\n";
 foreach ($pats as $pat){
+if($localinstall){
+echo "#Copying patches...\n";
+echo "cp $pat .\n";
+
+}else{
+echo "#Downloadning patches...\n";
 echo "wget --no-check-certificate -nc $pat\n";
+}
+
 }
 }
 
