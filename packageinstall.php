@@ -53,6 +53,7 @@ $addns[]=$aurl;
 $dependances=dependances($release, $v['code']);
 
 $packagesdir="/var/cache/ulfs-packages";
+$packagelogdir="/var/log/ulfs-packages/".$package."/";
 $installurl=$config['packages_url'];
 $localpath=$config['localpath'];
 
@@ -73,6 +74,11 @@ echo "# Release: $release\n";
 echo "# Package: $package\n";
 echo "#===========================\n\n";
 
+
+echo "#Creating log directory\n";
+echo "mkdir -p $packagelogdir\n";
+echo "#Saving start timestamp\n";
+echo "date +%s > ".$packagelogdir."start.time\n";
 echo "#Going to source directory...\n";
 echo "cd /sources\n";
 
@@ -99,8 +105,9 @@ echo "      fi\n";
 }
 }
 
-
 if($v['sourcefile']){
+echo "#Saving downloading timestamp\n";
+echo "date +%s > ".$packagelogdir."download.time\n";
 if($localinstall){
 echo "#Copying source package archive...\n";
 echo "cp $filepath . \n";
@@ -138,8 +145,10 @@ echo "wget --no-check-certificate -nc $pat\n";
 }
 }
 
- 
 if($v['sourcefile']){
+echo "#Saving extracting timestamp\n";
+echo "date +%s > ".$packagelogdir."unpack.time\n";
+
 if(preg_match("/zip$/",$v['sourcefile'])){
 echo "#Extracting zip source package archive...\n";
 echo "unzip ".$v['sourcefile']." -d ".$v['sourcedir']."\n";
@@ -160,18 +169,31 @@ echo "patch -Np1 -i ../$pat\n";
 }
 
 }
+echo "#Saving configuration timestamp\n";
+echo "date +%s > ".$packagelogdir."configure.time\n";
+
 echo "#Running configuration script...\n";
 echo configuration_script($v['configure'])."\n";
 
+echo "#Saving build timestamp\n";
+echo "date +%s > ".$packagelogdir."build.time\n";
+
 echo "#Running build script...\n";
 echo build_script($v['build'])."\n";
+
+echo "#Saving install timestamp\n";
+echo "date +%s > ".$packagelogdir."install.time\n";
 
 echo "#Running install script...\n";
 echo install_script($v['install'])."\n";
 
 echo "#Marking package as installed...\n";
 echo "mkdir -p $packagesdir\n";
-echo "touch $packagesdir/".$v['code'];
+echo "touch $packagesdir/".$v['code']."\n";
+
+echo "#Saving finish timestamp\n";
+echo "date +%s > ".$packagelogdir."finish.time\n";
+
 
 /*
 $s=$v['code'];
