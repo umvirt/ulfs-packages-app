@@ -110,22 +110,74 @@ echo "#Saving downloading timestamp\n";
 echo "date +%s > ".$packagelogdir."download.time\n";
 if($localinstall){
 echo "#Copying source package archive...\n";
+echo "cp $filepath.md5sum . \n";
 echo "cp $filepath . \n";
+
 }else{
 echo "#Downloading source package archive...\n";
+echo "wget --no-check-certificate -nc $url.md5sum\n";
 echo "wget --no-check-certificate -nc $url\n";
 }
+
+
+echo "#Checking source package file existance\n";
+echo "if [ ! -f ".$v['sourcefile']." ]; then\n";
+echo "echo \"Error: Can't find ".$v['sourcefile'].". Exiting!\"\n";
+echo "exit\n";
+echo "fi\n";
+
+
+echo "#Checking source package file checksum\n";
+echo "if [ -f ".$v['sourcefile'].".md5sum ]; then\n";
+echo "    MD5=`LANG=C md5sum -c ".$v['sourcefile'].".md5sum | grep OK`\n";
+echo "    if [ \"\$MD5\" == \"\" ] ; then\n";
+echo "    echo \"Error: Checksum of ".$v['sourcefile']." is wrong. Exiting!\"\n";
+echo "    exit\n";
+echo "    fi\n";
+echo "fi\n";
+
+
+
+
 }
 
 if(count($addons)){
-foreach ($addns as $addn){
+
 if($localinstall){
 echo "#Copying add-ons...\n";
-echo "cp $addn .\n";
 }else{
 echo "#Downloadning add-ons...\n";
+}
+
+foreach ($addns as $addn){
+$addfile=basename($addn);
+
+if($localinstall){
+echo "#Copying add-on \"$addfile\"...\n";
+echo "cp $addn.md5sum .\n";
+echo "cp $addn .\n";
+}else{
+echo "#Downloadning add-on  \"$addfile\"...\n";
+echo "wget --no-check-certificate -nc $addn.md5sum\n";
 echo "wget --no-check-certificate -nc $addn\n";
 }
+
+echo "#Checking addon file existance\n";
+echo "if [ ! -f $addfile ]; then\n";
+echo "echo \"Error: Can't find $addfile. Exiting!\"\n";
+echo "exit\n";
+echo "fi\n";
+
+
+echo "#Checking add-on file checksum\n";
+echo "if [ -f $addfile.md5sum ]; then\n";
+echo "    MD5=`LANG=C md5sum -c $addfile.md5sum | grep OK`\n";
+echo "    if [ \"\$MD5\" == \"\" ] ; then\n";
+echo "    echo \"Error: Checksum of $addfile is wrong. Exiting!\"\n";
+echo "    exit\n";
+echo "    fi\n";
+echo "fi\n";
+
 }
 }
 
