@@ -239,14 +239,18 @@ echo "date +%s > ".$packagelogdir."install.time\n";
 echo "#Running install script...\n";
 echo install_script($v['install'])."\n";
 
+echo "#Saving finish timestamp\n";
+echo "date +%s > ".$packagelogdir."finish.time\n";
+
+echo "#Producing files list\n";
+echo "find / -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time > ".$packagelogdir."files.txt\n";
+
 echo "#Marking package as installed...\n";
 echo "mkdir -p $packagesdir\n";
 echo "touch $packagesdir/".$v['code']."\n";
 
-echo "#Saving finish timestamp\n";
-echo "date +%s > ".$packagelogdir."finish.time\n";
 
-
+echo "\n#End of script\n";
 /*
 $s=$v['code'];
 
