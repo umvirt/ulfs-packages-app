@@ -140,17 +140,23 @@ return $basepath."$release/patches/$file";
 
 function dependances($release,$package){
 global $db;
-$sql="select dp.code, dd.code dependance from dependances d
+$sql="select dp.code, dd.code dependance, d.weight from dependances d
 inner join packages dp on d.package=dp.id
 inner join packages dd on d.dependance=dd.id 
 inner join `releases` r on r.id=dp.release 
-where dp.code=\"$package\" and r.release=\"$release\"";
+where dp.code=\"$package\" and r.release=\"$release\"
+
+order by d.weight
+";
 //var_dump($sql);
 $db->execute($sql);
 $deps=array();
 $x=$db->dataset;
 foreach($x as $k=>$v){
-	$deps[]=$v['dependance'];
+	$deps[]=array(
+	"code"=>$v['dependance'],
+	"weight"=>$v['weight']
+	);
 }
 return $deps;
 

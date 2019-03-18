@@ -44,7 +44,7 @@ echo "Codename: ".$v['code']."<br>";
 
 $dependances=dependances($release, $v['code']);
 foreach($dependances as $dep){
-$depends[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$dep.">$dep</a>";
+$depends[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$dep['code'].">".$dep['code']."</a>";
 }
 
 

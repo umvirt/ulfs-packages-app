@@ -86,7 +86,8 @@ echo "cd /sources\n";
 
 if(count($dependances)){
 echo "#Checking dependances...\n";
-foreach($dependances as $dep){
+foreach($dependances as $dependance){
+$dep=$dependance['code'];
 echo "      #Checking $dep...\n";
 echo "      if [ ! -f $packagesdir/$dep ]; then\n";
 echo "           echo \"Dependance \\\"$dep\\\" not found. Trying to install...\";\n";

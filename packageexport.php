@@ -66,7 +66,9 @@ $root->appendChild($install);
 //test: mc
 $dependances_element = $dom->createElement('dependances');
 foreach($dependances as $dep){
-	$dependance_element=$dom->createElement('dependance',$dep);
+	$dependance_element=$dom->createElement('dependance');
+$dependance_element->appendChild($dom->createElement('code',$dep['code']));
+$dependance_element->appendChild($dom->createElement('weight',$dep['weight']));
 	$dependances_element->appendChild($dependance_element);
 }
 $root->appendChild($dependances_element);
