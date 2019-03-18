@@ -54,6 +54,7 @@ exit;
 
 if($format=="xml"){
 $dom = new DOMDocument('1.0', 'utf-8');
+$dom->formatOutput=true;
 $root = $dom->createElement('ulfspackages');
 $releases_element = $dom->createElement('releases');
 $result=array();
@@ -137,6 +138,7 @@ exit;
 
 if($format=="xml"){
 $dom = new DOMDocument('1.0', 'utf-8');
+$dom->formatOutput=true;
 $root = $dom->createElement('packages');
 $release_element = $dom->createElement('release',$release);
 $root->appendChild($release_element);
