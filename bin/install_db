@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+include "../inc/main.php";
+$data=file_get_contents('../sql/database.sql');
+//echo $data;
+$sql=explode ("\n#SQLDELIMETER\n", $data);
+
+foreach($sql as $v){
+echo "Executing SQL query: $v\n";
+$db->execute($v);
+if($db->error){
+echo "Error: ".$db->error."\n";
+}
+}
