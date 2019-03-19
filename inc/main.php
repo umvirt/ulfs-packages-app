@@ -146,7 +146,7 @@ inner join packages dd on d.dependance=dd.id
 inner join `releases` r on r.id=dp.release 
 where dp.code=\"$package\" and r.release=\"$release\"
 
-order by d.weight
+order by d.weight, d.dependance
 ";
 //var_dump($sql);
 $db->execute($sql);
