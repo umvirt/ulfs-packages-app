@@ -252,7 +252,7 @@ echo "#Saving finish timestamp\n";
 echo "date +%s > ".$packagelogdir."finish.time\n";
 
 echo "#Producing files list\n";
-echo "find / -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time > ".$packagelogdir."files.txt\n";
+echo "find / -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time | grep \"^/bin/\\|/usr/\\|^/etc/\\|^/opt/\" > ".$packagelogdir."files.txt\n";
 
 echo "#Marking package as installed...\n";
 echo "mkdir -p $packagesdir\n";
