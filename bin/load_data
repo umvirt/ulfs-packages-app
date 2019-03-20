@@ -1,0 +1,382 @@
+#!/usr/bin/env php
+<?php
+//==================
+//Data Loader
+//==================
+
+include "../inc/main.php";
+
+$shortopts  = "";
+$longopts  = array(
+"path:",
+"release:",
+"format:"
+);
+
+class CMD{
+public $name;
+public $commands;
+public $info;
+}
+
+class PKG{
+public $code;
+public $sourcefile;
+public $sourcedir;
+public $configure;
+public $build;
+public $install;
+public $dependances;
+public $patches;
+public $addons;
+
+};
+
+
+
+$options = getopt($shortopts, $longopts);
+//var_dump($options);
+/*
+$url="http://umvirt.com/linux/packages";
+$format="json";
+$release="0.1";
+*/
+
+
+
+$path=@$options["path"];
+$format=@$options["format"];
+$release=@$options["release"];
+$outdir="../tmp/$release";
+
+echo "UmVirt LFS Packages data loader\n\n";
+
+if(!$path | !$format | !$release){
+echo "USAGE:\n\n";
+echo "        $argv[0] --path=<dump_path> --release=<release> --format=<xml|json>\n\n";
+exit;
+}
+
+echo "Packages path: $path\n";
+echo "Release: $release\n";
+echo "Format: $format\n\n";
+
+
+
+//Commands proccessing
+echo "Reading commands info... ";
+$csfile=@file_get_contents("$path/commands.$format");
+if(strlen($csfile)){
+
+if($format=="xml"){
+$xcommands=simplexml_load_string ($csfile);
+//var_dump($xpackages->commands->command);
+$c=0;
+
+$xmlIterator = new SimpleXMLIterator($xcommands->commands->asXML());
+for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
+$commands[]=$xmlIterator->current()->__toString();
+//break;
+}
+
+}
+
+//file_put_contents($outdir."/packages.".$format, $packages);
+echo "Ok\n\n";
+}else{
+echo "Error\n\n";
+exit;
+}
+
+
+//var_dump($commands);
+
+
+
+//exit;
+
+//Packages proccessing
+echo "Reading packages info... ";
+$psfile=@file_get_contents("$path/packages.$format");
+if(strlen($psfile)){
+
+if($format=="xml"){
+$xpackages=simplexml_load_string ($psfile);
+//var_dump($xpackages->packages->package);
+$c=0;
+
+$xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
+for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
+$packages[]=$xmlIterator->current()->__toString();
+//break;
+}
+
+}
+
+//file_put_contents($outdir."/packages.".$format, $packages);
+echo "Ok\n\n";
+}else{
+echo "Error\n\n";
+exit;
+}
+
+
+//var_dump($packages);
+//exit;
+
+echo "Creating release...";
+
+
+$sql[]="insert into releases (`release`) value (\"$release\")";
+$sql[]="select @@identity";
+$db->execute($sql);
+$release_id=$db->dataset[0]['@@identity'];
+
+if($release_id){
+echo "Ok\n\n";
+}else{
+echo "Error\n\n";
+exit;
+}
+
+
+
+foreach($commands as $command){
+$cfilename="$path/commands/$command.$format";
+$cfile=file_get_contents($cfilename);
+echo "Processing file \"$cfilename\"...\n";
+if(strlen($cfile)){
+
+
+if($format=="xml"){
+$xcommand=simplexml_load_string ($cfile);
+$obj=new CMD();
+
+$obj->name=$xcommand->name->__toString();
+$obj->commands=base64_decode($xcommand->commands->__toString());
+$obj->info=base64_decode($xcommand->info->__toString());
+
+
+$objs[]=$obj;
+
+}
+
+}
+
+}
+
+
+
+
+echo "Loaded ".count($objs)."/".count($commands)." packages.\n\n";
+
+
+echo "Creating commands...\n\n";
+
+
+foreach($objs as $obj){
+
+
+echo "Creating command \"$obj->name\"... ";
+$sql=array();
+$sql[]="insert into commands (name,`release`,commands,info)
+values (
+\"$obj->name\",
+\"$release_id\",
+\"".addslashes($obj->commands)."\",
+\"".addslashes($obj->info)."\"
+)";
+
+
+$sql[]="select @@identity";
+$db->execute($sql);
+$obj->id=$db->dataset[0]['@@identity'];
+
+
+if($obj->id){
+echo "Ok\n";
+}else{
+echo "Error\n";
+exit;
+}
+
+}
+
+
+
+
+
+//exit;
+
+
+$objs=array();
+
+foreach($packages as $package){
+$pfilename="$path/packages/$package.$format";
+$pfile=file_get_contents($pfilename);
+echo "Processing file \"$pfilename\"...\n";
+if(strlen($pfile)){
+
+
+if($format=="xml"){
+$xpackage=simplexml_load_string ($pfile);
+$obj=new PKG();
+
+$obj->code=$xpackage->code->__toString();
+$obj->sourcefile=$xpackage->sourcefile->__toString();
+$obj->sourcedir=$xpackage->sourcedir->__toString();
+$obj->configure=base64_decode($xpackage->configure->__toString());
+$obj->build=base64_decode($xpackage->build->__toString());
+$obj->install=base64_decode($xpackage->install->__toString());
+$obj->addons=array();
+$obj->patches=array();
+$obj->dependances=array();
+
+
+//addons
+$xmlIterator2 = new SimpleXMLIterator($xpackage->addons->asXML());
+for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
+$obj->addons[]=$xmlIterator2->current()->__toString();
+}
+
+//patches
+$xmlIterator2 = new SimpleXMLIterator($xpackage->patches->asXML());
+for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
+$obj->patches[]=$xmlIterator2->current()->__toString();
+}
+
+//dependaces
+$xmlIterator2 = new SimpleXMLIterator($xpackage->dependances->asXML());
+$w=0;
+for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
+$w++;
+$obj->dependances[]=array("code"=>$xmlIterator2->current()->code->__toString(), "weight"=>$w);
+}
+
+
+$objs[]=$obj;
+
+
+//var_dump($xpackage, $obj);
+//break;
+}
+}
+}
+
+echo "Loaded ".count($objs)."/".count($packages)." packages.\n\n";
+
+
+echo "Creating packages...\n\n";
+
+
+foreach($objs as $obj){
+
+
+echo "Creating package \"$obj->code\"... ";
+$sql=array();
+$sql[]="insert into packages (code,`release`,sourcefile,sourcedir,configure,build,install)
+values (
+\"$obj->code\",
+\"$release_id\",
+\"$obj->sourcefile\",
+\"$obj->sourcedir\",
+\"".addslashes($obj->configure)."\",
+\"".addslashes($obj->build)."\",
+\"".addslashes($obj->install)."\"
+)";
+
+
+$sql[]="select @@identity";
+$db->execute($sql);
+$obj->id=$db->dataset[0]['@@identity'];
+
+$pkg_ids[$obj->code]=$obj->id;
+
+if($obj->id){
+echo "Ok\n";
+}else{
+echo "Error\n";
+exit;
+}
+
+
+
+}
+
+
+echo "\nCreating dependances:\n\n";
+foreach($objs as $obj){
+echo "Creating dependances for package \"$obj->code\"... ";
+$c=0;
+$sql=array();
+foreach($obj->dependances as $dep){
+$c++;
+$sql[]="insert into dependances (package,dependance,weight) values (
+".$obj->id.",
+".$pkg_ids[$dep['code']].",
+$c)";
+$db->execute($sql);
+//var_dump($db->error);
+}
+
+
+if(!$db->error){
+echo "Ok\n";
+}else{
+echo "Error: $db->error\n";
+exit;
+}
+
+}
+
+echo "\nCreating patches:\n\n";
+foreach($objs as $obj){
+echo "Creating patches for package \"$obj->code\"... ";
+
+$sql=array();
+foreach($obj->patches as $patch){
+$c++;
+$sql[]="insert into patches (package,filename) values (
+".$obj->id.",
+\"".$patch."\")";
+$db->execute($sql);
+//var_dump($db->error);
+}
+
+if(!$db->error){
+echo "Ok\n";
+}else{
+echo "Error: $db->error\n";
+exit;
+}
+
+}
+
+
+
+echo "\nCreating addons:\n\n";
+foreach($objs as $obj){
+echo "Creating addons for package \"$obj->code\"... ";
+
+$sql=array();
+foreach($obj->addons as $addon){
+$c++;
+$sql[]="insert into addons (package,filename) values (
+".$obj->id.",
+\"".$addon."\")";
+$db->execute($sql);
+//var_dump($db->error);
+}
+
+if(!$db->error){
+echo "Ok\n";
+}else{
+echo "Error: $db->error\n";
+exit;
+}
+
+}
+
+
+//var_dump($release_id);
+

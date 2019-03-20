@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 //==================
-//Export Packages DB
+//Data Dumper
 //==================
 
 
@@ -27,7 +27,7 @@ $format=@$options["format"];
 $release=@$options["release"];
 $outdir="../tmp/$release";
 
-echo "UmVirt LFS Packages dumper\n\n";
+echo "UmVirt LFS Packages data dumper\n\n";
 
 if(!$url | !$format | !$release){
 echo "USAGE:\n\n";
