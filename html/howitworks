@@ -49,7 +49,8 @@ Application contain three parts:
 <h4>Site</h4>
 <p>Site is brain of application it get data from other aplication parts and produce HTML-pages, JSON-files, XML-files, and produce install scripts for packages.</p>
 
-<h3>Client environment</h3>
+<h2>Client</h2>
+<h3>Environment</h3>
 <p>Client environment is Linux From Scratch with next assumptions:
 <ul>
 <li>Environment variable $XORG_PREFIX contain path to Xorg files. Defined according BLFS book.
@@ -57,3 +58,77 @@ Application contain three parts:
 <li>Folder /sources exists. All operations with source packages is performed within this directory.
 </ul>
 </p>
+<h3>Directory Structure</h3>
+<pre>
+/sources
+	.cleanup
+
+/var
+	cache/
+		ulfs-packages/
+			%packagename%
+	log/
+		ulfs-packages/
+			%packagename%/
+				start.time
+				download.time
+				[cleanup.time]
+				unpack.time
+				configure.time
+				build.time
+				install.time
+				finish.time
+
+				files.txt
+</pre>
+
+<h4>/sources/</h4>
+
+<p>This directory is used to store source packages archives and directories.</p>
+<p>.cleanup - empty file which force directory remove before unpacking source package. </p>
+
+<h4>/var/cache/ulfs-packages/</h4>
+
+<p>This directory is used as database of installed packages. </p>
+<p>%packagename% - Each empty file represent package with same name.</p>
+
+<p>Installation script check file existance to make decission to install dependances or not.
+If file was deleted installation script perform it reinstallation.</p>
+
+<h4>/var/log/ulfs-packages/</h4>
+<p>This directory used to store information about source packages installation proccess.</p>
+<p>%packagename%/ - Each folder represent package with same name.</p>
+
+<p>Timestamp files used for search installed files and can be used for profiling:
+<ul>
+<li>start.time - timestamp recieved before start. 
+<li>download.time - timestamp recieved before download.
+<li>[cleanup.time]	-	timestamp recieved before directory cleanup. Optional.
+<li>unpack.time	- timestamp recieved before unpacking and patching
+<li>configure.time - timestamp recieved before configuration
+<li>build.time - timestamp recieved before build
+<li>install.time - timestamp recieved before installation
+<li>finish.time - timestamp recieved before finish
+</ul>
+</p>
+
+<p>files.txt - list of installed files</p>
+
+
+<h3>Autonomous installation Directory Structure</h3>
+<pre>
+/mnt/umvirt/
+	files/
+		packages/
+	packages/
+		%packagename%.sh
+</pre>
+
+<p>/mnt/umvirt/ - directory or symlink to directory which contain local installation data</p>
+
+<p>files/ - directory which contain umvirt lfs files</p>
+<p>files/packages/ - directory which contain source package repository</p>
+
+<p>packages/ - directory which contain installation scripts.</p>
+<p>packages/%packagename%.sh - each file represent package with same name.</p>
+

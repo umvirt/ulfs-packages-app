@@ -10,7 +10,7 @@ echo "<h1>UmVirt LFS Packages</h1>";
 
 if(!$release){
 echo "<h2>About</h2>";
-echo "<p>Every GNU/Linux distro is provide software packages to install additional applications. Umvirt LFS is not exception.</p>";
+echo "<p>Every GNU/Linux distro is provide software packages to install additional applications. <a href=\"//umvirt.com/linux/\">UmVirt LFS</a> is not exception.</p>";
 echo "<p>Main purpose of \"UmVirt LFS Packages\" service is package installing assistance. Linux from scratch is not typical distro where binary source packages offered to user. LFS offers source packages without compilation automation. User have to download, unpack, configure, build and install packages manualy.";
 echo "\"UmVirt LFS Packages\" service is help users to install packages and all it dependaces like in other distros.";
 }
@@ -77,23 +77,27 @@ echo "<h2>How to install package?</h2>";
 echo "<p>To download, unpack, compile, build and install \"Midnight Commander\" package with all dependances just type:</p>
 <p><tt>wget --no-check-cerificate ".$config['packages_url']."0.1/mc/install -O - | bash</tt>
 </p>";
-
+echo "<p><b>Tip:</b> <i>To simplify this string you can use <a href=\"//umvirt.com/linux/assistant\">UmVirt LFS Assistant</a>!</i></p>";
 
 
 echo "<h2>How to remove package?</h2>";
 echo "<p>No way. You can't remove packages. Imagine Android smartphone, router or other device with Linux firmware. You cant remove installed packages directly, only firmware entirely.</p>";
-echo "<p>Warning: Manual deletion of files can cause errors and system damage!</p>";
+echo "<p><b>Warning</b>: <i>Manual deletion of files can cause errors and system damage!</i></p>";
 
 
 echo "<h2>See also</h2>";
 echo "<ol>
 <li><a href=\"howitworks.html\">How it works?</a>
+<li><a href=\"howtofork.html\">How to fork?</a>
 <li><a href=\"api.html\">Application Programming interface (API)</a>
 </ol>";
 
+echo "<h2>Contacts</h2>
+<p>WWW:   <a href=http://umvirt.com/linux/packages>http://umvirt.com/linux/packages/</a>
+<br>Email: <a href=mailto:dev@umvirt.com>dev@umvirt.com</a></p>";
 
 echo  <<<EOL
-<h3>Keep this service working</h3>
+<h2>Keep this service working</h2>
 <p>We rent a physical servers in order to host our services. We need money to keep they working.</p> 
 <p>If you like to use our services please donate us some money as many as you wish.</p>
 <ul>

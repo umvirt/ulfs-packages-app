@@ -1,0 +1,33 @@
+<h2>How to fork</h2>
+<h3>Downloading</h3>
+<p>As other projects of UmVirt Development Team sources of UmVirt LFS Package Service stored in our 
+own <a href="/umvirt.com/cgit/">git repo storage</a>.</p>
+<p>First of all get sources of followed repositories via git/http.
+<ol>
+<li>ulfs-packages-app
+<li>ulfs-packages-assistant
+<li>ulfs-packages-database
+</ol>
+</p>
+<p>For example: you can use commands:</p>
+<p><tt> 
+git clone git://umvirt.com/ulfs-packages-app packages
+<br>git clone git://umvirt.com/ulfs-packages-assistant assistant
+<br>git clone git://umvirt.com/ulfs-packages-database
+</tt></p>
+<p>or</p>
+<p><tt>
+git clone http://umvirt.com/git/ulfs-packages-app packages
+<br>git clone http://umvirt.com/git/ulfs-packages-assistant assistant
+<br>git clone http://umvirt.com/git/ulfs-packages-database
+</tt></p>
+<h3>Installation</h3>
+<ol>
+<li>Deploy Linux+MySQL+PHP Web-server
+<li>Create database.
+<li>Place packages and assistant folders on one hierarchy level within one folder.
+<li>Create config.php files in inc directory of package and assistant and edit it according your needs.
+<li>Install database structure by running install_db script in bin directory of packages folder.
+<li>Load data from ulfs-packages-database directory  by running load_data script in bin directory of packages folder.
+<p><tt>./load_data --path=%path_to_ulfs-packages-database_folder% --release=0.1 --format=xml</tt></p>
+</ol>

@@ -4,7 +4,7 @@ include "inc/main.site.php";
 
 echo "<h1>UmVirt LFS Packages</h1>";
 $pages=array(
-"api","howitworks"
+"api","howitworks","howtofork"
 );
 $page=@$_REQUEST['page'];
 if(in_array($page,$pages)){
