@@ -92,7 +92,7 @@ echo "      #Checking $dep...\n";
 echo "      if [ ! -f $packagesdir/$dep ]; then\n";
 echo "           echo \"Dependance \\\"$dep\\\" not found. Trying to install...\";\n";
 if($localinstall){
-echo "           cat $localpath/packages/$release/$dep.sh -O - | bash\n";
+echo "           cat $localpath/packages/$release/$dep.sh | bash\n";
 }else{
 echo "           wget --no-check-certificate $installurl/$release/$dep/install -O - | bash\n";
 }
