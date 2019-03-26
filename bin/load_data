@@ -78,6 +78,16 @@ for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
 $commands[]=$xmlIterator->current()->__toString();
 //break;
 }
+}
+if($format=="json"){
+$jcommands=json_decode($csfile);
+//var_dump($xpackages->commands->command);
+$c=0;
+foreach ($jcommands->commands as $jcommand){
+$commands[]=$jcommand;
+}
+
+
 
 }
 
@@ -110,9 +120,18 @@ for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
 $packages[]=$xmlIterator->current()->__toString();
 //break;
 }
+}
+if($format=="json"){
+$jpackages=json_decode($psfile);
+//var_dump($xpackages->packages->package);
+$c=0;
 
+foreach ($jpackages->packages as $jpackage){
+$packages[]=$jpackage;
 }
 
+
+}
 //file_put_contents($outdir."/packages.".$format, $packages);
 echo "Ok\n\n";
 }else{
@@ -121,7 +140,7 @@ exit;
 }
 
 
-//var_dump($packages);
+//var_dump($packages,$commands);
 //exit;
 
 echo "Creating release...";
@@ -163,12 +182,29 @@ $objs[]=$obj;
 
 }
 
+if($format=="json"){
+$jcommand=json_decode ($cfile);
+$obj=new CMD();
+
+$obj->name=$jcommand->name;
+$obj->commands=base64_decode($jcommand->commands);
+$obj->info=base64_decode($jcommand->info);
+
+
+$objs[]=$obj;
+
 }
 
 
 
 
-echo "Loaded ".count($objs)."/".count($commands)." packages.\n\n";
+
+}
+
+
+
+
+echo "Loaded ".count($objs)."/".count($commands)." commands.\n\n";
 
 
 echo "Creating commands...\n\n";
@@ -259,8 +295,47 @@ $objs[]=$obj;
 
 //var_dump($xpackage, $obj);
 //break;
+
+}
+
+if($format=="json"){
+$jpackage=json_decode($pfile);
+$obj=new PKG();
+
+$obj->code=$jpackage->code;
+$obj->sourcefile=$jpackage->sourcefile;
+$obj->sourcedir=$jpackage->sourcedir;
+$obj->configure=base64_decode($jpackage->configure);
+$obj->build=base64_decode($jpackage->build);
+$obj->install=base64_decode($jpackage->install);
+$obj->addons=array();
+$obj->patches=array();
+$obj->dependances=array();
+
+foreach ($jpackage->addons as $jaddon){
+$obj->addons[]=$jaddon;
+}
+
+foreach ($jpackage->patches as $jpatch){
+$obj->patches[]=$jpatch;
+}
+
+$w=0;
+foreach ($jpackage->dependances as $jdep){
+$w++;
+$obj->dependances[]=array("code"=>$jdep->code,"weight"=>$w);
+}
+
+//var_dump($jpackage,$obj);
+//exit;
+
+$objs[]=$obj;
+
+
 }
 }
+
+
 }
 
 echo "Loaded ".count($objs)."/".count($packages)." packages.\n\n";
