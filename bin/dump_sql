@@ -11,7 +11,14 @@ $x=$db->dataset;
 if(count($x)){
 //var_dump($x);
 foreach($x as $v){
-return $v["Create Table"].";";
+
+$ct=$v["Create Table"];
+$string ='A AUTO_INCREMENT=100 B';
+$pattern = '/AUTO_INCREMENT=(\d+)/i';
+$replacement = '';
+$ct=preg_replace($pattern, $replacement, $ct);
+
+return $ct.";";
 }
 }
 }
