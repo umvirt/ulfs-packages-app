@@ -94,6 +94,11 @@ $x=file_exists("../downloads/$release/packages/python-modules/$file");
 if($x){
 return $basepath."$release/packages/python-modules/".$file;
 }
+$x=file_exists("../downloads/$release/packages/perl-modules/$file");
+//var_dump($x);
+if($x){
+return $basepath."$release/packages/perl-modules/".$file;
+}
 $x=file_exists("../downloads/$release/packages/Xorg/$file");
 //var_dump($x);
 if($x){
