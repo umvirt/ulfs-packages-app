@@ -13,6 +13,7 @@ CREATE TABLE `packages` (
   `release` int(10) unsigned NOT NULL,
   `sourcefile` varchar(255) CHARACTER SET latin1 NOT NULL,
   `sourcedir` varchar(255) CHARACTER SET latin1 NOT NULL,
+  `unpack` varchar(1024) NOT NULL,
   `configure` varchar(10240) CHARACTER SET latin1 NOT NULL,
   `build` varchar(10240) CHARACTER SET latin1 NOT NULL,
   `install` varchar(10240) CHARACTER SET latin1 NOT NULL,

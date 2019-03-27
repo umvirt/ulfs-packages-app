@@ -7,7 +7,7 @@ $package=@addslashes($_REQUEST['package']);
 $format=@addslashes($_REQUEST['format']);
 
 
-$sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, build, install from packages p
+$sql="select p.id, r.`release`, code, unpack, sourcefile, sourcedir, configure, build, install from packages p
 left join releases r on p.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
@@ -29,6 +29,7 @@ $arr=array(
 'release'=>$release,
 'sourcefile'=>$v['sourcefile'],
 'sourcedir'=>$v['sourcedir'],
+'unpack'=>base64_encode($v['unpack']),
 'configure'=>base64_encode($v['configure']),
 'build'=>base64_encode($v['build']),
 'install'=>base64_encode($v['install']),
@@ -50,6 +51,7 @@ $code = $dom->createElement('code',$package);
 
 $sourcefile = $dom->createElement('sourcefile',$v['sourcefile']);
 $sourcedir = $dom->createElement('sourcedir',$v['sourcedir']);
+$unpack = $dom->createElement('unpack',base64_encode($v['unpack']));
 $configure = $dom->createElement('configure',base64_encode($v['configure']));
 $build = $dom->createElement('build',base64_encode($v['build']));
 $install = $dom->createElement('install',base64_encode($v['install']));
@@ -59,6 +61,7 @@ $root->appendChild($release);
 $root->appendChild($code);
 $root->appendChild($sourcefile);
 $root->appendChild($sourcedir);
+$root->appendChild($unpack);
 $root->appendChild($configure);
 $root->appendChild($build);
 $root->appendChild($install);

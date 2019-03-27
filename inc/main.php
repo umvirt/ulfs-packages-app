@@ -54,6 +54,13 @@ return $v;
 }
 }
 
+function unpack_script($v=""){
+$v=str_replace("\r\n","\n",$v);
+
+return $v;
+}
+
+
 function build_script($v=""){
 if(!$v){
 return "make";

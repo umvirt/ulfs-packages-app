@@ -8,7 +8,7 @@ echo "<h1>UmVirt LFS Package info</h1>";
 $release=@addslashes($_REQUEST['release']);
 $package=@addslashes($_REQUEST['package']);
 
-$sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, build, install from packages p
+$sql="select p.id, r.`release`, unpack, code, sourcefile, sourcedir, configure, build, install from packages p
 left join releases r on p.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
@@ -86,8 +86,10 @@ echo "Addons: ".join($addns,", ").".<br>";
 }else{
 echo "Addons: *** NO ADDONS FOUND *** <br>";
 }
-
-
+if($v['unpack']){
+echo "Unpack script: 
+<br><pre>".configuration_script($v['unpack'])."</pre><br>";
+}
 echo "Configuration script: 
 <br><pre>".configuration_script($v['configure'])."</pre><br>";
 echo "Build script: 

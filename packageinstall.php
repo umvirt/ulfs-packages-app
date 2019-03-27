@@ -10,7 +10,7 @@ if(@$_REQUEST['type']=="local"){
 $localinstall=true;
 }
 
-$sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, build, install from packages p
+$sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, unpack, build, install from packages p
 left join releases r on p.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
@@ -210,15 +210,20 @@ echo "fi\n";
 echo "#Saving extracting timestamp\n";
 echo "date +%s > ".$packagelogdir."unpack.time\n";
 
+if($v['unpack']){
+echo "#Extracting source package with previously defined commands...\n";
+echo unpack_script($v['unpack'])."\n";
+}else{
+
 if(preg_match("/zip$/",$v['sourcefile'])){
-echo "#Extracting zip source package archive...\n";
+echo "#Extracting zip source package archive with default parameters...\n";
 echo "unzip ".$v['sourcefile']." -d ".$v['sourcedir']."\n";
 
 }else{
-echo "#Extracting tar source package archive...\n";
+echo "#Extracting tar source package archive with default parameters...\n";
 echo "tar -xf ".$v['sourcefile']."\n";
 }
-
+}
 echo "#Going to source package directory...\n";
 echo "cd ".$v['sourcedir']."\n";
 
