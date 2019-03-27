@@ -29,7 +29,8 @@ $tables=array(
 'patches',
 'addons',
 'dependances',
-'commands'
+'commands',
+'comments'
 );
 
 $ct=array();

@@ -62,4 +62,13 @@ CREATE TABLE `commands` (
   CONSTRAINT `commands_fk_release` FOREIGN KEY (`release`) REFERENCES `releases` (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 #SQLDELIMETER
+CREATE TABLE `comments` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `package` bigint(20) unsigned NOT NULL,
+  `text` varchar(1024) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `package` (`package`),
+  CONSTRAINT `comments_fk_packages` FOREIGN KEY (`package`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+#SQLDELIMETER
 set foreign_key_checks=1;
