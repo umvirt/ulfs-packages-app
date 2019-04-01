@@ -99,8 +99,29 @@ echo "Install script:
 
 
 
+
 //echo "Available packages: <table>".join ($pkgs)."</table>";
 
+$id=$v['id'];
 }
+
+
+$x=array();
+$sql="select package, text comment from comments where package=$id";
+$db->execute($sql);
+
+
+$x=$db->dataset;
+//var_dump($sql);
+if(count($x)){
+echo "<hr><p>Comments:<ol>";
+foreach($x as $v){
+echo "<li><pre>".$v["comment"]."</pre></li>";
+}
+echo "</ol></p>";
+
+}
+
+
 include "inc/template.php";
 

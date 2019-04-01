@@ -120,9 +120,13 @@ echo "Current releases: ".join ($releases,', ');
 //----
 
 
-$sql="select p.id, code, sourcefile from packages p
+$sql="select p.id, code, sourcefile, c.comments from packages p
 inner join releases r on r.id=p.`release`
-where r.`release`=\"".$release."\"";
+left join (select count(id) comments, package from comments group by package) as c on c.package=p.id 
+where r.`release`=\"".$release."\"
+order by p.id asc
+
+";
 //echo $sql;
 $db->execute($sql);
 
@@ -164,9 +168,13 @@ exit;
 $pkgs=array();
 foreach ($x as $k=>$v){
 
-$s=$v['code'];
+$s="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$v['code'].">".$v['code']."</a>";
 
-$pkgs[]="<tr><td>".$v['id']."</td><td><a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$v['code'].">".$s."</a></td><td>".$v['sourcefile']."</td></tr>";
+if($v['comments']){
+$s.="<sup>*</sup>";
+}
+
+$pkgs[]="<tr><td>".$v['id']."</td><td>".$s."</td><td>".$v['sourcefile']."</td></tr>";
 }
 
 echo "<h2>Packages(".count($x).")</h2>";
