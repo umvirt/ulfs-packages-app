@@ -80,8 +80,12 @@ $root->appendChild($dependances_element);
 //test: glib
 $patches_element = $dom->createElement('patches');
 foreach($patches as $pat){
-        $patch_element=$dom->createElement('patch',$pat);
-        $patches_element->appendChild($patch_element);
+        $patch_element=$dom->createElement('patch');
+	$filename_element=$dom->createElement('filename',$pat['filename']);
+	$patch_element->appendChild($filename_element);
+	$mode_element=$dom->createElement('mode',$pat['mode']);
+        $patch_element->appendChild($mode_element);
+	$patches_element->appendChild($patch_element);
 }
 $root->appendChild($patches_element);
 //Addons

@@ -59,8 +59,8 @@ $patches=patches($release,$v['code']);
 
 
 foreach($patches as $pat){
-$url=patch_url($release,$pat);
-$pats[]="<a href=\"$url\">$pat</a>";
+$url=patch_url($release,$pat['filename']);
+$pats[]="<a href=\"$url\">".$pat['filename']."</a>";
 }
 
 if(count($patches)){

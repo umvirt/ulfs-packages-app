@@ -29,9 +29,9 @@ $patches=patches($release,$v['code']);
 
 foreach($patches as $pat){
 if($localinstall){
-$purl=patch_path($release,$pat);
+$purl=patch_path($release,$pat['filename']);
 }else{
-$purl=patch_url($release,$pat);
+$purl=patch_url($release,$pat['filename']);
 }
 $pats[]=$purl;
 }
@@ -230,7 +230,11 @@ echo "cd ".$v['sourcedir']."\n";
 if(count($patches)){
 echo "#Applying patches...\n";
 foreach ($patches as $pat){
-echo "patch -Np1 -i ../$pat\n";
+if($pat['mode']==="0"){
+echo "patch -Np0 -i ../".$pat['filename']."\n";
+}else{
+echo "patch -Np1 -i ../".$pat['filename']."\n";
+}
 }
 }
 

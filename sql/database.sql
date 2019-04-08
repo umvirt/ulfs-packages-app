@@ -27,6 +27,7 @@ CREATE TABLE `patches` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `package` bigint(20) unsigned NOT NULL,
   `filename` varchar(255) CHARACTER SET latin1 NOT NULL,
+  `mode` varchar(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `package` (`package`),
   CONSTRAINT `patch_fk_package` FOREIGN KEY (`package`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE

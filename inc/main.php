@@ -177,7 +177,7 @@ return $deps;
 function patches($release,$package){
 
 global $db;
-$sql="select p.filename from patches p
+$sql="select p.filename,p.mode from patches p
 inner join packages pp on p.package=pp.id
 inner join `releases` r on r.id=pp.release 
 where pp.code=\"$package\" and r.release=\"$release\"";
@@ -186,7 +186,7 @@ $db->execute($sql);
 $deps=array();
 $x=$db->dataset;
 foreach($x as $k=>$v){
-        $deps[]=$v['filename'];
+        $deps[]=array("filename"=>$v['filename'],"mode"=>$v['mode']);
 }
 return $deps;
 
