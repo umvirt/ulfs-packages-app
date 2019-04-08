@@ -283,7 +283,10 @@ $obj->addons[]=$xmlIterator2->current()->__toString();
 //patches
 $xmlIterator2 = new SimpleXMLIterator($xpackage->patches->asXML());
 for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
-$obj->patches[]=$xmlIterator2->current()->__toString();
+$obj->patches[]=array(
+"filename"=>$xmlIterator2->current()->filename->__toString(),
+"mode"=>$xmlIterator2->current()->mode->__toString()
+);
 }
 
 //dependaces
@@ -327,7 +330,7 @@ $obj->addons[]=$jaddon;
 }
 
 foreach ($jpackage->patches as $jpatch){
-$obj->patches[]=$jpatch;
+$obj->patches[]=array("filename"=>$jpatch->filename,"mode"=>$jpatch->mode);
 }
 
 $w=0;
@@ -422,9 +425,9 @@ echo "Creating patches for package \"$obj->code\"... ";
 $sql=array();
 foreach($obj->patches as $patch){
 $c++;
-$sql[]="insert into patches (package,filename) values (
+$sql[]="insert into patches (package,filename,mode) values (
 ".$obj->id.",
-\"".$patch."\")";
+\"".$patch['filename']."\",\"".$patch['mode']."\")";
 $db->execute($sql);
 //var_dump($db->error);
 }
