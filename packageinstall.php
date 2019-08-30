@@ -52,6 +52,9 @@ $addns[]=$aurl;
 
 $dependances=dependances($release, $v['code']);
 
+$nestings=nestings($release, $v['code']);
+
+
 $packagesdir="/var/cache/ulfs-packages";
 $packagelogdir="/var/log/ulfs-packages/".$package."/";
 $installurl=$config['packages_url'];
@@ -255,7 +258,17 @@ echo "#Saving install timestamp\n";
 echo "date +%s > ".$packagelogdir."install.time\n";
 
 echo "#Running install script...\n";
+echo "cat > ulfs_install.sh << EOIS\n";
 echo install_script($v['install'])."\n";
+echo "EOIS\n";
+
+echo "USER=`whoami`\n";
+echo "if [ \"\$USER\" == \"root\" ] ; then \n";
+echo "cat ulfs_install.sh | bash \n";
+echo "else\n";
+echo "cat ulfs_install.sh | sudo bash \n";
+echo "fi\n";
+
 
 echo "#Saving finish timestamp\n";
 echo "date +%s > ".$packagelogdir."finish.time\n";
@@ -265,8 +278,11 @@ echo "find / -type f -newer ".$packagelogdir."install.time \! -newer ".$packagel
 
 echo "#Marking package as installed...\n";
 echo "mkdir -p $packagesdir\n";
-echo "touch $packagesdir/".$v['code']."\n";
 
+echo "touch $packagesdir/".$v['code']."\n";
+foreach($nestings as $nesting){
+	echo "touch $packagesdir/".$nesting."\n";
+}
 
 echo "\n#End of script\n";
 /*

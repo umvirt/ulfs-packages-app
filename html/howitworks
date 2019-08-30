@@ -25,6 +25,8 @@ Application contain three parts:
 <li>patches (source code fixes which not included in package), 
 <li>addons (extra downloads, additional files), 
 <li>dependances (packages which chould be installed before), 
+<li>comments (useful information from maintainer)
+<li>nestings (link to other packages which contents can be build separately from current package but installed with this package and have common source code. Instaling some of servers (postgresql-server) can lead to instaling clients (postgresql-client).)
 <li>configure command(s) (typicaly "./configure --prefix=/usr"), 
 <li>build command(s) (typicaly "make"),
 <li>install commands(s) (typicaly "make install")

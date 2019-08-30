@@ -30,7 +30,8 @@ $tables=array(
 'addons',
 'dependances',
 'commands',
-'comments'
+'comments',
+'nestings'
 );
 
 $ct=array();

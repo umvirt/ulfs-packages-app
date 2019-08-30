@@ -72,4 +72,13 @@ CREATE TABLE `comments` (
   CONSTRAINT `comments_fk_packages` FOREIGN KEY (`package`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 #SQLDELIMETER
+CREATE TABLE `nestings` (
+  `parent` bigint(20) unsigned NOT NULL,
+  `child` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`parent`,`child`),
+  KEY `child` (`child`),
+  CONSTRAINT `nestings_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `packages` (`id`),
+  CONSTRAINT `nestings_ibfk_2` FOREIGN KEY (`child`) REFERENCES `packages` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#SQLDELIMETER
 set foreign_key_checks=1;

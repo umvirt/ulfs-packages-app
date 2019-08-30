@@ -77,6 +77,7 @@ if(!$v){
 return "make install";
 }else{
 //\r\n\ -> \n
+$v=str_replace('$','\$',$v);
 $v=str_replace("\r\n","\n",$v);
 return $v;
 }
@@ -209,4 +210,25 @@ foreach($x as $k=>$v){
 return $deps;
 
 }
+
+
+function nestings($release,$package){
+global $db;
+$sql="select dp.code, dd.code child from nestings d
+inner join packages dp on d.parent=dp.id
+inner join packages dd on d.child=dd.id 
+inner join `releases` r on r.id=dp.release 
+where dp.code=\"$package\" and r.release=\"$release\"
+";
+//var_dump($sql);
+$db->execute($sql);
+$deps=array();
+$x=$db->dataset;
+foreach($x as $k=>$v){
+        $deps[]=$v['child'];
+}
+return $deps;
+
+}
+
 

@@ -22,6 +22,7 @@ foreach ($x as $k=>$v){
 $dependances=dependances($release, $v['code']);
 $patches=patches($release,$v['code']);
 $addons=addons($release,$v['code']);
+$nestings=nestings($release,$v['code']);
 
 if($format=="json"){
 $arr=array(
@@ -36,6 +37,7 @@ $arr=array(
 'dependances'=>$dependances,
 'patches'=>$patches,
 'addons'=>$addons,
+'nestings'=>$nestings,
 );
 $result=json_encode($arr);
 }
@@ -96,6 +98,16 @@ foreach($addons as $addon){
         $addons_element->appendChild($addon_element);
 }
 $root->appendChild($addons_element);
+//Nestings
+$nestings_element = $dom->createElement('nestings');
+foreach($nestings as $nesting){
+        $nesting_element=$dom->createElement('nesting',$nesting);
+        $nestings_element->appendChild($nesting_element);
+}
+$root->appendChild($nestings_element);
+
+
+
 
 $dom->appendChild($root);
 $result=$dom->saveXML();

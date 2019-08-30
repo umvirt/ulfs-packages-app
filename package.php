@@ -78,6 +78,17 @@ $url=download_url($release,$addn);
 $addns[]="<a href=\"$url\">$addn</a>";
 }
 
+$nestings = nestings($release,$v['code']);
+
+foreach($nestings as $nesting){
+//$url=download_url($release,$addn);
+//$addns[]="<a href=\"$url\">$addn</a>";
+$nestings_[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$nesting.">".$nesting."</a>";
+}
+
+
+
+
 
 
 
@@ -86,6 +97,14 @@ echo "Addons: ".join($addns,", ").".<br>";
 }else{
 echo "Addons: *** NO ADDONS FOUND *** <br>";
 }
+
+if(count($nestings)){
+echo "Nestings: ".join($nestings_,", ").".<br>";
+}else{
+echo "Nestings *** NO NESTINGS FOUND *** <br>";
+}
+
+
 if($v['unpack']){
 echo "Unpack script: 
 <br><pre>".configuration_script($v['unpack'])."</pre><br>";
