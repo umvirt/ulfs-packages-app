@@ -31,7 +31,8 @@ $tables=array(
 'dependances',
 'commands',
 'comments',
-'nestings'
+'nestings',
+'packagesfiles'
 );
 
 $ct=array();
