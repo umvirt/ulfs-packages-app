@@ -93,4 +93,6 @@ CREATE TABLE `packagesfiles` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 #SQLDELIMETER
+
+#SQLDELIMETER
 set foreign_key_checks=1;
