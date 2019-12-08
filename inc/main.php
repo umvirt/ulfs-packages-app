@@ -95,36 +95,36 @@ return getpath($release,$file, $config['localpath']."/files/");
 }
 
 function getpath($release,$file,$basepath){
+global $config;
 
-
-$x=file_exists("../downloads/$release/packages/python-modules/$file");
+$x=file_exists($config['filespath']."/$release/packages/python-modules/$file");
 //var_dump($x);
 if($x){
 return $basepath."$release/packages/python-modules/".$file;
 }
-$x=file_exists("../downloads/$release/packages/perl-modules/$file");
+$x=file_exists($config['filespath']."/$release/packages/perl-modules/$file");
 //var_dump($x);
 if($x){
 return $basepath."$release/packages/perl-modules/".$file;
 }
-$x=file_exists("../downloads/$release/packages/Xorg/$file");
+$x=file_exists($config['filespath']."/$release/packages/Xorg/$file");
 //var_dump($x);
 if($x){
 return  $basepath."$release/packages/Xorg/".$file;
 }
-$x=file_exists("../downloads/$release/packages/Xorg/lib/$file");
+$x=file_exists($config['filespath']."/$release/packages/Xorg/lib/$file");
 //var_dump($x);
 if($x){
 return  $basepath."$release/packages/Xorg/lib/".$file;
 }
 
-$x=file_exists("../downloads/$release/packages/Xorg/app/$file");
+$x=file_exists($config['filespath']."/$release/packages/Xorg/app/$file");
 //var_dump($x);
 if($x){
 return  $basepath."$release/packages/Xorg/app/".$file;
 }
 
-$x=file_exists("../downloads/$release/packages/Xorg/font/$file");
+$x=file_exists($config['filespath']."/$release/packages/Xorg/font/$file");
 //var_dump($x);
 if($x){
 return  $basepath."$release/packages/Xorg/font/".$file;

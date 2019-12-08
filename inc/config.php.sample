@@ -4,8 +4,11 @@ $db_config['database']='ulfs';
 $db_config['user']='ulfs';
 $db_config['password']='secret';
 $db_config['server']='127.0.0.1';
-//repository root
+//local install root path
 $config['localpath']="/mnt/umvirt";
+//files repository root
+$config['filespath']="/mnt/storage/data";
+
 //URLs
 //HTTP & IP
 $config['packages_url']="http://".$_SERVER['SERVER_ADDR']."/linux/packages/";
