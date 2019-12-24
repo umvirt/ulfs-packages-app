@@ -286,9 +286,16 @@ echo "#Checking package directory size after unpack...\n";
 echo "cd /sources \n";
 echo "du -s ".$v['sourcedir']." | awk 'NR==1 {print $1}' > ".$packagelogdir."install.size \n";
 
+echo "echo \"ULFS package installation completed.\"\n";
 
 echo "#Producing files list\n";
+echo "echo \"Looking for installed files...\"\n";
+echo "USER=`whoami`\n";
+echo "if [ \"\$USER\" == \"root\" ] ; then \n";
 echo "find / -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time | grep \"^/bin/\\|/usr/\\|^/etc/\\|^/opt/\" > ".$packagelogdir."files.txt\n";
+echo "else\n";
+echo "sudo find / -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time | grep \"^/bin/\\|/usr/\\|^/etc/\\|^/opt/\" > ".$packagelogdir."files.txt\n";
+echo "fi\n";
 
 echo "#Marking package as installed...\n";
 echo "mkdir -p $packagesdir\n";
@@ -324,6 +331,7 @@ echo "echo \$db > ".$packagelogdir."delta.time \n";
 
 
 echo "#Report\n";
+echo "echo \"\"\n";
 echo "echo \"ULFS Package installation report\"\n";
 echo "echo \"================================\"\n";
 echo "echo \"Package: $package\" \n";
