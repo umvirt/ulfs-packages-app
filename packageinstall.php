@@ -77,6 +77,11 @@ echo "# Release: $release\n";
 echo "# Package: $package\n";
 echo "#===========================\n\n";
 
+echo "echo \"ULFS Package installation start\"\n";
+echo "echo \"===============================\"\n";
+echo "echo \"Package: $package\" \n";
+echo "echo \"Release: $release\" \n";
+echo "\n";
 
 echo "#Creating log directory\n";
 echo "mkdir -p $packagelogdir\n";
@@ -227,6 +232,10 @@ echo "#Extracting tar source package archive with default parameters...\n";
 echo "tar -xf ".$v['sourcefile']."\n";
 }
 }
+
+echo "#Checking package directory size after unpack...\n";
+echo "du -s ".$v['sourcedir']." | awk 'NR==1 {print $1}' > ".$packagelogdir."unpack.size \n";
+
 echo "#Going to source package directory...\n";
 echo "cd ".$v['sourcedir']."\n";
 
@@ -273,6 +282,11 @@ echo "fi\n";
 echo "#Saving finish timestamp\n";
 echo "date +%s > ".$packagelogdir."finish.time\n";
 
+echo "#Checking package directory size after unpack...\n";
+echo "cd /sources \n";
+echo "du -s ".$v['sourcedir']." | awk 'NR==1 {print $1}' > ".$packagelogdir."install.size \n";
+
+
 echo "#Producing files list\n";
 echo "find / -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time | grep \"^/bin/\\|/usr/\\|^/etc/\\|^/opt/\" > ".$packagelogdir."files.txt\n";
 
@@ -284,6 +298,40 @@ foreach($nestings as $nesting){
 	echo "touch $packagesdir/".$nesting."\n";
 }
 
+echo "#Calculate delta size\n";
+echo "a=`cat ".$packagelogdir."unpack.size`\n";
+echo "b=`cat ".$packagelogdir."install.size`\n";
+echo "c=\$((\$b-\$a))\n";
+echo "echo \$c > ".$packagelogdir."delta.size \n";
+
+
+echo "#Calculate prepare time\n";
+echo "a=`cat ".$packagelogdir."start.time`\n";
+echo "b=`cat ".$packagelogdir."configure.time`\n";
+echo "dp=\$((\$b-\$a))\n";
+
+echo "#Calculate download time\n";
+echo "a=`cat ".$packagelogdir."download.time`\n";
+echo "b=`cat ".$packagelogdir."unpack.time`\n";
+echo "dd=\$((\$b-\$a))\n";
+
+echo "#Calculate delta time\n";
+echo "a=`cat ".$packagelogdir."configure.time`\n";
+echo "b=`cat ".$packagelogdir."finish.time`\n";
+echo "db=\$((\$b-\$a))\n";
+echo "echo \$db > ".$packagelogdir."delta.time \n";
+
+
+
+echo "#Report\n";
+echo "echo \"ULFS Package installation report\"\n";
+echo "echo \"================================\"\n";
+echo "echo \"Package: $package\" \n";
+echo "echo \"Release: $release\" \n";
+echo "echo \"Build size: \$c\" \n";
+echo "echo \"Prepare time: \$dp sec.\" \n";
+echo "echo \"Download time: \$dd sec.\" \n";
+echo "echo \"Build time: \$db sec.\" \n";
 echo "\n#End of script\n";
 /*
 $s=$v['code'];
