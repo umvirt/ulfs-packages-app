@@ -5,8 +5,10 @@ RewriteBase /
 RewriteRule ^([0-9.]+)(/?)$ /linux/packages/index.php?release=$1
 RewriteRule ^xml(/?)$ /linux/packages/index.php?format=xml
 RewriteRule ^json(/?)$ /linux/packages/index.php?format=json
+RewriteRule ^text(/?)$ /linux/packages/index.php?format=text
 RewriteRule ^xml/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=xml
 RewriteRule ^json/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=json
+RewriteRule ^text/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=text
 RewriteRule ^([0-9.]+)/([a-zA-z0-9.-]+)(/?)$ /linux/packages/package.php?release=$1&package=$2
 RewriteRule ^([0-9.]+)/([a-zA-z0-9.-]+)/install(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2
 RewriteRule ^([0-9.]+)/([a-zA-z0-9.-]+)/localinstall(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2&type=local

@@ -41,6 +41,19 @@ $releases[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/".$v['release'].">".$s
 
 if(!$release){
 
+if($format=="text"){
+$result=array();
+ob_end_clean();
+header("Content-type: text/plain");
+
+foreach ($x as $k=>$v){
+echo $v['release']."\n";
+}
+
+exit;
+}
+
+
 if($format=="json"){
 $result=array();
 ob_end_clean();
@@ -119,7 +132,6 @@ echo "Current releases: ".join ($releases,', ');
 
 //----
 
-
 $sql="select p.id, code, sourcefile, c.comments from packages p
 inner join releases r on r.id=p.`release`
 left join (select count(id) comments, package from comments group by package) as c on c.package=p.id 
@@ -143,6 +155,19 @@ header("Content-type: text/plain");
 echo json_encode($result);
 exit;
 }
+
+if($format=="text"){
+$result=array();
+$result['release']=$release;
+ob_end_clean();
+header("Content-type: text/plain");
+foreach ($x as $k=>$v){
+echo $v['code']."\n";
+}
+exit;
+}
+
+
 
 if($format=="xml"){
 $dom = new DOMDocument('1.0', 'utf-8');
