@@ -70,7 +70,7 @@ CREATE TABLE `comments` (
   PRIMARY KEY (`id`),
   KEY `package` (`package`),
   CONSTRAINT `comments_fk_packages` FOREIGN KEY (`package`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 #SQLDELIMETER
 CREATE TABLE `nestings` (
   `parent` bigint(20) unsigned NOT NULL,
@@ -84,15 +84,19 @@ CREATE TABLE `nestings` (
 CREATE TABLE `packagesfiles` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `release` int(10) unsigned NOT NULL,
-  `filename` varchar(255) NOT NULL,
-  `path` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `filename` varchar(255) CHARACTER SET latin1 NOT NULL,
+  `path` varchar(255) NOT NULL,
   `mtime` int(10) unsigned NOT NULL,
   `size` int(10) unsigned NOT NULL,
-  `md5_current` varchar(255) NOT NULL,
-  `md5_stored` varchar(255) NOT NULL,
+  `md5_current` varchar(255) CHARACTER SET latin1 NOT NULL,
+  `md5_stored` varchar(255) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 #SQLDELIMETER
-
+CREATE TABLE `packagesfiles_packages` (
+  `packagefile` int(11) unsigned NOT NULL,
+  `package` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`packagefile`,`package`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 #SQLDELIMETER
 set foreign_key_checks=1;

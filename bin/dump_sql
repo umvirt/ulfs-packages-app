@@ -33,7 +33,7 @@ $tables=array(
 'comments',
 'nestings',
 'packagesfiles',
-'packagesfiles_files'
+'packagesfiles_packages'
 );
 
 $ct=array();
