@@ -8,8 +8,12 @@ echo "<h1>UmVirt LFS Package info</h1>";
 $release=@addslashes($_REQUEST['release']);
 $package=@addslashes($_REQUEST['package']);
 
-$sql="select p.id, r.`release`, unpack, code, sourcefile, sourcedir, configure, build, install from packages p
+$sql="select p.id, r.`release`, unpack, code, sourcefile, sourcedir, configure, build, install,
+pf.id packagefile, pf.size packagefile_size, md5_stored packagefile_md5 
+from packages p
 left join releases r on p.release=r.id
+left join packagesfiles_packages pf_p on pf_p.package=p.id
+left join packagesfiles pf on pf.id=pf_p.packagefile 
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
 //var_dump($sql);
@@ -34,6 +38,10 @@ $linkmd5="<a href=$url.md5sum>$url.md5sum</a>";
 
 echo "Codename: ".$v['code']."<br>";
 echo "Source file: ".$v['sourcefile']."<br>";
+if($v['packagefile']){
+echo "Source file size: ".$v['packagefile_size']."<br>";
+echo "Source file MD5-checkum: ".($v['packagefile_md5'] ? $v['packagefile_md5'] : "none") ."<br>";
+}
 echo "Source directory: ".$v['sourcedir']."<br>";
 echo "Package URL: $link<br>";
 echo "Package md5-checksum URL: $linkmd5<br>";
