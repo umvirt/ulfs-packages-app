@@ -132,7 +132,7 @@ echo "Current releases: ".join ($releases,', ');
 
 //----
 
-$sql="select p.id, code, sourcefile, c.comments from packages p
+$sql="select p.id, code, sourcefile, c.comments, p.description from packages p
 inner join releases r on r.id=p.`release`
 left join (select count(id) comments, package from comments group by package) as c on c.package=p.id 
 where r.`release`=\"".$release."\"
@@ -199,11 +199,21 @@ if($v['comments']){
 $s.="<sup>*</sup>";
 }
 
+if($format=="descriptions"){
+$pkgs[]="<li><b>$s</b> <br>".$v['description']."</li>";
+}else{
 $pkgs[]="<tr><td>".$v['id']."</td><td>".$s."</td><td>".$v['sourcefile']."</td></tr>";
 }
 
+}
+
 echo "<h2>Packages(".count($x).")</h2>";
+
+if($format=="descriptions"){
+echo "Available packages: <ul>".join ($pkgs)."</ul>";
+}else{
 echo "Available packages: <table>".join ($pkgs)."</table>";
+}
 
 }
 

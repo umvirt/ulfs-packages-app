@@ -9,6 +9,7 @@ $release=@addslashes($_REQUEST['release']);
 $package=@addslashes($_REQUEST['package']);
 
 $sql="select p.id, r.`release`, unpack, code, sourcefile, sourcedir, configure, build, install,
+description,
 pf.id packagefile, pf.size packagefile_size, md5_stored packagefile_md5 
 from packages p
 left join releases r on p.release=r.id
@@ -30,6 +31,9 @@ $s=$v['code'];
 
 echo "<h2>".$v['code']."</h2>";
 
+echo $v['description'];
+
+echo "<h3>Package info</h3>";
 if($v['sourcefile']){
 $url=download_url($release, $v['sourcefile']);
 
