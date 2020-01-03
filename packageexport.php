@@ -7,7 +7,7 @@ $package=@addslashes($_REQUEST['package']);
 $format=@addslashes($_REQUEST['format']);
 
 
-$sql="select p.id, r.`release`, code, unpack, sourcefile, sourcedir, configure, build, install from packages p
+$sql="select p.id, r.`release`, code, unpack, sourcefile, sourcedir, configure, build, install, description from packages p
 left join releases r on p.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
@@ -27,6 +27,7 @@ $nestings=nestings($release,$v['code']);
 if($format=="json"){
 $arr=array(
 'code'=>$package,
+'description'=>base64_encode($v['description']),
 'release'=>$release,
 'sourcefile'=>$v['sourcefile'],
 'sourcedir'=>$v['sourcedir'],
@@ -50,6 +51,7 @@ $dom->formatOutput=true;
 $root = $dom->createElement('package');
 $release = $dom->createElement('release',$release);
 $code = $dom->createElement('code',$package);
+$description = $dom->createElement('description',base64_encode($v['description']));
 
 $sourcefile = $dom->createElement('sourcefile',$v['sourcefile']);
 $sourcedir = $dom->createElement('sourcedir',$v['sourcedir']);
@@ -61,6 +63,7 @@ $install = $dom->createElement('install',base64_encode($v['install']));
 
 $root->appendChild($release);
 $root->appendChild($code);
+$root->appendChild($description);
 $root->appendChild($sourcefile);
 $root->appendChild($sourcedir);
 $root->appendChild($unpack);

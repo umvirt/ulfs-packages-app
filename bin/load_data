@@ -21,6 +21,7 @@ public $info;
 
 class PKG{
 public $code;
+public $description;
 public $sourcefile;
 public $sourcedir;
 public $unpack="";
@@ -260,6 +261,7 @@ $xpackage=simplexml_load_string ($pfile);
 $obj=new PKG();
 
 $obj->code=$xpackage->code->__toString();
+$obj->description=base64_decode($xpackage->description->__toString());
 $obj->sourcefile=$xpackage->sourcefile->__toString();
 $obj->sourcedir=$xpackage->sourcedir->__toString();
 $obj->configure=base64_decode($xpackage->configure->__toString());
@@ -311,6 +313,7 @@ $jpackage=json_decode($pfile);
 $obj=new PKG();
 
 $obj->code=$jpackage->code;
+$obj->description=base64_decode($jpackage->description);
 $obj->sourcefile=$jpackage->sourcefile;
 $obj->sourcedir=$jpackage->sourcedir;
 $obj->configure=base64_decode($jpackage->configure);
@@ -362,9 +365,10 @@ foreach($objs as $obj){
 
 echo "Creating package \"$obj->code\"... ";
 $sql=array();
-$sql[]="insert into packages (code,`release`,sourcefile,sourcedir,unpack,configure,build,install)
+$sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install)
 values (
 \"$obj->code\",
+\"".addslashes($obj->description)."\",
 \"$release_id\",
 \"$obj->sourcefile\",
 \"$obj->sourcedir\",
