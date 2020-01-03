@@ -271,6 +271,7 @@ $obj->addons=array();
 $obj->patches=array();
 $obj->dependances=array();
 $obj->nestings=array();
+$obj->comments=array();
 
 
 
@@ -308,6 +309,12 @@ for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
 $obj->nestings[]=$xmlIterator2->current()->__toString();
 }
 
+//comments
+$xmlIterator2 = new SimpleXMLIterator($xpackage->comments->asXML());
+for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
+$obj->comments[]=base64_decode($xmlIterator2->current()->__toString());
+}
+
 
 
 $objs[]=$obj;
@@ -333,6 +340,8 @@ $obj->addons=array();
 $obj->patches=array();
 $obj->dependances=array();
 $obj->nestings=array();
+$obj->comments=array();
+
 
 
 if(@$jpackage->unpack){
@@ -356,6 +365,10 @@ $obj->dependances[]=array("code"=>$jdep->code,"weight"=>$w);
 
 foreach ($jpackage->nestings as $jn){
 $obj->nestings[]=$jn;
+}
+
+foreach ($jpackage->comments as $cm){
+$obj->comments[]=$cm;
 }
 
 
@@ -517,6 +530,33 @@ exit;
 }
 
 }
+
+
+
+
+echo "\nCreating comments:\n\n";
+foreach($objs as $obj){
+echo "Creating comments for package \"$obj->code\"... ";
+$c=0;
+$sql=array();
+foreach($obj->comments as $dep){
+$sql[]="insert into comments (package,text) values (
+".$obj->id.",
+\"".addslashes($dep)."\")";
+$db->execute($sql);
+//var_dump($db->error);
+}
+
+
+if(!$db->error){
+echo "Ok\n";
+}else{
+echo "Error: $db->error\n";
+exit;
+}
+
+}
+
 
 
 

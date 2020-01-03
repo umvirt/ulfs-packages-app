@@ -232,3 +232,21 @@ return $deps;
 }
 
 
+function comments($release,$package){
+global $db;
+$sql="select p.code, c.text text from comments c
+inner join packages p on c.package=p.id
+inner join `releases` r on r.id=p.release 
+where p.code=\"$package\" and r.release=\"$release\"
+";
+//var_dump($sql);
+$db->execute($sql);
+$deps=array();
+$x=$db->dataset;
+foreach($x as $k=>$v){
+        $deps[]=base64_encode($v['text']);
+}
+return $deps;
+
+}
+

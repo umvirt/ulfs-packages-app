@@ -23,6 +23,7 @@ $dependances=dependances($release, $v['code']);
 $patches=patches($release,$v['code']);
 $addons=addons($release,$v['code']);
 $nestings=nestings($release,$v['code']);
+$comments=comments($release,$v['code']);
 
 if($format=="json"){
 $arr=array(
@@ -39,6 +40,7 @@ $arr=array(
 'patches'=>$patches,
 'addons'=>$addons,
 'nestings'=>$nestings,
+'comments'=>$comments,
 );
 $result=json_encode($arr);
 }
@@ -108,6 +110,14 @@ foreach($nestings as $nesting){
         $nestings_element->appendChild($nesting_element);
 }
 $root->appendChild($nestings_element);
+
+//Comments
+$comments_element = $dom->createElement('comments');
+foreach($comments as $comment){
+        $comment_element=$dom->createElement('comment',$comment);
+        $comments_element->appendChild($comment_element);
+}
+$root->appendChild($comments_element);
 
 
 
