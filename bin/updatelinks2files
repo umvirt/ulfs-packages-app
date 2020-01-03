@@ -29,6 +29,7 @@ $sqlpf="insert into packagesfiles_packages (packagefile,package) values (".$pf['
 $db->execute($sqlpf);
 }
 
+/*
 //Addons
 
 $sqlp="select package from addons where filename=\"".trim($pf['filename'])."\"";
@@ -44,6 +45,7 @@ $sqlpf="insert into packagesfiles_packages (packagefile,package) values (".$pf['
 $db->execute($sqlpf);
 }
 
+*/
 
 
 
