@@ -9,6 +9,10 @@ $config['localpath']="/mnt/umvirt";
 //files repository root
 $config['filespath']="/mnt/storage/data";
 
+//sleep when dump requested 
+$config['dumpsleep']=0;
+
+
 //URLs
 //HTTP & IP
 $config['packages_url']="http://".@$_SERVER['SERVER_ADDR']."/linux/packages/";

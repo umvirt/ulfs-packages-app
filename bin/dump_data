@@ -3,7 +3,7 @@
 //==================
 //Data Dumper
 //==================
-
+include "../inc/main.php";
 
 $shortopts  = "";
 $longopts  = array(
@@ -82,7 +82,12 @@ if(strlen($data)){
 file_put_contents($outdir."/packages/$package.$format",$data);
 $c++;
 echo "Ok\n";
-sleep(1);
+
+//sleep if needed
+if(@$config['dumpsleep']){
+sleep($config['dumpsleep']);
+}
+
 }else{
 echo "Error\n";
 break;
@@ -104,7 +109,13 @@ if(strlen($data)){
 file_put_contents($outdir."/packages/$package.$format",$data);
 $c++;
 echo "Ok\n";
-sleep(1);
+
+//sleep if needed
+if(@$config['dumpsleep']){
+sleep($config['dumpsleep']);
+}
+
+
 }else{
 echo "Error\n";
 break;
@@ -146,7 +157,13 @@ if(strlen($data)){
 file_put_contents($outdir."/commands/$command.$format",$data);
 $c++;
 echo "Ok\n";
-sleep(1);
+
+//sleep if needed 
+if(@$config['dumpsleep']){
+sleep($config['dumpsleep']);
+}
+
+
 }else{
 echo "Error\n";
 break;
@@ -168,7 +185,13 @@ if(strlen($data)){
 file_put_contents($outdir."/commands/$command.$format",$data);
 $c++;
 echo "Ok\n";
-sleep(1);
+
+//sleep if needed
+if(@$config['dumpsleep']){
+sleep($config['dumpsleep']);
+}
+
+
 }else{
 echo "Error\n";
 break;
