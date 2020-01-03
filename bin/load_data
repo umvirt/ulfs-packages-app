@@ -270,6 +270,8 @@ $obj->install=base64_decode($xpackage->install->__toString());
 $obj->addons=array();
 $obj->patches=array();
 $obj->dependances=array();
+$obj->nestings=array();
+
 
 
 if(@$xpackage->unpack->__toString()){
@@ -300,6 +302,14 @@ $obj->dependances[]=array("code"=>$xmlIterator2->current()->code->__toString(), 
 }
 
 
+//nestings
+$xmlIterator2 = new SimpleXMLIterator($xpackage->nestings->asXML());
+for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
+$obj->nestings[]=$xmlIterator2->current()->__toString();
+}
+
+
+
 $objs[]=$obj;
 
 
@@ -322,6 +332,7 @@ $obj->install=base64_decode($jpackage->install);
 $obj->addons=array();
 $obj->patches=array();
 $obj->dependances=array();
+$obj->nestings=array();
 
 
 if(@$jpackage->unpack){
@@ -341,6 +352,12 @@ foreach ($jpackage->dependances as $jdep){
 $w++;
 $obj->dependances[]=array("code"=>$jdep->code,"weight"=>$w);
 }
+
+
+foreach ($jpackage->nestings as $jn){
+$obj->nestings[]=$jn;
+}
+
 
 //var_dump($jpackage,$obj);
 //exit;
@@ -472,4 +489,35 @@ exit;
 
 
 //var_dump($release_id);
+
+
+
+
+
+
+echo "\nCreating nestings:\n\n";
+foreach($objs as $obj){
+echo "Creating nestings for package \"$obj->code\"... ";
+$c=0;
+$sql=array();
+foreach($obj->nestings as $dep){
+$sql[]="insert into nestings (parent,child) values (
+".$obj->id.",
+".$pkg_ids[$dep].")";
+$db->execute($sql);
+//var_dump($db->error);
+}
+
+
+if(!$db->error){
+echo "Ok\n";
+}else{
+echo "Error: $db->error\n";
+exit;
+}
+
+}
+
+
+
 
