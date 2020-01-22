@@ -130,6 +130,12 @@ if($x){
 return  $basepath."$release/packages/Xorg/font/".$file;
 }
 
+$x=file_exists($config['filespath']."/$release/packages/games/$file");
+//var_dump($x);
+if($x){
+return  $basepath."$release/packages/games/".$file;
+}
+
 $dir=strtolower($file[0]); 
 return $basepath."$release/packages/".$dir."/".$file;
 
