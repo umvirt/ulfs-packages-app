@@ -429,19 +429,20 @@ exit;
 
 echo "\nCreating dependances:\n\n";
 foreach($objs as $obj){
+$sql=array();
+if(count($obj->dependances)){
 echo "Creating dependances for package \"$obj->code\"... ";
 $c=0;
-$sql=array();
 foreach($obj->dependances as $dep){
 $c++;
 $sql[]="insert into dependances (package,dependance,weight) values (
 ".$obj->id.",
 ".$pkg_ids[$dep['code']].",
 $c)";
-$db->execute($sql);
-//var_dump($db->error);
 }
 
+$db->execute($sql);
+//var_dump($db->error);
 
 if(!$db->error){
 echo "Ok\n";
@@ -449,22 +450,24 @@ echo "Ok\n";
 echo "Error: $db->error\n";
 exit;
 }
-
+}
 }
 
 echo "\nCreating patches:\n\n";
 foreach($objs as $obj){
-echo "Creating patches for package \"$obj->code\"... ";
-
 $sql=array();
+if(count($obj->patches)){
+echo "Creating patches for package \"$obj->code\"... ";
 foreach($obj->patches as $patch){
 $c++;
 $sql[]="insert into patches (package,filename,mode) values (
 ".$obj->id.",
 \"".$patch['filename']."\",\"".$patch['mode']."\")";
+}
+
 $db->execute($sql);
 //var_dump($db->error);
-}
+
 
 if(!$db->error){
 echo "Ok\n";
@@ -472,24 +475,25 @@ echo "Ok\n";
 echo "Error: $db->error\n";
 exit;
 }
-
+}
 }
 
 
 
 echo "\nCreating addons:\n\n";
 foreach($objs as $obj){
-echo "Creating addons for package \"$obj->code\"... ";
-
 $sql=array();
+if(count($obj->addons)){
+echo "Creating addons for package \"$obj->code\"... ";
 foreach($obj->addons as $addon){
 $c++;
 $sql[]="insert into addons (package,filename) values (
 ".$obj->id.",
 \"".$addon."\")";
+
+}
 $db->execute($sql);
 //var_dump($db->error);
-}
 
 if(!$db->error){
 echo "Ok\n";
@@ -497,7 +501,7 @@ echo "Ok\n";
 echo "Error: $db->error\n";
 exit;
 }
-
+}
 }
 
 
@@ -510,17 +514,18 @@ exit;
 
 echo "\nCreating nestings:\n\n";
 foreach($objs as $obj){
+$sql=array();
+if(count($obj->nestings)){
 echo "Creating nestings for package \"$obj->code\"... ";
 $c=0;
-$sql=array();
 foreach($obj->nestings as $dep){
 $sql[]="insert into nestings (parent,child) values (
 ".$obj->id.",
 ".$pkg_ids[$dep].")";
-$db->execute($sql);
-//var_dump($db->error);
 }
 
+$db->execute($sql);
+//var_dump($db->error);
 
 if(!$db->error){
 echo "Ok\n";
@@ -528,7 +533,7 @@ echo "Ok\n";
 echo "Error: $db->error\n";
 exit;
 }
-
+}
 }
 
 
@@ -536,16 +541,18 @@ exit;
 
 echo "\nCreating comments:\n\n";
 foreach($objs as $obj){
+$sql=array();
+if(count($obj->comments)){
 echo "Creating comments for package \"$obj->code\"... ";
 $c=0;
-$sql=array();
 foreach($obj->comments as $dep){
 $sql[]="insert into comments (package,text) values (
 ".$obj->id.",
 \"".addslashes($dep)."\")";
-$db->execute($sql);
-//var_dump($db->error);
 }
+
+$db->execute($sql);
+//var_dump($db->error)
 
 
 if(!$db->error){
@@ -554,7 +561,7 @@ echo "Ok\n";
 echo "Error: $db->error\n";
 exit;
 }
-
+}
 }
 
 
