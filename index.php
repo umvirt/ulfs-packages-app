@@ -207,6 +207,7 @@ $pkgs[]="<tr><td>".$v['id']."</td><td>".$s."</td><td>".$v['sourcefile']."</td></
 
 }
 
+echo "<p>[ <a href=/linux/packages/depmap/".$release."/>Dependencies Map</a> ]</p>";
 echo "<h2>Packages(".count($x).")</h2>";
 
 if($format=="descriptions"){
