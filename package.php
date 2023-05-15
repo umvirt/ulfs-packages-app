@@ -137,6 +137,34 @@ $id=$v['id'];
 }
 
 
+$sql="select a.code, ap.configure, ap.build, ap.install
+from packages p left join releases r on p.release=r.id 
+left join packagesfiles_packages pf_p on pf_p.package=p.id 
+left join packagesfiles pf on pf.id=pf_p.packagefile 
+inner join architectures_packages ap on ap.package=p.id 
+left join architectures a on ap.architecture=a.id
+where r.`release`=\"$release\" and p.code=\"$package\"";
+
+$db->execute($sql);
+$x=array();
+
+$x=$db->dataset;
+//var_dump($sql);
+if(count($x)){
+echo "<h3>Arch specific instructions</h3>";
+foreach($x as $v){
+echo "<h4>".$v["code"]."</h4>";
+echo "Configuration script: 
+<br><pre>".configuration_script($v['configure'])."</pre><br>";
+echo "Build script: 
+<br><pre>".build_script($v['build'])."</pre><br>";
+echo "Install script: 
+<br><pre>".install_script($v['install'])."</pre><br>";
+
+}
+}
+
+
 $x=array();
 $sql="select package, text comment from comments where package=$id";
 $db->execute($sql);

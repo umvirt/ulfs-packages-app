@@ -13,6 +13,7 @@ RewriteRule ^text/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=tex
 RewriteRule ^descriptions/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=descriptions
 RewriteRule ^([0-9.]+)/([a-zA-z0-9.-]+)(/?)$ /linux/packages/package.php?release=$1&package=$2
 RewriteRule ^([0-9.]+)/([a-zA-z0-9.-]+)/install(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2
+RewriteRule ^([0-9.]+)/([a-zA-z0-9.-]+)/install/([a-zA-z0-9.-]+)(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2&arch=$3
 RewriteRule ^([0-9.]+)/([a-zA-z0-9.-]+)/localinstall(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2&type=local
 
 RewriteRule ^install/([0-9.]+)/([a-zA-z0-9.-]+)(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2

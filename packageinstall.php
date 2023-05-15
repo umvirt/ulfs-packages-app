@@ -4,15 +4,28 @@ include "inc/main.site.php";
 ob_end_clean();
 $release=@addslashes($_REQUEST['release']);
 $package=@addslashes($_REQUEST['package']);
+$arch=@addslashes($_REQUEST['arch']);
+
 
 $localinstall=false;
 if(@$_REQUEST['type']=="local"){
 $localinstall=true;
 }
 
+if($arch){
+$sql="
+select p.id, r.`release`, p.code, p.sourcefile, p.sourcedir, p.unpack, ap.configure, ap.build, ap.install
+from packages p left join releases r on p.release=r.id 
+left join packagesfiles_packages pf_p on pf_p.package=p.id 
+left join packagesfiles pf on pf.id=pf_p.packagefile 
+left join architectures_packages ap on ap.package=p.id 
+left join architectures a on ap.architecture=a.id
+where r.`release`=\"$release\" and p.code=\"$package\" and a.code=\"$arch\"";
+}else{
 $sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, unpack, build, install from packages p
 left join releases r on p.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
+}
 
 //var_dump($sql);
 $db->execute($sql);
@@ -82,6 +95,23 @@ echo "echo \"===============================\"\n";
 echo "echo \"Package: $package\" \n";
 echo "echo \"Release: $release\" \n";
 echo "\n";
+
+
+echo "#default values\n";
+echo "ULFS_PKG_DOCUMENTATION=YES\n";
+echo "ULFS_PKG_STATIC=NO\n";
+echo "ULFS_CONFIG_FILE=/etc/ulfs-packages/config\n";
+
+
+echo "echo \"checking config file\"\n";
+echo "if [ -f \$ULFS_CONFIG_FILE ]\n";
+echo "then\n";
+echo "echo \"loading config file\"\n";
+echo ". \$ULFS_CONFIG_FILE\n";
+echo "fi\n";
+
+
+
 
 echo "#Creating log directory\n";
 echo "mkdir -p $packagelogdir\n";
