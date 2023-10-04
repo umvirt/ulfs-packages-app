@@ -24,6 +24,8 @@ return $ct.";";
 }
 
 $tables=array(
+'architectures',
+'architectures_packages',
 'releases',
 'packages',
 'patches',

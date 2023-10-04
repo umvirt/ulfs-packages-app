@@ -1,5 +1,24 @@
 set foreign_key_checks=0;
 #SQLDELIMETER
+CREATE TABLE `architectures` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) CHARACTER SET utf8 NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8 NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+#SQLDELIMETER
+CREATE TABLE `architectures_packages` (
+  `architecture` int(10) unsigned NOT NULL,
+  `package` bigint(20) unsigned NOT NULL,
+  `configure` varchar(1024) CHARACTER SET utf8 NOT NULL,
+  `build` varchar(1024) CHARACTER SET utf8 NOT NULL,
+  `install` varchar(1024) CHARACTER SET utf8 NOT NULL,
+  PRIMARY KEY (`architecture`,`package`),
+  KEY `package` (`package`),
+  CONSTRAINT `architectures_packages_ibfk_1` FOREIGN KEY (`architecture`) REFERENCES `architectures` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `architectures_packages_ibfk_2` FOREIGN KEY (`package`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+#SQLDELIMETER
 CREATE TABLE `releases` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `release` varchar(10) CHARACTER SET latin1 NOT NULL,
