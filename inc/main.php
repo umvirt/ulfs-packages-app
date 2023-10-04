@@ -9,6 +9,21 @@ include INCDIR."config.php";
 include INCDIR."db.php";
 $db=new db_connection($db_config);
 
+
+
+//version safe join function
+function strjoin($array, $delimeter=""){
+if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
+return join($delimeter, $array);
+}else{
+return join($array, $delimeter);
+}
+}
+
+
+
+
+
 // Returns a file size limit in bytes based on the PHP upload_max_filesize
 // and post_max_size
 function file_upload_max_size() {

@@ -61,7 +61,7 @@ $depends[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$dep['code']
 
 
 if(count($dependances)){
-echo "Dependances: ".join($depends,", ").".<br>";
+echo "Dependances: ".strjoin($depends,", ").".<br>";
 }else{
 echo "Dependances: *** NO DEPENDANCES FOUND *** <br>";
 
@@ -76,7 +76,7 @@ $pats[]="<a href=\"$url\">".$pat['filename']."</a>";
 }
 
 if(count($patches)){
-echo "Patches: ".join($pats,", ").".<br>";
+echo "Patches: ".strjoin($pats,", ").".<br>";
 }else{
 echo "Patches: *** NO PATCHES FOUND *** <br>";
 }
@@ -105,13 +105,13 @@ $nestings_[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$nesting."
 
 
 if(count($addons)){
-echo "Addons: ".join($addns,", ").".<br>";
+echo "Addons: ".strjoin($addns,", ").".<br>";
 }else{
 echo "Addons: *** NO ADDONS FOUND *** <br>";
 }
 
 if(count($nestings)){
-echo "Nestings: ".join($nestings_,", ").".<br>";
+echo "Nestings: ".strjoin($nestings_,", ").".<br>";
 }else{
 echo "Nestings *** NO NESTINGS FOUND *** <br>";
 }
@@ -131,7 +131,7 @@ echo "Install script:
 
 
 
-//echo "Available packages: <table>".join ($pkgs)."</table>";
+//echo "Available packages: <table>".strjoin ($pkgs)."</table>";
 
 $id=$v['id'];
 }

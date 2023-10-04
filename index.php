@@ -83,7 +83,7 @@ echo $dom->saveXML();
 exit;
 }
 echo "<h2>Packages list</h2>";
-echo "Please select release to get packages list: ".join ($releases,', ');
+echo "Please select release to get packages list: ".strjoin ($releases,', ');
 
 
 echo "<h2>How to install package?</h2>";
@@ -128,7 +128,7 @@ EOL;
 
 
 }else{
-echo "Current releases: ".join ($releases,', ');
+echo "Current releases: ".strjoin ($releases,', ');
 
 //----
 
@@ -211,9 +211,9 @@ echo "<p>[ <a href=/linux/packages/depmap/".$release."/>Dependencies Map</a> ]</
 echo "<h2>Packages(".count($x).")</h2>";
 
 if($format=="descriptions"){
-echo "Available packages: <ul>".join ($pkgs)."</ul>";
+echo "Available packages: <ul>".strjoin ($pkgs)."</ul>";
 }else{
-echo "Available packages: <table>".join ($pkgs)."</table>";
+echo "Available packages: <table>".strjoin ($pkgs)."</table>";
 }
 
 }
