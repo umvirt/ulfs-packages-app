@@ -66,6 +66,7 @@ echo "Format: $format\n\n";
 
 
 //Commands proccessing
+$commands=array();
 echo "Reading commands info... ";
 $csfile=@file_get_contents("$path/commands.$format");
 if(strlen($csfile)){
@@ -147,11 +148,29 @@ exit;
 
 echo "Creating release...";
 
+$sql_="select id from releases where `release`=\"$release\"";
+$db->execute($sql_);
 
+if(count($db->dataset)){
+$release_id=$db->dataset[0]['id'];
+
+$sql=array();
+$sql[]="delete from packages where `release`=\"$release_id\"";
+$sql[]="delete from commands where `release`=\"$release_id\"";
+$db->execute($sql);
+
+
+
+}else{
+
+
+$sql=array();
 $sql[]="insert into releases (`release`) value (\"$release\")";
 $sql[]="select @@identity";
 $db->execute($sql);
 $release_id=$db->dataset[0]['@@identity'];
+
+}
 
 if($release_id){
 echo "Ok\n\n";
@@ -160,6 +179,8 @@ echo "Error\n\n";
 exit;
 }
 
+//var_dump($commands);exit;
+$objs=Array();
 
 
 foreach($commands as $command){
