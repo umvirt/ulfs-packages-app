@@ -266,6 +266,9 @@ echo "tar -xf ".$v['sourcefile']."\n";
 echo "#Checking package directory size after unpack...\n";
 echo "du -s ".$v['sourcedir']." | awk 'NR==1 {print $1}' > ".$packagelogdir."unpack.size \n";
 
+
+
+
 echo "#Going to source package directory...\n";
 echo "cd ".$v['sourcedir']."\n";
 
@@ -295,6 +298,9 @@ echo build_script($v['build'])."\n";
 
 echo "#Saving install timestamp\n";
 echo "date +%s > ".$packagelogdir."install.time\n";
+
+echo "#Changing all files creation time in source directory to find them\n";
+echo "find /sources/".$v['sourcedir']." -exec touch -m {} +\n";
 
 echo "#Running install script...\n";
 echo "cat > ulfs_install.sh << EOIS\n";
