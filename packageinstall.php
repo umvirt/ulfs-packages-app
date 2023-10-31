@@ -288,13 +288,27 @@ echo "#Saving configuration timestamp\n";
 echo "date +%s > ".$packagelogdir."configure.time\n";
 
 echo "#Running configuration script...\n";
+if($release=="0.1"){
 echo configuration_script($v['configure'])."\n";
+}else{
+echo "cat > ulfs_configure.sh << EOIS\n";
+echo configuration_script($v['configure'])."\n";
+echo "EOIS\n";
+echo "cat ulfs_configure.sh | bash | tee ".$packagelogdir."configure.log \n";
+}
 
 echo "#Saving build timestamp\n";
 echo "date +%s > ".$packagelogdir."build.time\n";
 
 echo "#Running build script...\n";
+if($release=="0.1"){
 echo build_script($v['build'])."\n";
+}else{
+echo "cat > ulfs_build.sh << EOIS\n";
+echo build_script($v['build'])."\n";
+echo "EOIS\n";
+echo "cat ulfs_build.sh | bash | tee ".$packagelogdir."build.log \n";
+}
 
 echo "#Saving install timestamp\n";
 echo "date +%s > ".$packagelogdir."install.time\n";
@@ -309,9 +323,9 @@ echo "EOIS\n";
 
 echo "USER=`whoami`\n";
 echo "if [ \"\$USER\" == \"root\" ] ; then \n";
-echo "cat ulfs_install.sh | bash \n";
+echo "cat ulfs_install.sh | bash | tee ".$packagelogdir."install.log \n";
 echo "else\n";
-echo "cat ulfs_install.sh | sudo bash \n";
+echo "cat ulfs_install.sh | sudo bash | tee ".$packagelogdir."install.log \n";
 echo "fi\n";
 
 

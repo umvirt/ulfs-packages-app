@@ -62,16 +62,16 @@ function configuration_script($v=""){
 if(!$v){
 return "./configure --prefix=/usr";
 }else{
+//$ -> \$
+$v=str_replace('$','\$',$v);
 //\r\n\ -> \n
 $v=str_replace("\r\n","\n",$v);
-
 return $v;
 }
 }
 
 function unpack_script($v=""){
 $v=str_replace("\r\n","\n",$v);
-
 return $v;
 }
 
@@ -80,9 +80,10 @@ function build_script($v=""){
 if(!$v){
 return "make";
 }else{
+//$ -> \$
+$v=str_replace('$','\$',$v);
 //\r\n\ -> \n
 $v=str_replace("\r\n","\n",$v);
-
 return $v;
 }
 }
@@ -91,8 +92,9 @@ function install_script($v=""){
 if(!$v){
 return "make install";
 }else{
-//\r\n\ -> \n
+//$ -> \$
 $v=str_replace('$','\$',$v);
+//\r\n\ -> \n
 $v=str_replace("\r\n","\n",$v);
 return $v;
 }
