@@ -341,6 +341,8 @@ echo "echo \"ULFS package installation completed.\"\n";
 echo "#Producing files list\n";
 echo "echo \"Looking for installed files...\"\n";
 echo "rm ".$packagelogdir."files.txt\n";
+
+$skipdir=str_replace('//','/',"$packagelogdir/*");
 echo "USER=`whoami`\n";
 echo "if [ \"\$USER\" == \"root\" ] ; then \n";
 echo "find /bin -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
@@ -350,7 +352,7 @@ echo "find /etc -type f -newer ".$packagelogdir."install.time \! -newer ".$packa
 echo "find /opt -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /lib -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /lib64 -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /var -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /var -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time \! -path \"$skipdir\" >> ".$packagelogdir."files.txt\n";
 
 echo "else\n";
 
@@ -361,7 +363,7 @@ echo "sudo find /etc -type f -newer ".$packagelogdir."install.time \! -newer ".$
 echo "sudo find /opt -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /lib -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /lib64 -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /var -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /var -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time \!  -path \"$skipdir\" >> ".$packagelogdir."files.txt\n";
 
 echo "fi\n";
 
