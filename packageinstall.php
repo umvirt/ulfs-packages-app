@@ -34,9 +34,12 @@ $x=$db->dataset;
 
 $pkgs=array();
 foreach ($x as $k=>$v){
+$url="";
+$filepath="";
+if($v['sourcefile']){
 $url=download_url($release, $v['sourcefile']);
 $filepath=file_path($release, $v['sourcefile']);
-
+}
 $patches=patches($release,$v['code']);
 
 
@@ -289,6 +292,9 @@ echo "patch -Np1 -i ../".$pat['filename']."\n";
 echo "#Saving configuration timestamp\n";
 echo "date +%s > ".$packagelogdir."configure.time\n";
 
+if($v['sourcefile']){
+
+
 echo "#Sleep 1 second\n";
 echo "sleep 1\n";
 
@@ -306,8 +312,11 @@ echo "EOIS\n";
 echo "cat ulfs_configure.sh | bash | tee ".$packagelogdir."configure.log \n";
 }
 
+}
 echo "#Saving build timestamp\n";
 echo "date +%s > ".$packagelogdir."build.time\n";
+
+if($v['sourcefile']){
 
 echo "#Running build script...\n";
 if($release=="0.1"){
@@ -319,10 +328,16 @@ echo "EOIS\n";
 echo "cat ulfs_build.sh | bash | tee ".$packagelogdir."build.log \n";
 }
 
+}
+
 echo "#Saving install timestamp\n";
 echo "date +%s > ".$packagelogdir."install.time\n";
 
+
 echo "#Running install script...\n";
+
+if($v['sourcefile']){
+
 echo "cat > ulfs_install.sh << EOIS\n";
 echo install_script($v['install'])."\n";
 echo "EOIS\n";
@@ -334,9 +349,18 @@ echo "else\n";
 echo "cat ulfs_install.sh | sudo bash | tee ".$packagelogdir."install.log \n";
 echo "fi\n";
 
+} else {
+
+echo install_script($v['install'])."\n";
+
+}
+
 
 echo "#Saving finish timestamp\n";
 echo "date +%s > ".$packagelogdir."finish.time\n";
+
+
+if($v['sourcefile']){
 
 echo "#Checking package directory size after unpack...\n";
 echo "cd /sources \n";
@@ -373,6 +397,8 @@ echo "sudo find /var -type f -newer ".$packagelogdir."configure.time \! -newer "
 
 echo "fi\n";
 
+}
+
 echo "#Marking package as installed...\n";
 echo "mkdir -p $packagesdir\n";
 
@@ -381,12 +407,15 @@ foreach($nestings as $nesting){
 	echo "touch $packagesdir/".$nesting."\n";
 }
 
+if($v['sourcefile']){
+
 echo "#Calculate delta size\n";
 echo "a=`cat ".$packagelogdir."unpack.size`\n";
 echo "b=`cat ".$packagelogdir."install.size`\n";
 echo "c=\$((\$b-\$a))\n";
 echo "echo \$c > ".$packagelogdir."delta.size \n";
 
+}
 
 echo "#Calculate prepare time\n";
 echo "a=`cat ".$packagelogdir."start.time`\n";
@@ -412,7 +441,12 @@ echo "echo \"ULFS Package installation report\"\n";
 echo "echo \"================================\"\n";
 echo "echo \"Package: $package\" \n";
 echo "echo \"Release: $release\" \n";
+
+if($v['sourcefile']){
+
 echo "echo \"Build size: \$c\" \n";
+
+}
 echo "echo \"Prepare time: \$dp sec.\" \n";
 echo "echo \"Download time: \$dd sec.\" \n";
 echo "echo \"Build time: \$db sec.\" \n";
