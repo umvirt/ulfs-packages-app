@@ -272,6 +272,8 @@ echo "du -s ".$v['sourcedir']." | awk 'NR==1 {print $1}' > ".$packagelogdir."unp
 echo "#Going to source package directory...\n";
 echo "cd ".$v['sourcedir']."\n";
 
+
+
 if(count($patches)){
 echo "#Applying patches...\n";
 foreach ($patches as $pat){
@@ -286,6 +288,13 @@ echo "patch -Np1 -i ../".$pat['filename']."\n";
 }
 echo "#Saving configuration timestamp\n";
 echo "date +%s > ".$packagelogdir."configure.time\n";
+
+echo "#Sleep 1 second\n";
+echo "sleep 1\n";
+
+echo "#Changing all files creation time (except build configuration files) in source directory to find them after installation\n";
+echo "find /sources/".$v['sourcedir']." \! -path \"*/configure*\"  \! -path \"*/Makefile*\"  \! -path \"*.m4\" \! -path \"*.am\" -exec touch -m {} +\n";
+
 
 echo "#Running configuration script...\n";
 if($release=="0.1"){
@@ -312,9 +321,6 @@ echo "cat ulfs_build.sh | bash | tee ".$packagelogdir."build.log \n";
 
 echo "#Saving install timestamp\n";
 echo "date +%s > ".$packagelogdir."install.time\n";
-
-echo "#Changing all files creation time in source directory to find them\n";
-echo "find /sources/".$v['sourcedir']." -exec touch -m {} +\n";
 
 echo "#Running install script...\n";
 echo "cat > ulfs_install.sh << EOIS\n";
@@ -345,25 +351,25 @@ echo "rm ".$packagelogdir."files.txt\n";
 $skipdir=str_replace('//','/',"$packagelogdir/*");
 echo "USER=`whoami`\n";
 echo "if [ \"\$USER\" == \"root\" ] ; then \n";
-echo "find /bin -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /sbin -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /usr -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /etc -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /opt -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /lib -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /lib64 -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /var -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time \! -path \"$skipdir\" >> ".$packagelogdir."files.txt\n";
+echo "find /bin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /sbin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /usr -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /opt -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /lib -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /lib64 -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /var -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! -path \"$skipdir\" >> ".$packagelogdir."files.txt\n";
 
 echo "else\n";
 
-echo "sudo find /bin -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /sbin -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /usr -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /etc -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /opt -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /lib -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /lib64 -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /var -type f -newer ".$packagelogdir."install.time \! -newer ".$packagelogdir."finish.time \!  -path \"$skipdir\" >> ".$packagelogdir."files.txt\n";
+echo "sudo find /bin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /sbin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /usr -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /opt -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /lib -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /lib64 -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /var -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \!  -path \"$skipdir\" >> ".$packagelogdir."files.txt\n";
 
 echo "fi\n";
 
