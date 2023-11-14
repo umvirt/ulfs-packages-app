@@ -299,7 +299,7 @@ echo "#Sleep 1 second\n";
 echo "sleep 1\n";
 
 echo "#Changing all files creation time (except build configuration files) in source directory to find them after installation\n";
-echo "find /sources/".$v['sourcedir']." \! -path \"*/configure*\"  \! -path \"*/Makefile*\"  \! -path \"*.m4\" \! -path \"*.am\" -exec touch -m {} +\n";
+echo "find /sources/".$v['sourcedir']." \! -path \"*/configure*\"  \! -path \"*/Makefile*\" \! -path \"*.make\"  \! -path \"*.stamp\" \! -path \"*.m4\" \! -path \"*.am\" -exec touch -m {} +\n";
 
 
 echo "#Running configuration script...\n";
