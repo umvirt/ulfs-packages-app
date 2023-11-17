@@ -1,6 +1,6 @@
 <?php
 
-function configuration_script($v=""){
+function configuration_script($v="",$release=""){
 if(!$v){
 return "./configure --prefix=/usr";
 }else{
@@ -8,6 +8,9 @@ return "./configure --prefix=/usr";
 $v=str_replace('$','\$',$v);
 //\r\n\ -> \n
 $v=str_replace("\r\n","\n",$v);
+if($release != "0.1"){
+$v=str_replace('\\','\\\\',$v);
+}
 return $v;
 }
 }
@@ -18,7 +21,7 @@ return $v;
 }
 
 
-function build_script($v=""){
+function build_script($v="",$release=""){
 if(!$v){
 return "make";
 }else{
@@ -26,6 +29,9 @@ return "make";
 $v=str_replace('$','\$',$v);
 //\r\n\ -> \n
 $v=str_replace("\r\n","\n",$v);
+if($release!="0.1"){
+$v=str_replace('\\','\\\\',$v);
+}
 return $v;
 }
 }

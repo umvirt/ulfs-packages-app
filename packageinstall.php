@@ -298,16 +298,32 @@ if($v['sourcefile']){
 echo "#Sleep 1 second\n";
 echo "sleep 1\n";
 
+if($release!="0.1"){
 echo "#Changing all files creation time (except build configuration files) in source directory to find them after installation\n";
-echo "find /sources/".$v['sourcedir']." \! -path \"*/configure*\"  \! -path \"*/Makefile*\" \! -path \"*.make\"  \! -path \"*.stamp\" \! -path \"*.m4\" \! -path \"*.am\" -exec touch -m {} +\n";
 
+//default
+$dateresetskip=Array(
+"*/configure*","*/Makefile*","*.make","*.m4","*.am"
+);
+//nettle
+$dateresetskip[]="*.stamp";
+//grub
+$dateresetskip[]="*gentpl.py";
+
+$skip="";
+foreach($dateresetskip as $dss){
+$skip.="\! -path \"$dss\" ";
+}
+
+echo "find /sources/".$v['sourcedir']." $skip -exec touch -m {} +\n";
+}
 
 echo "#Running configuration script...\n";
 if($release=="0.1"){
-echo configuration_script($v['configure'])."\n";
+echo configuration_script($v['configure'],$release)."\n";
 }else{
 echo "cat > ulfs_configure.sh << EOIS\n";
-echo configuration_script($v['configure'])."\n";
+echo configuration_script($v['configure'],$release)."\n";
 echo "EOIS\n";
 echo "cat ulfs_configure.sh | bash | tee ".$packagelogdir."configure.log \n";
 }
@@ -320,10 +336,10 @@ if($v['sourcefile']){
 
 echo "#Running build script...\n";
 if($release=="0.1"){
-echo build_script($v['build'])."\n";
+echo build_script($v['build'],$release)."\n";
 }else{
 echo "cat > ulfs_build.sh << EOIS\n";
-echo build_script($v['build'])."\n";
+echo build_script($v['build'],$release)."\n";
 echo "EOIS\n";
 echo "cat ulfs_build.sh | bash | tee ".$packagelogdir."build.log \n";
 }
