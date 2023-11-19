@@ -4,13 +4,15 @@ function configuration_script($v="",$release=""){
 if(!$v){
 return "./configure --prefix=/usr";
 }else{
+if($release != "0.1"){
+$v=str_replace('\\','\\\\',$v);
+}
 //$ -> \$
 $v=str_replace('$','\$',$v);
 //\r\n\ -> \n
 $v=str_replace("\r\n","\n",$v);
-if($release != "0.1"){
-$v=str_replace('\\','\\\\',$v);
-}
+
+
 return $v;
 }
 }
@@ -25,15 +27,18 @@ function build_script($v="",$release=""){
 if(!$v){
 return "make";
 }else{
+if($release!="0.1"){
+$v=str_replace('\\','\\\\',$v);
+}
 //$ -> \$
 $v=str_replace('$','\$',$v);
 //\r\n\ -> \n
 $v=str_replace("\r\n","\n",$v);
-if($release!="0.1"){
-$v=str_replace('\\','\\\\',$v);
-}
+
 return $v;
 }
+
+
 }
 
 function install_script($v=""){
