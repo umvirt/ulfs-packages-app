@@ -298,12 +298,16 @@ if($v['sourcefile']){
 echo "#Sleep 1 second\n";
 echo "sleep 1\n";
 
+
+echo "if [[ \"\$ULFS_PKG_DATERESET\" == \"YES\" ]]\n";
+echo "then\n";
+
 if($release!="0.1"){
 echo "#Changing all files creation time (except build configuration files) in source directory to find them after installation\n";
 
 //default
 $dateresetskip=Array(
-"*/configure*","*/Makefile*","*.make","*.m4","*.am"
+"*/configure*","*/Makefile*","*.make","*.m4","*.am","*.mk"
 );
 //nettle
 $dateresetskip[]="*.stamp";
@@ -317,6 +321,8 @@ $skip.="\! -path \"$dss\" ";
 
 echo "find /sources/".$v['sourcedir']." $skip -exec touch -m {} +\n";
 }
+
+echo "fi\n";
 
 echo "#Running configuration script...\n";
 if($release=="0.1"){
