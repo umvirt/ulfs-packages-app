@@ -241,12 +241,12 @@ echo "wget --no-check-certificate -nc $pat\n";
 
 if($v['sourcefile']){
 
-echo "if [ -f /sources/.cleanup ]; then\n";
+//echo "if [ -f /sources/.cleanup ]; then\n";
 echo "    #Saving cleanup timestamp\n";
 echo "    date +%s > ".$packagelogdir."cleanup.time\n";
 
 echo      "rm -rfv /sources/".$v['sourcedir']."/\n";
-echo "fi\n";
+//echo "fi\n";
 
 echo "#Saving extracting timestamp\n";
 echo "date +%s > ".$packagelogdir."unpack.time\n";
