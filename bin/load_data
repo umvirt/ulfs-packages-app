@@ -63,6 +63,8 @@ echo "Packages path: $path\n";
 echo "Release: $release\n";
 echo "Format: $format\n\n";
 
+//release git commit
+$commit=trim(file_get_contents($path.'/.git/refs/heads/master'));
 
 
 //Commands proccessing
@@ -165,7 +167,7 @@ $db->execute($sql);
 
 
 $sql=array();
-$sql[]="insert into releases (`release`) value (\"$release\")";
+$sql[]="insert into releases (`release`,`commit`) value (\"$release\",\"$commit\")";
 $sql[]="select @@identity";
 $db->execute($sql);
 $release_id=$db->dataset[0]['@@identity'];

@@ -4,6 +4,8 @@ ini_set('error_reporting',E_ALL);
 
 DEFINE('APPDIR',dirname(dirname(__file__)).'/');
 DEFINE('INCDIR',APPDIR.'/inc/');
+DEFINE('APPCOMMIT',trim(file_get_contents(APPDIR.'/.git/refs/heads/master')));
+//var_dump(APPCOMMIT);exit;
 //echo APPDIR;exit;
 include INCDIR."config.php";
 include INCDIR."db.php";
