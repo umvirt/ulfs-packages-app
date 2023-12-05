@@ -22,6 +22,7 @@ CREATE TABLE `architectures_packages` (
 CREATE TABLE `releases` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `release` varchar(10) CHARACTER SET latin1 NOT NULL,
+  `commit` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `release` (`release`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
