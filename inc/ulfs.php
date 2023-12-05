@@ -1,9 +1,6 @@
 <?php
 
-function configuration_script($v="",$release=""){
-if(!$v){
-return "./configure --prefix=/usr";
-}else{
+function scriptslashes($v,$release=""){
 if($release != "0.1"){
 $v=str_replace('\\','\\\\',$v);
 }
@@ -12,7 +9,13 @@ $v=str_replace('$','\$',$v);
 //\r\n\ -> \n
 $v=str_replace("\r\n","\n",$v);
 
+return $v;
+}
 
+function configuration_script($v=""){
+if(!$v){
+return "./configure --prefix=/usr";
+}else{
 return $v;
 }
 }
@@ -23,18 +26,10 @@ return $v;
 }
 
 
-function build_script($v="",$release=""){
+function build_script($v=""){
 if(!$v){
 return "make";
 }else{
-if($release!="0.1"){
-$v=str_replace('\\','\\\\',$v);
-}
-//$ -> \$
-$v=str_replace('$','\$',$v);
-//\r\n\ -> \n
-$v=str_replace("\r\n","\n",$v);
-
 return $v;
 }
 
@@ -225,4 +220,30 @@ foreach($x as $k=>$v){
 return $deps;
 
 }
+
+
+function distributedBuildInit($localbuild=0){
+
+$s= "";
+
+if(!$localbuild){
+$s.= "echo \"Initializing distributed build environment... \"\n";
+$s.= "if [[ \"\$ULFS_ICECC\" == \"YES\" ]]\n";
+$s.= "then\n";
+$s.= "    export PATH=\"\$ULFS_ICECC_PATH:\$PATH\"\n";
+$s.= "    echo \"ICECC\"\n";
+$s.= "fi\n";
+$s.= "\n";
+}
+
+$s.= "echo \"Environment debug...\"\n";
+$s.= "echo \"PATH: \$PATH\"\n";
+$s.= "echo \"MAKEFLAGS: \$MAKEFLAGS\"\n";
+$s.= "echo \"NINJAJOBS: \$NINJAJOBS\"\n";
+$s.= "\n\n";
+
+return $s;
+
+}
+
 

@@ -7,7 +7,7 @@ $package=@addslashes($_REQUEST['package']);
 $format=@addslashes($_REQUEST['format']);
 
 
-$sql="select p.id, r.`release`, code, unpack, sourcefile, sourcedir, configure, build, install, description from packages p
+$sql="select p.id, r.`release`, code, unpack, sourcefile, sourcedir, configure, build, install, description,localbuild from packages p
 left join releases r on p.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
@@ -36,6 +36,7 @@ $arr=array(
 'configure'=>base64_encode($v['configure']),
 'build'=>base64_encode($v['build']),
 'install'=>base64_encode($v['install']),
+'localbuild'=>$v['localbuild'],
 'dependances'=>$dependances,
 'patches'=>$patches,
 'addons'=>$addons,
@@ -61,6 +62,7 @@ $unpack = $dom->createElement('unpack',base64_encode($v['unpack']));
 $configure = $dom->createElement('configure',base64_encode($v['configure']));
 $build = $dom->createElement('build',base64_encode($v['build']));
 $install = $dom->createElement('install',base64_encode($v['install']));
+$localbuild = $dom->createElement('localbuild',$v['localbuild']);
 
 
 $root->appendChild($release);
@@ -72,6 +74,7 @@ $root->appendChild($unpack);
 $root->appendChild($configure);
 $root->appendChild($build);
 $root->appendChild($install);
+$root->appendChild($localbuild);
 
 //Dependances
 //test: mc

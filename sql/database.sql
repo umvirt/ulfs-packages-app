@@ -37,6 +37,7 @@ CREATE TABLE `packages` (
   `configure` varchar(10240) CHARACTER SET latin1 NOT NULL,
   `build` varchar(10240) CHARACTER SET latin1 NOT NULL,
   `install` varchar(10240) CHARACTER SET latin1 NOT NULL,
+  `localbuild` bit(1) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`,`release`) USING BTREE,
   KEY `version` (`release`),

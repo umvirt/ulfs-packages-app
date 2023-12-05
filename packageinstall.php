@@ -22,7 +22,7 @@ left join architectures_packages ap on ap.package=p.id
 left join architectures a on ap.architecture=a.id
 where r.`release`=\"$release\" and p.code=\"$package\" and a.code=\"$arch\"";
 }else{
-$sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, unpack, build, install from packages p
+$sql="select p.id, r.`release`, code, sourcefile, sourcedir, configure, unpack, build, install,localbuild from packages p
 left join releases r on p.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
 }
@@ -325,11 +325,15 @@ echo "find /sources/".$v['sourcedir']." $skip -exec touch -m {} +\n";
 echo "fi\n";
 
 echo "#Running configuration script...\n";
+$configure="";
+$configure.=scriptslashes(distributedBuildInit($v['localbuild']),$release);
+$configure.=scriptslashes(configuration_script($v['configure']),$release);
+
 if($release=="0.1"){
-echo configuration_script($v['configure'],$release)."\n";
+echo $configure."\n";
 }else{
 echo "cat > ulfs_configure.sh << EOIS\n";
-echo configuration_script($v['configure'],$release)."\n";
+echo $configure."\n";
 echo "EOIS\n";
 echo "cat ulfs_configure.sh | bash | tee ".$packagelogdir."configure.log \n";
 }
@@ -341,11 +345,15 @@ echo "date +%s > ".$packagelogdir."build.time\n";
 if($v['sourcefile']){
 
 echo "#Running build script...\n";
+$build="";
+$build.=scriptslashes(distributedBuildInit($v['localbuild']),$release);
+$build.=scriptslashes(build_script($v['build']),$release);
+
 if($release=="0.1"){
-echo build_script($v['build'],$release)."\n";
+echo $build."\n";
 }else{
 echo "cat > ulfs_build.sh << EOIS\n";
-echo build_script($v['build'],$release)."\n";
+echo $build."\n";
 echo "EOIS\n";
 echo "cat ulfs_build.sh | bash | tee ".$packagelogdir."build.log \n";
 }
