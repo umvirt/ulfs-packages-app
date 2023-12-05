@@ -294,7 +294,11 @@ $obj->dependances=array();
 $obj->nestings=array();
 $obj->comments=array();
 
-
+if(@$xpackage->localbuild->__toString()=="1"){
+$obj->localbuild=1;
+}else{
+$obj->localbuild=0;
+}
 
 if(@$xpackage->unpack->__toString()){
 $obj->unpack=base64_decode($xpackage->unpack->__toString());
@@ -363,6 +367,11 @@ $obj->dependances=array();
 $obj->nestings=array();
 $obj->comments=array();
 
+if(@$jpackage->localbuild=="1"){
+$obj->localbuild=1;
+}else{
+$obj->localbuild=0;
+}
 
 
 if(@$jpackage->unpack){
@@ -416,7 +425,7 @@ foreach($objs as $obj){
 
 echo "Creating package \"$obj->code\"... ";
 $sql=array();
-$sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install)
+$sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install,localbuild)
 values (
 \"$obj->code\",
 \"".addslashes($obj->description)."\",
@@ -426,7 +435,8 @@ values (
 \"".addslashes($obj->unpack)."\",
 \"".addslashes($obj->configure)."\",
 \"".addslashes($obj->build)."\",
-\"".addslashes($obj->install)."\"
+\"".addslashes($obj->install)."\",
+".addslashes($obj->localbuild)."
 )";
 
 
