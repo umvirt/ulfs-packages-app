@@ -2,9 +2,17 @@
 ini_set('display_errors',1);
 ini_set('error_reporting',E_ALL);
 
+function gitHead($path){
+$ref=trim(file_get_contents("$path/.git/HEAD"));
+$file=str_replace('ref: ','',$ref);
+//echo $file;
+return trim(file_get_contents("$path/.git/$file"));
+}
+
+
 DEFINE('APPDIR',dirname(dirname(__file__)).'/');
 DEFINE('INCDIR',APPDIR.'/inc/');
-DEFINE('APPCOMMIT',trim(file_get_contents(APPDIR.'/.git/refs/heads/master')));
+DEFINE('APPCOMMIT',gitHead(APPDIR));
 //var_dump(APPCOMMIT);exit;
 //echo APPDIR;exit;
 include INCDIR."config.php";

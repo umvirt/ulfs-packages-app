@@ -64,7 +64,7 @@ echo "Release: $release\n";
 echo "Format: $format\n\n";
 
 //release git commit
-$commit=trim(file_get_contents($path.'/.git/refs/heads/master'));
+$commit=gitHead($path);
 
 
 //Commands proccessing
