@@ -103,19 +103,15 @@ echo "echo \"Release: $release\" \n";
 echo "\n";
 
 
+/*
 echo "#default values\n";
 echo "ULFS_PKG_DOCUMENTATION=YES\n";
 echo "ULFS_PKG_STATIC=NO\n";
 echo "ULFS_CONFIG_FILE=/etc/ulfs-packages/config\n";
+*/
 
-
-echo "echo \"checking config file\"\n";
-echo "if [ -f \$ULFS_CONFIG_FILE ]\n";
-echo "then\n";
-echo "echo \"loading config file\"\n";
-echo ". \$ULFS_CONFIG_FILE\n";
-echo "fi\n";
-
+//load config
+loadConfig();
 
 
 
@@ -329,6 +325,7 @@ echo "fi\n";
 
 echo "#Running configuration script...\n";
 $configure="";
+$configure.=scriptslashes(loadConfig(),$release);
 $configure.=scriptslashes(distributedBuildInit($v['localbuild']),$release);
 $configure.=scriptslashes(configuration_script($v['configure']),$release);
 
@@ -349,6 +346,7 @@ if($v['sourcefile']){
 
 echo "#Running build script...\n";
 $build="";
+$build.=scriptslashes(loadConfig(),$release);
 $build.=scriptslashes(distributedBuildInit($v['localbuild']),$release);
 $build.=scriptslashes(build_script($v['build']),$release);
 

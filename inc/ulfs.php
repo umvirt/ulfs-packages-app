@@ -240,6 +240,7 @@ $s.= "echo \"Environment debug...\"\n";
 $s.= "echo \"PATH: \$PATH\"\n";
 $s.= "echo \"MAKEFLAGS: \$MAKEFLAGS\"\n";
 $s.= "echo \"NINJAJOBS: \$NINJAJOBS\"\n";
+$s.= "env | grep ULFS\n";
 $s.= "\n\n";
 
 return $s;
@@ -247,3 +248,11 @@ return $s;
 }
 
 
+function loadConfig(){
+echo "echo \"checking config file\"\n";
+echo "if [ -f \$ULFS_CONFIG_FILE ]\n";
+echo "then\n";
+echo "echo \"loading config file \$ULFS_CONFIG_FILE...\"\n";
+echo ". \$ULFS_CONFIG_FILE\n";
+echo "fi\n";
+}
