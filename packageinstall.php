@@ -298,10 +298,11 @@ echo "#Sleep 1 second\n";
 echo "sleep 1\n";
 
 
+if($release!="0.1"){
+
 echo "if [[ \"\$ULFS_PKG_DATERESET\" == \"YES\" ]]\n";
 echo "then\n";
 
-if($release!="0.1"){
 echo "#Changing all files creation time (except build configuration files) in source directory to find them after installation\n";
 
 //default
@@ -319,14 +320,17 @@ $skip.="\! -path \"$dss\" ";
 }
 
 echo "find /sources/".$v['sourcedir']." $skip -exec touch -m {} +\n";
-}
+
 
 echo "fi\n";
+}
 
 echo "#Running configuration script...\n";
 $configure="";
+if($release!="0.1"){
 $configure.=scriptslashes(loadConfig(),$release);
 $configure.=scriptslashes(distributedBuildInit($v['localbuild']),$release);
+}
 $configure.=scriptslashes(configuration_script($v['configure']),$release);
 
 if($release=="0.1"){
@@ -346,8 +350,10 @@ if($v['sourcefile']){
 
 echo "#Running build script...\n";
 $build="";
+if($release!="0.1"){
 $build.=scriptslashes(loadConfig(),$release);
 $build.=scriptslashes(distributedBuildInit($v['localbuild']),$release);
+}
 $build.=scriptslashes(build_script($v['build']),$release);
 
 if($release=="0.1"){
@@ -356,7 +362,9 @@ echo $build."\n";
 echo "cat > ulfs_build.sh << EOIS\n";
 echo $build."\n";
 echo "EOIS\n";
-echo "cat ulfs_build.sh | bash | tee ".$packagelogdir."build.log \n";
+//echo "cat ulfs_build.sh | bash 2>".$packagelogdir."build.err | tee ".$packagelogdir."build.log \n";
+
+echo "cat ulfs_build.sh | bash 2>&1 | tee ".$packagelogdir."build.log \n";
 }
 
 }
