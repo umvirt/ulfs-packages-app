@@ -1,6 +1,9 @@
 <?php
+if(@$config['debug']){
 ini_set('display_errors',1);
 ini_set('error_reporting',E_ALL);
+}
+
 
 function gitHead($path){
 $ref=trim(file_get_contents("$path/.git/HEAD"));

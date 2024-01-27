@@ -4,6 +4,10 @@ $db_config['database']='ulfs';
 $db_config['user']='ulfs';
 $db_config['password']='secret';
 $db_config['server']='127.0.0.1';
+
+//debug
+$config['debug']=false;
+
 //local install root path
 $config['localpath']="/mnt/umvirt";
 //files repository root
