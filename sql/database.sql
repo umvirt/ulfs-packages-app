@@ -82,7 +82,7 @@ CREATE TABLE `commands` (
   `info` varchar(1024) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id`),
   KEY `release` (`release`),
-  CONSTRAINT `commands_fk_release` FOREIGN KEY (`release`) REFERENCES `releases` (`id`)
+  CONSTRAINT `commands_fk_release` FOREIGN KEY (`release`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 #SQLDELIMETER
 CREATE TABLE `comments` (
@@ -98,9 +98,9 @@ CREATE TABLE `nestings` (
   `parent` bigint(20) unsigned NOT NULL,
   `child` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`parent`,`child`),
-  KEY `child` (`child`),
-  CONSTRAINT `nestings_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `packages` (`id`),
-  CONSTRAINT `nestings_ibfk_2` FOREIGN KEY (`child`) REFERENCES `packages` (`id`)
+  KEY `nestings_ibfk_2` (`child`),
+  CONSTRAINT `nestings_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `nestings_ibfk_2` FOREIGN KEY (`child`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 #SQLDELIMETER
 CREATE TABLE `packagesfiles` (
