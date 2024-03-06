@@ -105,28 +105,6 @@ echo "<ol>
 <li><a href=\"api.html\">Application Programming interface (API)</a>
 </ol>";
 
-echo "<h2>Contacts</h2>
-<p>WWW:   <a href=http://umvirt.com/linux/packages>http://umvirt.com/linux/packages/</a>
-<br>Email: <a href=mailto:dev@umvirt.com>dev@umvirt.com</a></p>";
-
-echo  <<<EOL
-<h2>Keep this service working</h2>
-<p>We rent a physical servers in order to host our services. We need money to keep they working.</p> 
-<p>If you like to use our services please donate us some money as many as you wish.</p>
-<ul>
-<li><b>BTC:</b> 3JegVULRiijjcxDwx1YbKCk8mWvxANTGGo [ <a href="qr/3JegVULRiijjcxDwx1YbKCk8mWvxANTGGo.png">QR-code</a> | <a href="https://www.blockchain.com/btc/address/3JegVULRiijjcxDwx1YbKCk8mWvxANTGGo" target="_blank">Check transaction</a> ]
-<li><b>BCH:</b> qr9c2n9ujxmyh8knxaz6rv4eh73pz3m5ruk7wgunxk [ <a href="qr/qr9c2n9ujxmyh8knxaz6rv4eh73pz3m5ruk7wgunxk.png">QR-code</a> | <a href="https://blockdozer.com/address/qr9c2n9ujxmyh8knxaz6rv4eh73pz3m5ruk7wgunxk" target="_blank">Check transaction</a> ]
-<li><b>LTC:</b> LMx39BwUwaYZeeLn7DyYoGvuRhXFx5i3SW [ <a href="qr/LMx39BwUwaYZeeLn7DyYoGvuRhXFx5i3SW.png">QR-code</a> | <a href="https://bchain.info/LTC/addr/LMx39BwUwaYZeeLn7DyYoGvuRhXFx5i3SW" target="_blank">Check transaction</a> ]
-<li><b>Monero:</b> 87yTheNHaxNdmSBcHJZFfR4a9WT8CKwTJMDe7L1JaEFCf3eE2mN2GpzAiDqn9YAasgHymTwk4KJ4VToZkvnMmuFDLBF3FUD [ <a href="qr/87yTheNHaxNdmSBcHJZFfR4a9WT8CKwTJMDe7L1JaEFCf3eE2mN2GpzAiDqn9YAasgHymTwk4KJ4VToZkvnMmuFDLBF3FUD
-.png">QR-code</a> ]
-</ul>
-</p>
-EOL;
-
-
-
-
-
 }else{
 echo "Current releases: ".strjoin ($releases,', ');
 
