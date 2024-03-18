@@ -36,13 +36,16 @@ $arr=array(
 'configure'=>base64_encode($v['configure']),
 'build'=>base64_encode($v['build']),
 'install'=>base64_encode($v['install']),
-'localbuild'=>$v['localbuild'],
 'dependances'=>$dependances,
 'patches'=>$patches,
 'addons'=>$addons,
 'nestings'=>$nestings,
 'comments'=>$comments,
 );
+if($release!="0.1"){
+$arr['localbuild']=$v['localbuild'];
+}
+
 $result=json_encode($arr);
 }
 
@@ -52,7 +55,7 @@ if($format=="xml"){
 $dom = new DOMDocument('1.0', 'utf-8');
 $dom->formatOutput=true;
 $root = $dom->createElement('package');
-$release = $dom->createElement('release',$release);
+$release_ = $dom->createElement('release',$release);
 $code = $dom->createElement('code',$package);
 $description = $dom->createElement('description',base64_encode($v['description']));
 
@@ -62,10 +65,8 @@ $unpack = $dom->createElement('unpack',base64_encode($v['unpack']));
 $configure = $dom->createElement('configure',base64_encode($v['configure']));
 $build = $dom->createElement('build',base64_encode($v['build']));
 $install = $dom->createElement('install',base64_encode($v['install']));
-$localbuild = $dom->createElement('localbuild',$v['localbuild']);
 
-
-$root->appendChild($release);
+$root->appendChild($release_);
 $root->appendChild($code);
 $root->appendChild($description);
 $root->appendChild($sourcefile);
@@ -74,7 +75,11 @@ $root->appendChild($unpack);
 $root->appendChild($configure);
 $root->appendChild($build);
 $root->appendChild($install);
+
+if($release!="0.1"){
+$localbuild = $dom->createElement('localbuild',$v['localbuild']);
 $root->appendChild($localbuild);
+}
 
 //Dependances
 //test: mc
