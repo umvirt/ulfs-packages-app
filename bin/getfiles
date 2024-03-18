@@ -1,0 +1,116 @@
+#!/usr/bin/env php
+<?php
+//==================
+//Data Dumper
+//==================
+include "../inc/main.php";
+
+$release=@$argv[2];
+$section=@$argv[1];
+
+echo "Release: $release\n";
+if (!$release){
+die("no release defined");
+}
+
+echo "Section: $section\n";
+if (!$section){
+die("no section defined");
+}
+
+echo "\n";
+
+switch($section){
+
+case "addons": 
+
+$sql="select p.code package, a.filename from packages p
+left join addons a on a.package=p.id
+left join releases r on r.id=p.release where r.release=\"$release\"";
+
+$db->execute($sql);
+if($db->error){
+echo $db->error;
+}
+
+$x=$db->dataset;
+
+foreach($x as $row){
+if($row['filename']){
+$fpath="ERROR";
+$file_path=file_path($release, $row['filename']);
+if($file_path){
+$fpath=$file_path;
+}
+
+
+echo $row['package']."\t".$row['filename']."\t".$fpath."\n";
+
+}
+}
+
+break;
+
+
+case "patches":
+
+$sql="select p.code package, p2.filename from packages p
+left join patches p2 on p2.package=p.id
+left join releases r on r.id=p.release where r.release=\"$release\"";
+
+$db->execute($sql);
+if($db->error){
+echo $db->error;
+}
+
+$x=$db->dataset;
+
+foreach($x as $row){
+if($row['filename']){
+$fpath="ERROR";
+$file_path=patch_path($release, $row['filename']);
+if($file_path){
+$fpath=$file_path;
+}
+
+
+echo $row['package']."\t".$row['filename']."\t".$fpath."\n";
+
+}
+}
+
+break;
+
+
+case "packages":
+
+$sql="select p.code package, p.sourcefile from packages p
+left join releases r on r.id=p.release where r.release=\"$release\"";
+
+$db->execute($sql);
+if($db->error){
+echo $db->error;
+}
+
+$x=$db->dataset;
+
+foreach($x as $row){
+if($row['sourcefile']){
+$fpath="ERROR";
+$file_path=file_path($release, $row['sourcefile']);
+if($file_path){
+$fpath=$file_path;
+}
+
+
+echo $row['package']."\t".$row['sourcefile']."\t".$fpath."\n";
+
+}
+}
+
+
+
+break;
+
+
+}

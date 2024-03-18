@@ -102,25 +102,28 @@ return  $basepath."$release/packages/games/".$file;
 }
 
 $dir=strtolower($file[0]); 
+if(file_exists($config['filespath']."/$release/packages/".$dir."/".$file)){
 return $basepath."$release/packages/".$dir."/".$file;
+}
 
+return "";
 }
 
 function patch_url($release,$file){
 global $config;
-return getpatchpath ($release,$file,$config['downloads_url']);
+return $config['downloads_url']."$release/patches/$file";
 }
 
 
 function patch_path($release,$file){
 global $config;
-return getpatchpath ($release,$file,$config['localpath']."/files/");
+if(file_exists($config['filespath']."/$release/patches/$file")){
+return $config['filespath']."/$release/patches/$file";
+}
+return "";
+
 }
 
-
-function getpatchpath($release,$file,$basepath){
-return $basepath."$release/patches/$file";
-}
 
 function dependances($release,$package){
 global $db;

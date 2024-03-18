@@ -35,10 +35,20 @@ echo $v['description'];
 
 echo "<h3>Package info</h3>";
 if($v['sourcefile']){
-$url=download_url($release, $v['sourcefile']);
 
+$link=$v['sourcefile'];
+$linkmd5=$v['sourcefile'].".md5sum";
+
+
+$url=download_url($release, $v['sourcefile']);
+if($url){
 $link="<a href=$url>$url</a>";
-$linkmd5="<a href=$url.md5sum>$url.md5sum</a>";
+}
+
+$url=download_url($release, $v['sourcefile'].".md5sum");
+if($url){
+$linkmd5="<a href=$url.md5sum>$url</a>";
+}
 
 echo "Codename: ".$v['code']."<br>";
 echo "Source file: ".$v['sourcefile']."<br>";
@@ -57,6 +67,7 @@ echo "Codename: ".$v['code']."<br>";
 $dependances=dependances($release, $v['code']);
 foreach($dependances as $dep){
 $depends[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$dep['code'].">".$dep['code']."</a>";
+
 }
 
 
@@ -72,7 +83,11 @@ $patches=patches($release,$v['code']);
 
 foreach($patches as $pat){
 $url=patch_url($release,$pat['filename']);
+if(file_exists(patch_path($release,$pat['filename']))){
 $pats[]="<a href=\"$url\">".$pat['filename']."</a>";
+}else{
+$pats[]=$pat['filename'];
+}
 }
 
 if(count($patches)){
@@ -87,7 +102,11 @@ $addons=addons($release,$v['code']);
 
 foreach($addons as $addn){
 $url=download_url($release,$addn);
+if($url){
 $addns[]="<a href=\"$url\">$addn</a>";
+}else{
+$addns[]="$addn";
+}
 }
 
 $nestings = nestings($release,$v['code']);
