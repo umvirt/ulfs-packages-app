@@ -339,7 +339,7 @@ echo $configure."\n";
 echo "cat > ulfs_configure.sh << EOIS\n";
 echo $configure."\n";
 echo "EOIS\n";
-echo "cat ulfs_configure.sh | bash | tee ".$packagelogdir."configure.log \n";
+echo "cat ulfs_configure.sh | bash 2>&1 | tee ".$packagelogdir."configure.log \n";
 }
 
 }
@@ -383,9 +383,9 @@ echo "EOIS\n";
 
 echo "USER=`whoami`\n";
 echo "if [ \"\$USER\" == \"root\" ] ; then \n";
-echo "cat ulfs_install.sh | bash | tee ".$packagelogdir."install.log \n";
+echo "cat ulfs_install.sh | bash 2>&1 | tee ".$packagelogdir."install.log \n";
 echo "else\n";
-echo "cat ulfs_install.sh | sudo bash | tee ".$packagelogdir."install.log \n";
+echo "cat ulfs_install.sh | sudo bash 2>&1 | tee ".$packagelogdir."install.log \n";
 echo "fi\n";
 
 } else {
