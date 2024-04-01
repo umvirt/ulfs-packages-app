@@ -9,7 +9,7 @@ $release=@addslashes($_REQUEST['release']);
 $package=@addslashes($_REQUEST['package']);
 
 $sql="select p.id, r.`release`, unpack, code, sourcefile, sourcedir, configure, build, install,
-description,
+description,r.commit releasedbcommit,
 pf.id packagefile, pf.size packagefile_size, md5_stored packagefile_md5 
 from packages p
 left join releases r on p.release=r.id
@@ -28,6 +28,10 @@ foreach ($x as $k=>$v){
 $s=$v['code'];
 
 //$pkgs[]="<tr><td><a href=package.php?release=".$release."&package=".$v['code'].">".$s."</a></td><td>".$v['sourcefile']."</td></tr>";
+
+echo "DB commit: ".$v['releasedbcommit']."<br/>\n";
+echo "APP commit: ".APPCOMMIT."\n";
+
 
 echo "<h2>".$v['code']."</h2>";
 
