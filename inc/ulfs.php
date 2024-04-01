@@ -149,6 +149,31 @@ return $deps;
 
 }
 
+function dependanceOf($release,$package){
+global $db;
+$sql="select dp.code package, dd.code, d.weight from dependances d
+inner join packages dp on d.package=dp.id
+inner join packages dd on d.dependance=dd.id 
+inner join `releases` r on r.id=dp.release 
+where dd.code=\"$package\" and r.release=\"$release\"
+
+order by d.weight, d.dependance
+";
+//var_dump($sql);
+$db->execute($sql);
+$deps=array();
+$x=$db->dataset;
+foreach($x as $k=>$v){
+        $deps[]=array(
+        "code"=>$v['package'],
+        "weight"=>$v['weight']
+        );
+}
+return $deps;
+
+}
+
+
 function patches($release,$package){
 
 global $db;

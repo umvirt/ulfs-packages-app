@@ -71,8 +71,13 @@ echo "Codename: ".$v['code']."<br>";
 $dependances=dependances($release, $v['code']);
 foreach($dependances as $dep){
 $depends[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$dep['code'].">".$dep['code']."</a>";
-
 }
+
+$dependanceof=dependanceof($release, $v['code']);
+foreach($dependanceof as $dep){
+$dependof[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$dep['code'].">".$dep['code']."</a>";
+}
+
 
 
 if(count($dependances)){
@@ -81,6 +86,17 @@ echo "Dependances: ".strjoin($depends,", ").".<br>";
 echo "Dependances: *** NO DEPENDANCES FOUND *** <br>";
 
 }
+
+
+if(count($dependanceof)){
+echo "Dependance of: ".strjoin($dependof,", ").".<br>";
+}else{
+echo "Dependance of: *** NO PACKAGES FOUND *** <br>";
+
+}
+
+
+
 
 $patches=patches($release,$v['code']);
 
