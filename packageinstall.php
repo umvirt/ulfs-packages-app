@@ -444,10 +444,24 @@ echo "fi\n";
 echo "#Marking package as installed...\n";
 echo "mkdir -p $packagesdir\n";
 
+echo "USER=`whoami`\n";
+echo "if [ \"\$USER\" == \"root\" ] ; then \n";
+
+
 echo "touch $packagesdir/".$v['code']."\n";
 foreach($nestings as $nesting){
 	echo "touch $packagesdir/".$nesting."\n";
 }
+
+echo "else\n";
+
+echo "sudo touch $packagesdir/".$v['code']."\n";
+foreach($nestings as $nesting){
+        echo "sudo touch $packagesdir/".$nesting."\n";
+}
+
+echo "fi\n";
+
 
 if($v['sourcefile']){
 
