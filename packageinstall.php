@@ -409,7 +409,10 @@ echo "echo \"ULFS package installation completed.\"\n";
 
 echo "#Producing files list\n";
 echo "echo \"Looking for installed files...\"\n";
+echo "if [  -f ".$packagelogdir."files.txt ]; then\n";
 echo "rm ".$packagelogdir."files.txt\n";
+echo "fi\n";
+
 
 $skipdir=str_replace('//','/',"$packagelogdir/*");
 echo "USER=`whoami`\n";
