@@ -64,6 +64,9 @@ $aurl=download_url($release,$addn);
 $addns[]=$aurl;
 }
 
+//Use packagename from database instead from user 
+$package_=$package;
+$package=$v['code'];
 
 
 $dependances=dependances($release, $v['code']);
