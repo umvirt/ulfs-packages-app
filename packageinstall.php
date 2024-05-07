@@ -282,11 +282,14 @@ echo "cd ".$v['sourcedir']."\n";
 if(count($patches)){
 echo "#Applying patches...\n";
 foreach ($patches as $pat){
-if($pat['mode']==="0"){
-echo "patch -Np0 -i ../".$pat['filename']."\n";
-}else{
-echo "patch -Np1 -i ../".$pat['filename']."\n";
+$plevel="1";
+
+if($pat['mode']){
+$plevel=$pat['mode'];
 }
+
+echo "patch -Np".$pat['mode']." -i ../".$pat['filename']."\n";
+
 }
 }
 
