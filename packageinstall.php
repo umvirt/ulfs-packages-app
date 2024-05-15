@@ -7,6 +7,20 @@ $package=@addslashes($_REQUEST['package']);
 $arch=@addslashes($_REQUEST['arch']);
 
 
+//extract arch from packagename
+if(strpos($package,':')){
+$matches=array();
+//preg_match('/:([a-zA-z0-9.-]+)$/',$package,$matches);
+//$arch=matches[1];
+$matches=explode(":",$package);
+//var_dump($matches);
+if(count($matches)==2){
+$package=$matches[0];
+$arch=$matches[1];
+}
+
+}
+
 $localinstall=false;
 if(@$_REQUEST['type']=="local"){
 $localinstall=true;
@@ -68,6 +82,12 @@ $addns[]=$aurl;
 $package_=$package;
 $package=$v['code'];
 
+//If arch defined
+if($arch){
+	//Append arch code to package name to separate arch specific packages
+	$package=$package.":".$arch;
+}
+
 
 $dependances=dependances($release, $v['code']);
 
@@ -94,6 +114,9 @@ echo "# $mode \n";
 echo "#===========================\n";
 echo "# Release: $release\n";
 echo "# Package: $package\n";
+if($arch){
+echo "# Architecture: $arch\n";
+}
 echo "#===========================\n";
 echo "# DB commit: ".$v['releasedbcommit']."\n";
 echo "# APP commit: ".APPCOMMIT."\n";
@@ -103,6 +126,10 @@ echo "echo \"ULFS Package installation start\"\n";
 echo "echo \"===============================\"\n";
 echo "echo \"Package: $package\" \n";
 echo "echo \"Release: $release\" \n";
+if($arch){
+echo "echo \"Architecture: $arch\" \n";
+}
+
 echo "\n";
 
 
