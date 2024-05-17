@@ -175,7 +175,7 @@ echo "Install script:
 $id=$v['id'];
 }
 
-
+/*
 $sql="select a.code, ap.configure, ap.build, ap.install
 from packages p left join releases r on p.release=r.id 
 left join packagesfiles_packages pf_p on pf_p.package=p.id 
@@ -188,11 +188,30 @@ $db->execute($sql);
 $x=array();
 
 $x=$db->dataset;
+*/
+$x=pkgarchpackages($release,$package);
+
 //var_dump($sql);
 if(count($x)){
 echo "<h3>Arch specific instructions</h3>";
 foreach($x as $v){
-echo "<h4>".$v["code"]."</h4>";
+echo "<h4>".$v["arch"]."</h4>";
+
+$adependances=archpkgdependances($release,$v['arch'],$package);
+foreach($adependances as $dep){
+$adepends[]="<a href=".dirname($_SERVER['SCRIPT_NAME'])."/$release/".$dep['code'].">".$dep['code'].':'.$dep['arch']."</a>";
+}
+
+if(count($adependances)){
+echo "Dependances: ".strjoin($adepends,", ").".<br>";
+}else{
+echo "Dependances: *** NO DEPENDANCES FOUND *** <br>";
+
+}
+
+
+
+
 echo "Configuration script: 
 <br><pre>".configuration_script($v['configure'])."</pre><br>";
 echo "Build script: 

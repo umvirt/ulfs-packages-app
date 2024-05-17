@@ -24,6 +24,8 @@ $patches=patches($release,$v['code']);
 $addons=addons($release,$v['code']);
 $nestings=nestings($release,$v['code']);
 $comments=comments($release,$v['code']);
+$archpackages=pkgarchpackages($release,$package);
+
 
 if($format=="json"){
 $arr=array(
@@ -127,6 +129,58 @@ foreach($comments as $comment){
 }
 $root->appendChild($comments_element);
 
+//Architecture specific instructions
+if(count($archpackages)){
+$archpackages_element = $dom->createElement('archpackages');
+foreach($archpackages as $archpackage){
+        //main container init
+        $archpackage_element=$dom->createElement('archpackage');
+
+        //arch
+        $arch_element=$dom->createElement('arch',$archpackage['arch']);
+        $archpackage_element->appendChild($arch_element);
+
+        //configure script
+        $arch_element=$dom->createElement('configure',base64_encode($archpackage['configure']));
+        $archpackage_element->appendChild($arch_element);
+
+        //build script
+        $arch_element=$dom->createElement('build',base64_encode($archpackage['build']));
+        $archpackage_element->appendChild($arch_element);
+
+        //install script
+        $arch_element=$dom->createElement('install',base64_encode($archpackage['install']));
+        $archpackage_element->appendChild($arch_element);
+
+        //arch dependances
+	$adependances=archpkgdependances($release,$archpackage['arch'],$v['code']);
+	//var_dump($adependances);exit;
+	if(count($adependances)){
+        	$arch_element=$dom->createElement('dependances');
+		foreach ($adependances as $adep){
+		$dep_element=$dom->createElement('dependance');
+		//code
+		$depcode_element=$dom->createElement('code',$adep['code']);
+		$dep_element->appendChild($depcode_element);
+		//arch
+		$depcode_element=$dom->createElement('arch',$adep['arch']);
+		$dep_element->appendChild($depcode_element);
+		//weight
+		$depcode_element=$dom->createElement('weight',$adep['weight']);
+		$dep_element->appendChild($depcode_element);
+
+		$archpackage_element->appendChild($dep_element);
+	}
+
+        $archpackage_element->appendChild($arch_element);
+	}
+
+        //main container finalize
+        $archpackages_element->appendChild($archpackage_element);
+}
+
+$root->appendChild($archpackages_element);
+}
 
 
 

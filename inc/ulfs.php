@@ -284,3 +284,77 @@ echo "echo \"loading config file \$ULFS_CONFIG_FILE...\"\n";
 echo ". \$ULFS_CONFIG_FILE\n";
 echo "fi\n";
 }
+
+
+function archpkgdependances($release,$arch,$package,$dependance=""){
+global $db;
+//$db=$Yaps->Ulfs->db;
+$d="";
+if($dependance){
+$d=" and dd.code=\"$dependance\"";
+}
+$sql="
+select dp.code, dd.code dependance, ad.weight, da.code arch, dd.id from architectures_dependances ad
+inner join architectures_packages adp on ad.package=adp.id
+inner join packages dp on dp.id=adp.package
+inner join architectures_packages `add` on ad.dependance=`add`.id 
+inner join `releases` r on r.id=dp.release 
+inner join packages dd on dd.id=`add`.package
+inner join architectures pa on pa.id=adp.architecture
+inner join architectures da on da.id=`add`.architecture
+where pa.code=\"$arch\" and dp.code=\"$package\" and r.release=\"$release\" $d
+order by ad.weight, ad.dependance
+";
+
+//var_dump($db);
+$db->execute($sql);
+$deps=array();
+$x=$db->dataset;
+//$x=array();
+foreach($x as $k=>$v){
+	$deps[]=array(
+	"code"=>$v['dependance'],
+	"weight"=>$v['weight'],
+        "arch"=>$v['arch'],
+        "id"=>$v['id']
+
+	);
+}
+//var_dump($deps);
+
+return $deps;
+
+}
+
+
+
+function pkgarchpackages($release,$package){
+global $db;
+
+$sql="select a.code, ap.configure, ap.build, ap.install
+from packages p left join releases r on p.release=r.id 
+left join packagesfiles_packages pf_p on pf_p.package=p.id 
+left join packagesfiles pf on pf.id=pf_p.packagefile 
+inner join architectures_packages ap on ap.package=p.id 
+left join architectures a on ap.architecture=a.id
+where r.`release`=\"$release\" and p.code=\"$package\"";
+
+
+$db->execute($sql);
+$res=array();
+
+$x=$db->dataset;
+
+foreach($x as $k=>$v){
+        $res[]=array(
+        "arch"=>$v['code'],
+        "configure"=>$v['configure'],
+        "build"=>$v['build'],
+        "install"=>$v['install']
+
+        );
+}
+
+return $res;
+
+}

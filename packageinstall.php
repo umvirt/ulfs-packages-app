@@ -88,8 +88,22 @@ if($arch){
 	$package=$package.":".$arch;
 }
 
+if($arch){
+$dependances1=dependances($release, $v['code']);
+$dependances2=archpkgdependances($release,$arch,$v['code']);
+$dependances=array_merge($dependances1,$dependances2);
 
+}else{
 $dependances=dependances($release, $v['code']);
+}
+
+
+
+//var_dump($dependances);
+
+
+//exit;
+
 
 $nestings=nestings($release, $v['code']);
 
@@ -157,7 +171,13 @@ echo "cd /sources\n";
 if(count($dependances)){
 echo "#Checking dependances...\n";
 foreach($dependances as $dependance){
+if($dependance['arch']){
+$dep=$dependance['code'].':'.$dependance['arch'];
+}else{
 $dep=$dependance['code'];
+}
+
+
 echo "      #Checking $dep...\n";
 echo "      if [ ! -f $packagesdir/$dep ]; then\n";
 echo "           echo \"Dependance \\\"$dep\\\" not found. Trying to install...\";\n";
@@ -481,16 +501,16 @@ echo "USER=`whoami`\n";
 echo "if [ \"\$USER\" == \"root\" ] ; then \n";
 
 
-echo "touch $packagesdir/".$v['code']."\n";
+echo "touch $packagesdir/".$package."\n";
 foreach($nestings as $nesting){
-	echo "touch $packagesdir/".$nesting."\n";
+	echo "touch $packagesdir/".$package."\n";
 }
 
 echo "else\n";
 
-echo "sudo touch $packagesdir/".$v['code']."\n";
+echo "sudo touch $packagesdir/".$package."\n";
 foreach($nestings as $nesting){
-        echo "sudo touch $packagesdir/".$nesting."\n";
+        echo "sudo touch $packagesdir/".$package."\n";
 }
 
 echo "fi\n";
