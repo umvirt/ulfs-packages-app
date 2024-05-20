@@ -327,6 +327,16 @@ return $deps;
 }
 
 
+function architectures(){
+global $db;
+$sql="select id,code,description from architectures"; 
+
+$db->execute($sql);
+$deps=array();
+$x=$db->dataset;
+return $x;
+}
+
 
 function pkgarchpackages($release,$package){
 global $db;

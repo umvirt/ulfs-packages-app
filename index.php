@@ -151,8 +151,22 @@ if($format=="xml"){
 $dom = new DOMDocument('1.0', 'utf-8');
 $dom->formatOutput=true;
 $root = $dom->createElement('packages');
+
 $release_element = $dom->createElement('release',$release);
 $root->appendChild($release_element);
+
+$archs=architectures();
+$archs_element=$dom->createElement('architectures');
+//$root->appendChild($archs_element);
+foreach ($archs as $arch){
+$arch_element=$dom->createElement('architecture');
+$arch_element->appendChild($dom->createElement('code',$arch['code']));
+$arch_element->appendChild($dom->createElement('code',base64_encode($arch['description'])));
+$archs_element->appendChild($arch_element);
+}
+
+$root->appendChild($archs_element);
+
 $result=array();
 ob_end_clean();
 $packages_element = $dom->createElement('packages');
