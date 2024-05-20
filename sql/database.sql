@@ -15,7 +15,7 @@ CREATE TABLE `architectures_packages` (
   `build` varchar(1024) CHARACTER SET utf8 NOT NULL,
   `install` varchar(1024) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `architecture` (`architecture`),
+  UNIQUE KEY `architecture_package` (`architecture`,`package`) USING BTREE,
   KEY `package` (`package`),
   CONSTRAINT `architectures_packages_ibfk_1` FOREIGN KEY (`architecture`) REFERENCES `architectures` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `architectures_packages_ibfk_2` FOREIGN KEY (`package`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -24,7 +24,7 @@ CREATE TABLE `architectures_packages` (
 CREATE TABLE `architectures_dependances` (
   `package` bigint(20) unsigned NOT NULL,
   `dependance` bigint(20) unsigned NOT NULL,
-  `weeight` int(11) NOT NULL,
+  `weight` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`package`,`dependance`),
   KEY `dependance` (`dependance`),
   CONSTRAINT `architectures_dependances_ibfk_1` FOREIGN KEY (`package`) REFERENCES `architectures_packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
