@@ -161,7 +161,7 @@ $archs_element=$dom->createElement('architectures');
 foreach ($archs as $arch){
 $arch_element=$dom->createElement('architecture');
 $arch_element->appendChild($dom->createElement('code',$arch['code']));
-$arch_element->appendChild($dom->createElement('code',base64_encode($arch['description'])));
+$arch_element->appendChild($dom->createElement('description',base64_encode($arch['description'])));
 $archs_element->appendChild($arch_element);
 }
 
