@@ -4,7 +4,8 @@ CREATE TABLE `architectures` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(20) CHARACTER SET utf8 NOT NULL,
   `description` varchar(255) CHARACTER SET utf8 NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 #SQLDELIMETER
 CREATE TABLE `architectures_packages` (
