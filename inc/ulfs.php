@@ -338,6 +338,20 @@ return $x;
 }
 
 
+function getArchId($code){
+global $db;
+$sql="select id from architectures where code=\"$code\""; 
+
+$db->execute($sql);
+$deps=array();
+$x=$db->dataset;
+foreach($x as $k=>$v){
+return $v['id'];
+}
+}
+
+
+
 function pkgarchpackages($release,$package){
 global $db;
 

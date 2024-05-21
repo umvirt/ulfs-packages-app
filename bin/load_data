@@ -13,6 +13,12 @@ $longopts  = array(
 "format:"
 );
 
+class ARCH{
+public $code;
+public $description;
+}
+
+
 class CMD{
 public $name;
 public $commands;
@@ -31,7 +37,7 @@ public $install;
 public $dependances;
 public $patches;
 public $addons;
-
+public $archpackages;
 };
 
 
@@ -66,6 +72,9 @@ echo "Format: $format\n\n";
 //release git commit
 $commit=gitHead($path);
 
+//architectures array
+$archs=array();
+$architectures=array();
 
 //Commands proccessing
 $commands=array();
@@ -120,6 +129,20 @@ $xpackages=simplexml_load_string ($psfile);
 //var_dump($xpackages->packages->package);
 $c=0;
 
+if(@$xpackages->architectures){
+//load architectures
+$xmlIterator = new SimpleXMLIterator($xpackages->architectures->asXML());
+for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
+$architectures[]=$xmlIterator->current();
+
+//break;
+}
+
+//var_dump (count($architectures)); exit;
+
+}
+
+//load packages
 $xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
 for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
 $packages[]=$xmlIterator->current()->__toString();
@@ -264,8 +287,32 @@ exit;
 }
 
 
+echo "Loading architectures...\n\n";
+
+foreach($architectures as $architecture){
+
+if($format=="xml"){
+
+//var_dump ($architecture);
 
 
+$arch=new ARCH;
+
+//$architecture=simplexml_load_string ($architecture_);
+//var_dump ($architecture);
+
+$arch->code=$architecture->code->__toString();
+$arch->description=base64_decode($architecture->description->__toString());
+$archs[]=$arch;
+
+echo $arch->code."\n";
+
+}
+
+
+}
+
+//var_dump (count($archs)); exit;
 
 //exit;
 
@@ -280,6 +327,7 @@ if(strlen($pfile)){
 
 
 if($format=="xml"){
+
 $xpackage=simplexml_load_string ($pfile);
 $obj=new PKG();
 
@@ -295,6 +343,8 @@ $obj->patches=array();
 $obj->dependances=array();
 $obj->nestings=array();
 $obj->comments=array();
+$obj->archpackages=array();
+
 
 if(@$xpackage->localbuild->__toString()=="1"){
 $obj->localbuild=1;
@@ -343,6 +393,64 @@ $obj->comments[]=base64_decode($xmlIterator2->current()->__toString());
 }
 
 
+//archpackages
+if($xpackage->archpackages){
+$xmlIterator2 = new SimpleXMLIterator($xpackage->archpackages->asXML());
+$w=0;
+for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
+//$w++;
+$apkg=array(
+"arch"=>$xmlIterator2->current()->arch->__toString(), 
+"configure"=>base64_decode($xmlIterator2->current()->configure->__toString()),
+"build"=>base64_decode($xmlIterator2->current()->build->__toString()),
+"install"=>base64_decode($xmlIterator2->current()->install->__toString())
+);
+
+$apkg['dependances']=array();
+if(@$xmlIterator2->current()->dependances){
+//$apkg['dependances']=$xmlIterator2->current()->dependances;
+foreach($xmlIterator2->current()->dependances as $dep){
+
+
+//var_dump('xxx',$dep);
+//var_dump($xmlIterator2->current()->dependances);
+
+$xmlIterator3 = $xmlIterator2->current()->dependances->dependance;
+
+//var_dump($xmlIterator3);
+for( $xmlIterator3->rewind(); $xmlIterator3->valid(); $xmlIterator3->next() ) {
+//var_dump($xmlIterator3->current()->dependance);
+
+
+
+$apkg['dependances'][]=array(
+'code'=>$xmlIterator3->current()->code->__toString(), 
+'arch'=>$xmlIterator3->current()->arch->__toString(), 
+'weight'=>$xmlIterator3->current()->weight->__toString());
+
+}
+
+}
+
+
+//foreach($xmlIterator2->current()->dependances as $dep){
+//var_dump($dep->current());
+//$apkg['dependances'][]=array('code'=>$dep->current()->code->__toString());
+//}
+
+
+
+}
+
+$obj->archpackages[]=$apkg;
+
+
+}
+}
+
+//if($obj->code=='Xlibs'){
+//var_dump($obj);//exit;
+//}
 
 $objs[]=$obj;
 
@@ -351,6 +459,9 @@ $objs[]=$obj;
 //break;
 
 }
+//}
+
+
 
 if($format=="json"){
 $jpackage=json_decode($pfile);
@@ -419,6 +530,37 @@ $objs[]=$obj;
 echo "Loaded ".count($objs)."/".count($packages)." packages.\n\n";
 
 
+
+
+echo "Creating architectures...\n\n";
+foreach($archs as $arch){
+$sql=array();
+$sql[]="insert into architectures (code,`description`)
+values (
+\"$arch->code\",
+\"".addslashes($arch->description)."\")";
+
+$sql[]="select @@identity";
+$db->execute($sql);
+$arch->id=$db->dataset[0]['@@identity'];
+
+$arch_ids[$arch->code]=$arch->id;
+
+echo "Creating \"$arch->code\"... ";
+
+if($arch->id){
+echo "Ok\n";
+}else{
+echo "Error\n";
+//exit;
+}
+
+
+}
+
+
+echo "\n";
+
 echo "Creating packages...\n\n";
 
 
@@ -464,7 +606,7 @@ echo "\nCreating dependances:\n\n";
 foreach($objs as $obj){
 $sql=array();
 if(count($obj->dependances)){
-echo "Creating dependances for package \"$obj->code\"... ";
+echo "Creating dependances for package \"$obj->code\"...";
 $c=0;
 foreach($obj->dependances as $dep){
 $c++;
@@ -473,6 +615,7 @@ $sql[]="insert into dependances (package,dependance,weight) values (
 ".$pkg_ids[$dep['code']].",
 $c)";
 }
+//var_dump($sql,$pkg_ids);
 
 $db->execute($sql);
 //var_dump($db->error);
@@ -597,7 +740,80 @@ exit;
 }
 }
 
+if(count($obj->archpackages)){
+echo "\nCreating archpackages:\n\n";
+foreach($objs as $obj){
+$sql=array();
+echo "Creating archpackages for package \"$obj->code\"... ";
+$c=0;
+foreach($obj->archpackages as $archpackage){
+$sql[]="insert into architectures_packages (package,architecture,configure,build,install) values (".$obj->id.",".getArchId($archpackage['arch']).",
+\"".addslashes($archpackage['configure'])."\",
+\"".addslashes($archpackage['build'])."\",
+\"".addslashes($archpackage['install'])."\"
+)";
+}
+
+//$db->execute($sql);
+//var_dump($db->error)
+
+$sql[]="select @@identity";
+$db->execute($sql);
+$obj->id=$db->dataset[0]['@@identity'];
+
+$apkg_ids[$obj->code.":".$archpackage['arch']]=$obj->id;
 
 
 
 
+if(!$db->error){
+echo "Ok\n";
+}else{
+echo "Error: $db->error\n";
+exit;
+}
+}
+}
+
+
+
+
+//var_dump($apkg_ids);
+if(count($obj->archpackages)){
+echo "\nCreating archpackages dependances:\n\n";
+foreach($objs as $obj){
+$sql=array();
+echo "Creating dependance for archpackage \"".$obj->code.':'.$archpackage['arch']."\"... \n";
+$c=0;
+foreach($obj->archpackages as $archpackage){
+
+if(@$archpackage['dependances']){
+//var_dump(count($archpackage['dependances']));
+//echo $obj->code.':'.$archpackage['arch'];
+
+//var_dump($archpackage['dependances']);
+
+$c=0;
+foreach($archpackage['dependances'] as $dep){
+//echo $dep['code'].':'.$dep['arch']."-> ".$apkg_ids[$dep['code'].':'.$dep['arch']]."\n";
+
+//$c++;
+$sql[]="insert into architectures_dependances (package,dependance,weight) values (
+".$obj->id.",
+".$apkg_ids[$dep['code'].':'.$dep['arch']].",".
+$dep['weight'].")";
+
+//var_dump($sql);
+$db->execute($sql);
+
+
+}
+
+
+}
+
+}
+
+}
+
+}
