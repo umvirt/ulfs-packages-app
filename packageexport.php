@@ -169,7 +169,7 @@ foreach($archpackages as $archpackage){
 		$depcode_element=$dom->createElement('weight',$adep['weight']);
 		$dep_element->appendChild($depcode_element);
 
-		$archpackage_element->appendChild($dep_element);
+		$arch_element->appendChild($dep_element);
 	}
 
         $archpackage_element->appendChild($arch_element);
