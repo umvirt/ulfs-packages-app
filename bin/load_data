@@ -541,6 +541,7 @@ values (
 \"".addslashes($arch->description)."\")";
 
 $sql[]="select @@identity";
+try{
 $db->execute($sql);
 $arch->id=$db->dataset[0]['@@identity'];
 
@@ -553,6 +554,10 @@ echo "Ok\n";
 }else{
 echo "Error\n";
 //exit;
+}
+
+}catch (Exception $e) {
+echo "Skiping\n";
 }
 
 
@@ -740,10 +745,10 @@ exit;
 }
 }
 
-if(count($obj->archpackages)){
 echo "\nCreating archpackages:\n\n";
 foreach($objs as $obj){
 $sql=array();
+if(count($obj->archpackages)){
 echo "Creating archpackages for package \"$obj->code\"... ";
 $c=0;
 foreach($obj->archpackages as $archpackage){
@@ -779,10 +784,10 @@ exit;
 
 
 //var_dump($apkg_ids);
-if(count($obj->archpackages)){
 echo "\nCreating archpackages dependances:\n\n";
 foreach($objs as $obj){
 $sql=array();
+if(count($obj->archpackages)){
 echo "Creating dependance for archpackage \"".$obj->code.':'.$archpackage['arch']."\"... \n";
 $c=0;
 foreach($obj->archpackages as $archpackage){
