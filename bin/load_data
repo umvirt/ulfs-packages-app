@@ -787,6 +787,9 @@ echo "Creating dependance for archpackage \"".$obj->code.':'.$archpackage['arch'
 $c=0;
 foreach($obj->archpackages as $archpackage){
 
+$sql=array();
+
+
 if(@$archpackage['dependances']){
 //var_dump(count($archpackage['dependances']));
 //echo $obj->code.':'.$archpackage['arch'];
@@ -803,11 +806,19 @@ $sql[]="insert into architectures_dependances (package,dependance,weight) values
 ".$apkg_ids[$dep['code'].':'.$dep['arch']].",".
 $dep['weight'].")";
 
-//var_dump($sql);
-$db->execute($sql);
-
-
 }
+
+
+//var_dump($sql);
+try{
+$db->execute($sql);
+}catch (Exception $e) {
+echo $e->getMessage()."\n\n";
+var_dump($sql);
+echo $dep['code'].':'.$dep['arch']."-> ".$apkg_ids[$dep['code'].':'.$dep['arch']]."\n";
+}
+
+
 
 
 }
