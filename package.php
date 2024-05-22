@@ -51,7 +51,7 @@ $link="<a href=$url>$url</a>";
 
 $url=download_url($release, $v['sourcefile'].".md5sum");
 if($url){
-$linkmd5="<a href=$url.md5sum>$url</a>";
+$linkmd5="<a href=$url>$url</a>";
 }
 
 echo "Codename: ".$v['code']."<br>";
