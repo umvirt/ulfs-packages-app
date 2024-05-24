@@ -154,6 +154,22 @@ $jpackages=json_decode($psfile);
 //var_dump($xpackages->packages->package);
 $c=0;
 
+//var_dump($jpackages->architectures);exit;
+
+
+if(@$jpackages->architectures){
+foreach($jpackages->architectures as $arch) {
+$architectures[]=array('code'=>$arch->code, 'description'=>$arch->description);
+
+//break;
+}
+
+//var_dump (count($architectures)); exit;
+
+}
+
+
+
 foreach ($jpackages->packages as $jpackage){
 $packages[]=$jpackage;
 }
@@ -303,6 +319,18 @@ $arch=new ARCH;
 
 $arch->code=$architecture->code->__toString();
 $arch->description=base64_decode($architecture->description->__toString());
+$archs[]=$arch;
+
+echo $arch->code."\n";
+
+}
+
+if($format=="json"){
+
+$arch=new ARCH;
+$arch->code=$architecture['code'];
+$arch->description=base64_decode($architecture['description']);
+
 $archs[]=$arch;
 
 echo $arch->code."\n";
@@ -512,6 +540,43 @@ $obj->nestings[]=$jn;
 
 foreach ($jpackage->comments as $cm){
 $obj->comments[]=$cm;
+}
+
+if(@$jpackage->archpackages){
+$obj->archpackages=array();
+
+foreach($jpackage->archpackages as $jarchpackage){
+
+$apkg=array(
+"arch"=>$jarchpackage->arch,
+"configure"=>base64_decode($jarchpackage->configure),
+"build"=>base64_decode($jarchpackage->build),
+"install"=>base64_decode($jarchpackage->install)
+);
+
+$apkg['dependances']=array();
+if(@$jarchpackage->dependances){
+
+foreach($jarchpackage->dependances as $adep){
+
+$apkg['dependances'][]=array(
+'code'=>$adep->code,
+'arch'=>$adep->arch,
+'weight'=>$adep->weight
+);
+}
+
+
+}
+
+
+
+
+
+$obj->archpackages[]=$apkg;
+
+}
+
 }
 
 

@@ -44,9 +44,39 @@ $arr=array(
 'nestings'=>$nestings,
 'comments'=>$comments,
 );
+
 if($release!="0.1"){
 $arr['localbuild']=$v['localbuild'];
 }
+
+//Architecture specific instructions
+if(count($archpackages)){
+$arr['archpackages']=array();
+foreach($archpackages as $archpackage){
+$architem=array(
+'arch'=>$archpackage['arch'],
+'configure'=>base64_encode($archpackage['configure']),
+'build'=>base64_encode($archpackage['build']),
+'install'=>base64_encode($archpackage['install'])
+);
+$adependances=archpkgdependances($release,$archpackage['arch'],$v['code']);
+if(count($adependances)){
+$architem['dependances']=array();
+foreach ($adependances as $adep){
+$architem['dependances'][]=array(
+'code'=>$adep['code'],
+'arch'=>$adep['arch'],
+'weight'=>$adep['weight']
+);
+}
+
+}
+
+$arr['archpackages'][]=$architem;
+}
+
+}
+
 
 $result=json_encode($arr);
 }

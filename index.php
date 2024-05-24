@@ -125,6 +125,12 @@ $x=$db->dataset;
 if($format=="json"){
 $result=array();
 $result['release']=$release;
+$archs=architectures();
+$result['architectures']=array();
+foreach ($archs as $arch){
+$result['architectures'][]=array('code'=>$arch['code'],'description'=>base64_encode($arch['description']));
+}
+
 ob_end_clean();
 foreach ($x as $k=>$v){
 $result['packages'][]=$v['code'];
