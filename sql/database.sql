@@ -12,7 +12,7 @@ CREATE TABLE `architectures_packages` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `architecture` int(10) unsigned NOT NULL,
   `package` bigint(20) unsigned NOT NULL,
-  `configure` varchar(1024) CHARACTER SET utf8 NOT NULL,
+  `configure` varchar(10240) CHARACTER SET utf8 NOT NULL,
   `build` varchar(1024) CHARACTER SET utf8 NOT NULL,
   `install` varchar(1024) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`id`),
