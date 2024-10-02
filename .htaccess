@@ -11,13 +11,13 @@ RewriteRule ^xml/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=xml
 RewriteRule ^json/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=json
 RewriteRule ^text/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=text
 RewriteRule ^descriptions/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=descriptions
-RewriteRule ^([0-9.]+)/([a-zA-z0-9:.-]+)(/?)$ /linux/packages/package.php?release=$1&package=$2
-RewriteRule ^([0-9.]+)/([a-zA-z0-9:.-]+)/install(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2
-RewriteRule ^([0-9.]+)/([a-zA-z0-9:.-]+)/install/([a-zA-z0-9.-]+)(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2&arch=$3
-RewriteRule ^([0-9.]+)/([a-zA-z0-9:.-]+)/localinstall(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2&type=local
+RewriteRule ^([0-9.]+)/([a-zA-z0-9!:.-]+)(/?)$ /linux/packages/package.php?release=$1&package=$2
+RewriteRule ^([0-9.]+)/([a-zA-z0-9!:.-]+)/install(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2
+RewriteRule ^([0-9.]+)/([a-zA-z0-9!:.-]+)/install/([a-zA-z0-9.-]+)(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2&arch=$3
+RewriteRule ^([0-9.]+)/([a-zA-z0-9!:.-]+)/localinstall(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2&type=local
 
-RewriteRule ^install/([0-9.]+)/([a-zA-z0-9.-]+)(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2
-RewriteRule ^xml/([0-9.]+)/([a-zA-z0-9.-]+)(/?)$ /linux/packages/packageexport.php?release=$1&package=$2&format=xml
-RewriteRule ^json/([0-9.]+)/([a-zA-z0-9.-]+)(/?)$ /linux/packages/packageexport.php?release=$1&package=$2&format=json
+RewriteRule ^install/([0-9.]+)/([a-zA-z0-9!.-]+)(/?)$ /linux/packages/packageinstall.php?release=$1&package=$2
+RewriteRule ^xml/([0-9.]+)/([a-zA-z0-9!.-]+)(/?)$ /linux/packages/packageexport.php?release=$1&package=$2&format=xml
+RewriteRule ^json/([0-9.]+)/([a-zA-z0-9!.-]+)(/?)$ /linux/packages/packageexport.php?release=$1&package=$2&format=json
 
 RewriteRule ^([0-9a-z.]+).html$ /linux/packages/html.php?page=$1
