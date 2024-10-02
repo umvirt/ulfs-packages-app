@@ -161,11 +161,11 @@ echo "Unpack script:
 <br><pre>".configuration_script($v['unpack'])."</pre><br>";
 }
 echo "Configuration script: 
-<br><pre>".configuration_script($v['configure'])."</pre><br>";
+<br><pre>".val2html(configuration_script($v['configure']))."</pre><br>";
 echo "Build script: 
-<br><pre>".build_script($v['build'])."</pre><br>";
+<br><pre>".val2html(build_script($v['build']))."</pre><br>";
 echo "Install script: 
-<br><pre>".install_script($v['install'])."</pre><br>";
+<br><pre>".val2html(install_script($v['install']))."</pre><br>";
 
 
 
@@ -213,11 +213,11 @@ echo "Dependances: *** NO DEPENDANCES FOUND *** <br>";
 
 
 echo "Configuration script: 
-<br><pre>".configuration_script($v['configure'])."</pre><br>";
+<br><pre>".val2html(configuration_script($v['configure']))."</pre><br>";
 echo "Build script: 
-<br><pre>".build_script($v['build'])."</pre><br>";
+<br><pre>".val2html(build_script($v['build']))."</pre><br>";
 echo "Install script: 
-<br><pre>".install_script($v['install'])."</pre><br>";
+<br><pre>".val2html(install_script($v['install']))."</pre><br>";
 
 }
 }

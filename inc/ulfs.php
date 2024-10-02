@@ -1,5 +1,10 @@
 <?php
 
+function val2html($val){
+return htmlspecialchars($val,ENT_QUOTES);
+}
+
+
 function scriptslashes($v,$release=""){
 if($release != "0.1"){
 $v=str_replace('\\','\\\\',$v);
