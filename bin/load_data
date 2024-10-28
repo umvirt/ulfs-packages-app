@@ -65,12 +65,13 @@ echo "        $argv[0] --path=<dump_path> --release=<release> --format=<xml|json
 exit;
 }
 
-echo "Packages path: $path\n";
-echo "Release: $release\n";
-echo "Format: $format\n\n";
-
 //release git commit
 $commit=gitHead($path);
+
+echo "Packages path: $path\n";
+echo "Release: $release\n";
+echo "Commit: $commit \n";
+echo "Format: $format\n\n";
 
 //architectures array
 $archs=array();
@@ -198,9 +199,8 @@ $release_id=$db->dataset[0]['id'];
 $sql=array();
 $sql[]="delete from packages where `release`=\"$release_id\"";
 $sql[]="delete from commands where `release`=\"$release_id\"";
+$sql[]="update releases set `commit`=\"$commit\" where id=\"$release_id\" ";
 $db->execute($sql);
-
-
 
 }else{
 
