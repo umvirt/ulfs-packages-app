@@ -33,7 +33,12 @@ echo "DB commit: ".$v['releasedbcommit']."<br/>\n";
 echo "APP commit: ".APPCOMMIT."\n";
 
 
+echo "<div align=right>[ <a href=\"/linux/packages/$release/$package/install\">BASH</a> | 
+<a href=\"/linux/packages/xml/$release/$package\">XML</a>  | <a href=\"/linux/packages/json/$release/$package\">JSON</a> 
+ ]</div>";
+
 echo "<h2>".$v['code']."</h2>";
+
 
 echo $v['description'];
 
