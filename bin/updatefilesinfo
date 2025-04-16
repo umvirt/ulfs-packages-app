@@ -127,7 +127,7 @@ foreach($x as $v){
 echo "Processing release \"".$v['release']."\"... ";
 $dp=new dirparser();
 
-$dp->dir="/mnt/raw/LFS/".$v['release']."/packages";
+$dp->dir=$config['filespath']."/".$v['release']."/packages";
 $dp->ignorefiles=array('/.md5sum$/');
 $files=$dp->getFiles();
 
