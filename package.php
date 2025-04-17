@@ -13,8 +13,7 @@ description,r.commit releasedbcommit,
 pf.id packagefile, pf.size packagefile_size, md5_stored packagefile_md5 
 from packages p
 left join releases r on p.release=r.id
-left join packagesfiles_packages pf_p on pf_p.package=p.id
-left join packagesfiles pf on pf.id=pf_p.packagefile 
+left join packagesfiles pf on pf.filename=p.sourcefile and pf.release=r.id
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
 //var_dump($sql);
