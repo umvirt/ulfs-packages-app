@@ -30,8 +30,6 @@ if($arch){
 $sql="
 select p.id, r.`release`, r.`commit` releasedbcommit,p.code, p.sourcefile, p.sourcedir, p.unpack, ap.configure, ap.build, ap.install
 from packages p left join releases r on p.release=r.id 
-left join packagesfiles_packages pf_p on pf_p.package=p.id 
-left join packagesfiles pf on pf.id=pf_p.packagefile 
 left join architectures_packages ap on ap.package=p.id 
 left join architectures a on ap.architecture=a.id
 where r.`release`=\"$release\" and p.code=\"$package\" and a.code=\"$arch\"";
