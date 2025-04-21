@@ -1,0 +1,37 @@
+#!/usr/bin/env php
+<?php
+
+include "../inc/main.php";
+$sql="select id, `release` from releases";
+$db->execute($sql);
+$x=$db->dataset;
+
+$sql="truncate packagesfiles";
+//echo $sql;
+$db->execute($sql);
+
+foreach($x as $v){
+echo "Processing release \"".$v['release']."\"... ";
+$dp=new dirparser();
+
+$dp->dir=$config['filespath']."/".$v['release']."/packages";
+$dp->ignorefiles=array('/.md5sum$/');
+$files=$dp->getFiles();
+
+echo count($files);
+
+foreach($files as $file){
+$sql="insert into packagesfiles (`release`, filename,path, size, mtime, md5_current, md5_stored) values (
+".$v['id'].",\"".$file['name']."\",\"".$file['path']."\", ".$file['size'].", ".$file['mtime'].", \"".$file['md5']."\",\"".$file['md5_']."\")";
+//var_dump($sql); 
+$db->execute($sql);
+//var_dump($db->error);
+//exit;
+}
+
+
+}
+
+
+
+
