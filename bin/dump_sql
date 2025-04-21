@@ -35,6 +35,7 @@ $tables=array(
 'commands',
 'comments',
 'nestings',
+'packagespatchesfiles',
 'packagesfiles',
 'packagesfiles_packages'
 );

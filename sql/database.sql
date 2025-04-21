@@ -116,6 +116,18 @@ CREATE TABLE `nestings` (
   CONSTRAINT `nestings_ibfk_2` FOREIGN KEY (`child`) REFERENCES `packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 #SQLDELIMETER
+CREATE TABLE `packagespatchesfiles` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `release` int(10) unsigned NOT NULL,
+  `filename` varchar(255) CHARACTER SET latin1 NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `mtime` int(10) unsigned NOT NULL,
+  `size` int(10) unsigned NOT NULL,
+  `md5_current` varchar(255) CHARACTER SET latin1 NOT NULL,
+  `md5_stored` varchar(255) CHARACTER SET latin1 NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+#SQLDELIMETER
 CREATE TABLE `packagesfiles` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `release` int(10) unsigned NOT NULL,
