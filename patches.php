@@ -23,13 +23,13 @@ $releaseid=$v['id'];
 
 header('Content-type: text/plain');
 
-$sql="SELECT id,path,filename FROM `packagesfiles`  where `release` = $releaseid order by path,filename";
+$sql="SELECT id,path,filename FROM `packagespatchesfiles`  where `release` = $releaseid order by path,filename";
 $db->execute($sql);
 
 $x=$db->dataset;
 
 foreach ($x as $k=>$v){
-echo  $config['downloads_url'].$release.'/packages'.$v['path'].'/'.$v['filename']."\n";
+echo  $config['downloads_url'].$release.'/patches'.$v['path'].'/'.$v['filename']."\n";
 }
 
 exit;
@@ -63,11 +63,11 @@ echo "Current releases: ".strjoin ($releases,', ');
 
 
 
-echo "<p>[  <a href=/linux/packages/".$release."/>Packages</a> | <a href=/linux/packages/patches/".$release."/>Patches</a> ]</p>";
-echo "<h2>Files</h2>";
+echo "<p>[  <a href=/linux/packages/".$release."/>Packages</a> | <a href=/linux/packages/files/".$release."/>Files</a> ]</p>";
+echo "<h2>Patches</h2>";
 
 
-$sql="SELECT `release`,path,sum(size) size, count(id) cnt FROM `packagesfiles`  where `release` = $releaseid group by `release`,path";
+$sql="SELECT `release`,path,sum(size) size, count(id) cnt FROM `packagespatchesfiles`  where `release` = $releaseid group by `release`,path";
 
 $db->execute($sql);
 
@@ -79,18 +79,18 @@ $cnt=0;
 
 foreach ($x as $k=>$v){
 
-$s.='<li><b>'.$v['path'].'</b> - '.round($v['size']/1024/1024).'MB in '.$v['cnt'].' files';
+//$s.='<li><b>'.$v['path'].'</b> - '.round($v['size']/1024/1024).'MB in '.$v['cnt'].' files';
 $size+=$v['size'];
 $cnt+=$v['cnt'];
 
 }
 
-echo "<ul>".$s."</ul>";
+//echo "<ul>".$s."</ul>";
 
 echo "Total size: ".round($size/1024/1024).'MB'."<br>";
 echo "Total files: ".$cnt."<br>";
 
-echo "<p> Download all files with: <a href=/linux/packages/files/".$release."/wget>WGET</a> </p>";
+echo "<p> Download all files with: <a href=/linux/packages/patches/".$release."/wget>WGET</a> </p>";
 
 }
 

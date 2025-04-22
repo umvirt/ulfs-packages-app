@@ -8,6 +8,8 @@ RewriteRule ^json(/?)$ /linux/packages/index.php?format=json
 RewriteRule ^text(/?)$ /linux/packages/index.php?format=text
 RewriteRule ^files/([0-9.]+)(/?)$ /linux/packages/files.php?release=$1
 RewriteRule ^files/([0-9.]+)/wget(/?)$ /linux/packages/files.php?release=$1&act=wget
+RewriteRule ^patches/([0-9.]+)(/?)$ /linux/packages/patches.php?release=$1
+RewriteRule ^patches/([0-9.]+)/wget(/?)$ /linux/packages/patches.php?release=$1&act=wget
 RewriteRule ^depmap/([0-9.]+)(/?)$ /linux/packages/depmap.php?release=$1
 RewriteRule ^xml/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=xml
 RewriteRule ^json/([0-9.]+)(/?)$ /linux/packages/index.php?release=$1&format=json
