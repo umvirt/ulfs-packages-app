@@ -106,6 +106,26 @@ if($x){
 return  $basepath."$release/packages/games/".$file;
 }
 
+$x=file_exists($config['filespath']."/$release/packages/kde/kf/$file");
+//var_dump($x);
+if($x){
+return  $basepath."$release/packages/kde/kf/".$file;
+}
+
+$x=file_exists($config['filespath']."/$release/packages/kde/plasma/$file");
+//var_dump($x);
+if($x){
+return  $basepath."$release/packages/kde/plasma/".$file;
+}
+
+$x=file_exists($config['filespath']."/$release/packages/kde/apps/$file");
+//var_dump($x);
+if($x){
+return  $basepath."$release/packages/kde/apps/".$file;
+}
+
+
+
 $dir=strtolower($file[0]); 
 if(file_exists($config['filespath']."/$release/packages/".$dir."/".$file)){
 return $basepath."$release/packages/".$dir."/".$file;
