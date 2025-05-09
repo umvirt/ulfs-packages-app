@@ -302,6 +302,8 @@ return $s;
 
 
 function loadConfig(){
+echo "echo \"loading environment settings(profile)\"\n";
+echo ". /etc/profile\n";
 echo "echo \"checking config file\"\n";
 echo "if [ -f \$ULFS_CONFIG_FILE ]\n";
 echo "then\n";

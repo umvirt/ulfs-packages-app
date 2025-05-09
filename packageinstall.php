@@ -432,6 +432,9 @@ echo "cat > ulfs_install.sh << EOIS\n";
 echo install_script($v['install'])."\n";
 echo "EOIS\n";
 
+//update linker directories
+echo "echo \"/sbin/ldconfig\" >> ulfs_install.sh\n";
+
 echo "USER=`whoami`\n";
 echo "if [ \"\$USER\" == \"root\" ] ; then \n";
 echo "cat ulfs_install.sh | bash 2>&1 | tee ".$packagelogdir."install.log \n";
@@ -471,22 +474,22 @@ echo "if [ \"\$USER\" == \"root\" ] ; then \n";
 echo "find /bin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /sbin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /usr -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! path /etc/ld.so.cache >> ".$packagelogdir."files.txt\n";
 echo "find /opt -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /lib -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /lib64 -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /var -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! -path \"$skipdir\" >> ".$packagelogdir."files.txt\n";
+echo "find /var -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! -path \"$skipdir\" \! -path /var/cache/ldconfig/aux-cache >> ".$packagelogdir."files.txt\n";
 
 echo "else\n";
 
 echo "sudo find /bin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /sbin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /usr -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
+echo "sudo find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! path /etc/ld.so.cache >> ".$packagelogdir."files.txt\n";
 echo "sudo find /opt -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /lib -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /lib64 -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /var -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \!  -path \"$skipdir\" >> ".$packagelogdir."files.txt\n";
+echo "sudo find /var -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \!  -path \"$skipdir\"  \! -path /var/cache/ldconfig/aux-cache >> ".$packagelogdir."files.txt\n";
 
 echo "fi\n";
 
