@@ -354,6 +354,20 @@ return $deps;
 }
 
 
+function templates($release){
+global $db;
+$sql="select t.id, r.id `release_id`, r.release `release`, t.code, t.description, t.configure, t.build, t.install from packages_templates t
+left join releases r on r.id=t.release 
+where r.release=\"".addslashes($release)."\""; 
+
+$db->execute($sql);
+$deps=array();
+$x=$db->dataset;
+return $x;
+}
+
+
+
 function architectures(){
 global $db;
 $sql="select id,code,description from architectures"; 

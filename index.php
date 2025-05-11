@@ -131,6 +131,24 @@ foreach ($archs as $arch){
 $result['architectures'][]=array('code'=>$arch['code'],'description'=>base64_encode($arch['description']));
 }
 
+
+$templates=templates($release);
+
+if(count($templates)){
+	$result['templates']=array();
+
+	foreach ($templates as $template){
+	$result['templates'][]=array(
+		'code'=>$template['code'],
+		'description'=>base64_encode($template['description']),
+		'configure'=>base64_encode($template['configure']),
+		'build'=>base64_encode($template['build']),
+		'install'=>base64_encode($template['install'])
+	);
+	}
+
+}
+
 ob_end_clean();
 foreach ($x as $k=>$v){
 $result['packages'][]=$v['code'];
@@ -172,6 +190,26 @@ $archs_element->appendChild($arch_element);
 }
 
 $root->appendChild($archs_element);
+
+//templates
+
+$templates=templates($release);
+if(count($templates)){
+$templates_element=$dom->createElement('templates');
+//$root->appendChild($archs_element);
+foreach ($templates as $template){
+$template_element=$dom->createElement('template');
+$template_element->appendChild($dom->createElement('code',$template['code']));
+$template_element->appendChild($dom->createElement('description',base64_encode($template['description'])));
+$template_element->appendChild($dom->createElement('configure',base64_encode($template['configure'])));
+$template_element->appendChild($dom->createElement('build',base64_encode($template['build'])));
+$template_element->appendChild($dom->createElement('install',base64_encode($template['install'])));
+$templates_element->appendChild($template_element);
+}
+
+$root->appendChild($templates_element);
+}
+
 
 $result=array();
 ob_end_clean();

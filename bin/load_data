@@ -18,6 +18,14 @@ public $code;
 public $description;
 }
 
+class TMPL{
+public $code;
+public $description;
+public $configure;
+public $build;
+public $install;
+}
+
 
 class CMD{
 public $name;
@@ -76,6 +84,7 @@ echo "Format: $format\n\n";
 //architectures array
 $archs=array();
 $architectures=array();
+$templates=array();
 
 //Commands proccessing
 $commands=array();
@@ -139,6 +148,18 @@ $architectures[]=$xmlIterator->current();
 //break;
 }
 
+//load templates
+if(@$xpackages->templates){
+	$xmlIterator = new SimpleXMLIterator($xpackages->templates->asXML());
+	for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
+		$templates[]=$xmlIterator->current();
+		//break;
+	}
+}
+
+
+
+
 //var_dump (count($architectures)); exit;
 
 }
@@ -150,6 +171,7 @@ $packages[]=$xmlIterator->current()->__toString();
 //break;
 }
 }
+
 if($format=="json"){
 $jpackages=json_decode($psfile);
 //var_dump($xpackages->packages->package);
@@ -159,16 +181,24 @@ $c=0;
 
 
 if(@$jpackages->architectures){
-foreach($jpackages->architectures as $arch) {
-$architectures[]=array('code'=>$arch->code, 'description'=>$arch->description);
-
-//break;
+	foreach($jpackages->architectures as $arch) {
+		$architectures[]=array('code'=>$arch->code, 'description'=>$arch->description);
+	}
 }
 
-//var_dump (count($architectures)); exit;
 
+if(@$jpackages->templates){
+	foreach($jpackages->templates as $tmpl) {
+		$templates[]=array(
+			'code'=>$tmpl->code, 
+			'description'=>$tmpl->description,
+			'configure'=>$tmpl->configure,
+			'build'=>$tmpl->build,
+			'install'=>$tmpl->install
+		);
+
+	}
 }
-
 
 
 foreach ($jpackages->packages as $jpackage){
@@ -198,6 +228,7 @@ $release_id=$db->dataset[0]['id'];
 
 $sql=array();
 $sql[]="delete from packages where `release`=\"$release_id\"";
+$sql[]="delete from packages_templates where `release`=\"$release_id\"";
 $sql[]="delete from commands where `release`=\"$release_id\"";
 $sql[]="update releases set `commit`=\"$commit\" where id=\"$release_id\" ";
 $db->execute($sql);
@@ -343,6 +374,63 @@ echo $arch->code."\n";
 //var_dump (count($archs)); exit;
 
 //exit;
+
+
+// Packages templates
+
+
+echo "Loading packages templates...\n\n";
+
+foreach($templates as $template){
+
+if($format=="xml"){
+
+//var_dump ($architecture);
+
+
+$tmpl=new TMPL;
+
+//$architecture=simplexml_load_string ($architecture_);
+//var_dump ($architecture);
+
+$tmpl->code=$template->code->__toString();
+$tmpl->description=base64_decode($template->description->__toString());
+$tmpl->configure=base64_decode($template->configure->__toString());
+$tmpl->build=base64_decode($template->build->__toString());
+$tmpl->install=base64_decode($template->install->__toString());
+
+$tmpls[]=$tmpl;
+
+echo $tmpl->code."\n";
+
+}
+
+if($format=="json"){
+
+$tmpl=new TMPL;
+$tmpl->code=$template['code'];
+$tmpl->description=base64_decode($template['description']);
+$tmpl->configure=base64_decode($template['configure']);
+$tmpl->build=base64_decode($template['build']);
+$tmpl->install=base64_decode($template['install']);
+
+$tmpls[]=$tmpl;
+
+echo $tmpl->code."\n";
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+
 
 
 $objs=array();
@@ -627,6 +715,54 @@ echo "Skiping\n";
 
 
 }
+
+echo "\n";
+
+
+// templates
+
+echo "Creating templates...\n\n";
+foreach($tmpls as $tmpl){
+$sql=array();
+$sql[]="insert into packages_templates (code,`release`,`description`,`configure`,`build`,`install`)
+values (
+\"$tmpl->code\",
+$release_id,
+\"".addslashes($tmpl->description)."\",
+\"".addslashes($tmpl->configure)."\",
+\"".addslashes($tmpl->build)."\",
+\"".addslashes($tmpl->install)."\"
+)";
+
+$sql[]="select @@identity";
+try{
+$db->execute($sql);
+$tmpl->id=$db->dataset[0]['@@identity'];
+
+$tmpl_ids[$tmpl->code]=$tmpl->id;
+
+echo "Creating \"$tmpl->code\"... ";
+
+if($tmpl->id){
+echo "Ok\n";
+}else{
+echo "Error\n";
+
+echo $db->errors[0]."\n";
+//exit;
+
+}
+
+}catch (Exception $e) {
+echo "Skiping\n";
+}
+
+
+}
+
+
+
+
 
 
 echo "\n";
