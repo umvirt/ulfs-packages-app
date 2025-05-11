@@ -37,7 +37,8 @@ $tables=array(
 'nestings',
 'packagespatchesfiles',
 'packagesfiles',
-'packagesfiles_packages'
+'packagesfiles_packages',
+'packages_templates'
 );
 
 $ct=array();

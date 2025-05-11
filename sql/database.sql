@@ -52,10 +52,13 @@ CREATE TABLE `packages` (
   `build` varchar(10240) CHARACTER SET latin1 NOT NULL,
   `install` varchar(10240) CHARACTER SET latin1 NOT NULL,
   `localbuild` bit(1) NOT NULL DEFAULT b'0',
+  `template` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`,`release`) USING BTREE,
   KEY `version` (`release`),
-  CONSTRAINT `release_fk` FOREIGN KEY (`release`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `template_fk` (`template`),
+  CONSTRAINT `release_fk` FOREIGN KEY (`release`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `template_fk` FOREIGN KEY (`template`) REFERENCES `packages_templates` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 #SQLDELIMETER
 CREATE TABLE `patches` (
@@ -145,5 +148,15 @@ CREATE TABLE `packagesfiles_packages` (
   `package` int(11) unsigned NOT NULL,
   PRIMARY KEY (`packagefile`,`package`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#SQLDELIMETER
+CREATE TABLE `packages_templates` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) CHARACTER SET latin1 NOT NULL,
+  `description` varchar(255) CHARACTER SET latin1 NOT NULL,
+  `configure` varchar(10240) CHARACTER SET latin1 NOT NULL,
+  `build` varchar(10240) CHARACTER SET latin1 NOT NULL,
+  `install` varchar(10240) CHARACTER SET latin1 NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 #SQLDELIMETER
 set foreign_key_checks=1;
