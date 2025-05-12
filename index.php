@@ -110,8 +110,11 @@ echo "Current releases: ".strjoin ($releases,', ');
 
 //----
 
-$sql="select p.id, code, sourcefile, c.comments, p.description from packages p
+$sql="select p.id, p.code, sourcefile, c.comments, p.description, p.configure, p.build, p.install,
+p.template template_id, t.code template, t.configure template_configure, t.build template_build, t.install template_install
+ from packages p
 inner join releases r on r.id=p.`release`
+left join packages_templates t on t.id=p.template
 left join (select count(id) comments, package from comments group by package) as c on c.package=p.id 
 where r.`release`=\"".$release."\"
 order by p.id asc
@@ -119,7 +122,7 @@ order by p.id asc
 ";
 //echo $sql;
 $db->execute($sql);
-
+//var_dump($db->errors);
 $x=$db->dataset;
 
 if($format=="json"){
@@ -238,7 +241,36 @@ $s.="<sup>*</sup>";
 if($format=="descriptions"){
 $pkgs[]="<li><b>$s</b> <br>".$v['description']."</li>";
 }else{
-$pkgs[]="<tr><td>".$v['id']."</td><td>".$s."</td><td>".$v['sourcefile']."</td></tr>";
+
+//$s="";
+//foreach($packages as $v){
+
+$tmpl="Default";
+
+if($v['template']){
+$tmpl=$v['template'];
+}
+$mod_c=".";
+if($v['configure']){
+$mod_c="C";
+}
+
+$mod_b=".";
+if($v['build']){
+$mod_b="B";
+}
+
+$mod_i=".";
+if($v['install']){
+$mod_i="I";
+}
+
+$tmpl=$tmpl.':'.$mod_c.$mod_b.$mod_i;
+
+
+
+
+$pkgs[]="<tr><td>".$v['id']."</td><td>".$s."</td><td>".$v['sourcefile']."</td><td>$tmpl</td></tr>";
 }
 
 }

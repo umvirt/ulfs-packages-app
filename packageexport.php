@@ -7,8 +7,11 @@ $package=@addslashes($_REQUEST['package']);
 $format=@addslashes($_REQUEST['format']);
 
 
-$sql="select p.id, r.`release`, code, unpack, sourcefile, sourcedir, configure, build, install, description,localbuild from packages p
+$sql="select p.id, r.`release`, p.code, p.unpack, p.sourcefile, p.sourcedir, p.configure, p.build, p.install, p.description,p.localbuild,
+p.template template_id, t.code template
+from packages p
 left join releases r on p.release=r.id
+left join packages_templates t on t.id=p.template
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
 //var_dump($sql);
@@ -48,6 +51,11 @@ $arr=array(
 if($release!="0.1"){
 $arr['localbuild']=$v['localbuild'];
 }
+
+if($v['template']){
+$arr['template']=$v['template'];
+}
+
 
 //Architecture specific instructions
 if(count($archpackages)){
@@ -112,6 +120,12 @@ if($release!="0.1"){
 $localbuild = $dom->createElement('localbuild',$v['localbuild']);
 $root->appendChild($localbuild);
 }
+
+if($v['template']){
+$localbuild = $dom->createElement('template',$v['template']);
+$root->appendChild($localbuild);
+}
+
 
 //Dependances
 //test: mc

@@ -8,12 +8,14 @@ echo "<h1>UmVirt LFS Package info</h1>";
 $release=@addslashes($_REQUEST['release']);
 $package=@addslashes($_REQUEST['package']);
 
-$sql="select p.id, r.`release`, unpack, code, sourcefile, sourcedir, configure, build, install,
-description,r.commit releasedbcommit,
+$sql="select p.id, r.`release`, unpack, p.code, sourcefile, sourcedir, p.configure, p.build, p.install,
+p.description,r.commit releasedbcommit,
+p.template template_id, t.code template, t.configure template_configure, t.build template_build, t.install template_install,
 pf.id packagefile, pf.size packagefile_size, md5_stored packagefile_md5 
 from packages p
 left join releases r on p.release=r.id
 left join packagesfiles pf on pf.filename=p.sourcefile and pf.release=r.id
+left join packages_templates t on t.id=p.template
 where r.`release`=\"$release\" and p.code=\"$package\"";
 
 //var_dump($sql);
@@ -58,6 +60,7 @@ if($url){
 $linkmd5="<a href=$url>$url</a>";
 }
 
+echo "Template: ".$v['template']."<br>";
 echo "Codename: ".$v['code']."<br>";
 echo "Source file: ".$v['sourcefile']."<br>";
 if($v['packagefile']){
@@ -165,11 +168,11 @@ echo "Unpack script:
 <br><pre>".configuration_script($v['unpack'])."</pre><br>";
 }
 echo "Configuration script: 
-<br><pre>".val2html(configuration_script($v['configure']))."</pre><br>";
+<br><pre>".val2html(configuration_script($v))."</pre><br>";
 echo "Build script: 
-<br><pre>".val2html(build_script($v['build']))."</pre><br>";
+<br><pre>".val2html(build_script($v))."</pre><br>";
 echo "Install script: 
-<br><pre>".val2html(install_script($v['install']))."</pre><br>";
+<br><pre>".val2html(install_script($v))."</pre><br>";
 
 
 
@@ -217,11 +220,11 @@ echo "Dependances: *** NO DEPENDANCES FOUND *** <br>";
 
 
 echo "Configuration script: 
-<br><pre>".val2html(configuration_script($v['configure']))."</pre><br>";
+<br><pre>".val2html(archconfiguration_script($v['configure']))."</pre><br>";
 echo "Build script: 
-<br><pre>".val2html(build_script($v['build']))."</pre><br>";
+<br><pre>".val2html(archbuild_script($v['build']))."</pre><br>";
 echo "Install script: 
-<br><pre>".val2html(install_script($v['install']))."</pre><br>";
+<br><pre>".val2html(archinstall_script($v['install']))."</pre><br>";
 
 }
 }

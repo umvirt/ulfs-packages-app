@@ -29,13 +29,17 @@ $localinstall=true;
 if($arch){
 $sql="
 select p.id, r.`release`, r.`commit` releasedbcommit,p.code, p.sourcefile, p.sourcedir, p.unpack, ap.configure, ap.build, ap.install
-from packages p left join releases r on p.release=r.id 
+from packages p 
+left join releases r on p.release=r.id 
 left join architectures_packages ap on ap.package=p.id 
 left join architectures a on ap.architecture=a.id
 where r.`release`=\"$release\" and p.code=\"$package\" and a.code=\"$arch\"";
 }else{
-$sql="select p.id, r.`release`, r.`commit` releasedbcommit, code, sourcefile, sourcedir, configure, unpack, build, install,localbuild from packages p
+$sql="select p.id, r.`release`, r.`commit` releasedbcommit, p.code, p.sourcefile, p.sourcedir, p.configure, p.unpack, p.build, p.install,p.localbuild,
+p.template template_id, t.code template, t.configure template_configure, t.build template_build, t.install template_install
+from packages p
 left join releases r on p.release=r.id
+left join packages_templates t on t.id=p.template
 where r.`release`=\"$release\" and p.code=\"$package\"";
 }
 
@@ -382,7 +386,7 @@ if($release!="0.1"){
 $configure.=scriptslashes(loadConfig(),$release);
 $configure.=scriptslashes(distributedBuildInit($v['localbuild']),$release);
 }
-$configure.=scriptslashes(configuration_script($v['configure']),$release);
+$configure.=scriptslashes(configuration_script($v),$release);
 
 if($release=="0.1"){
 echo $configure."\n";
@@ -405,7 +409,7 @@ if($release!="0.1"){
 $build.=scriptslashes(loadConfig(),$release);
 $build.=scriptslashes(distributedBuildInit($v['localbuild']),$release);
 }
-$build.=scriptslashes(build_script($v['build']),$release);
+$build.=scriptslashes(build_script($v),$release);
 
 if($release=="0.1"){
 echo $build."\n";
@@ -429,7 +433,7 @@ echo "#Running install script...\n";
 if($v['sourcefile']){
 
 echo "cat > ulfs_install.sh << EOIS\n";
-echo install_script($v['install'])."\n";
+echo install_script($v)."\n";
 echo "EOIS\n";
 
 //update linker directories

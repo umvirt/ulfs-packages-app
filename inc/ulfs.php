@@ -17,7 +17,77 @@ $v=str_replace("\r\n","\n",$v);
 return $v;
 }
 
-function configuration_script($v=""){
+
+function configuration_script($v){
+if(!$v['configure']){
+
+if(!$v['template']){
+return "./configure --prefix=/usr";
+}else{
+$v=$v['template_configure'];
+$v=str_replace("\r\n","\n",$v);
+return $v;
+}
+
+}else{
+//$ -> \$
+$v=str_replace('$','\$',$v['configure']);
+//\r\n\ -> \n
+$v=str_replace("\r\n","\n",$v);
+return $v;
+}
+}
+
+
+function build_script($v){
+if(!$v['build']){
+
+if(!$v['template']){
+return "make";
+}else{
+$v=$v['template_build'];
+$v=str_replace("\r\n","\n",$v);
+return $v;
+}
+
+}else{
+//$ -> \$
+$v=str_replace('$','\$',$v['build']);
+//\r\n\ -> \n
+$v=str_replace("\r\n","\n",$v);
+return $v;
+}
+}
+
+function install_script($v){
+if(!$v['install']){
+
+if(!$v['template']){
+return "make install";
+}else{
+$v=$v['template_install'];
+$v=str_replace("\r\n","\n",$v);
+return $v;
+}
+
+}else{
+//$ -> \$
+$v=str_replace('$','\$',$v['install']);
+//\r\n\ -> \n
+$v=str_replace("\r\n","\n",$v);
+return $v;
+}
+}
+
+
+
+
+
+
+
+
+
+function archconfiguration_script($v=""){
 if(!$v){
 return "./configure --prefix=/usr";
 }else{
@@ -31,7 +101,7 @@ return $v;
 }
 
 
-function build_script($v=""){
+function archbuild_script($v=""){
 if(!$v){
 return "make";
 }else{
@@ -39,9 +109,12 @@ return $v;
 }
 
 
+
+
+
 }
 
-function install_script($v=""){
+function archinstall_script($v=""){
 if(!$v){
 return "make install";
 }else{
@@ -421,3 +494,23 @@ foreach($x as $k=>$v){
 return $res;
 
 }
+
+
+function getTemplateID($code="",$release){
+global $db;
+//$res="";
+
+$sql="select t.id from packages_templates t
+left join releases r on t.`release`=r.id
+where r.`release`=\"".addslashes($release)."\" and t.code=\"".addslashes($code)."\"";
+$db->execute($sql);
+//var_dump($db->errors,$sql);
+
+foreach($db->dataset as $row){
+//$res=
+echo $row[id];
+return $row['id'];
+}
+//return $res;
+}
+

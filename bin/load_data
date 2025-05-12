@@ -39,6 +39,7 @@ public $description;
 public $sourcefile;
 public $sourcedir;
 public $unpack="";
+public $template="";
 public $configure;
 public $build;
 public $install;
@@ -472,6 +473,12 @@ if(@$xpackage->unpack->__toString()){
 $obj->unpack=base64_decode($xpackage->unpack->__toString());
 }
 
+if(@$xpackage->template->__toString()){
+$obj->template=$xpackage->template->__toString();
+}
+
+
+
 //addons
 $xmlIterator2 = new SimpleXMLIterator($xpackage->addons->asXML());
 for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
@@ -606,6 +613,13 @@ $obj->localbuild=0;
 if(@$jpackage->unpack){
 $obj->unpack=base64_decode($jpackage->unpack);
 }
+
+if(@$jpackage->template){
+$obj->template=$jpackage->template;
+}
+
+
+
 
 foreach ($jpackage->addons as $jaddon){
 $obj->addons[]=$jaddon;
@@ -772,10 +786,18 @@ echo "Creating packages...\n\n";
 
 foreach($objs as $obj){
 
+$template="null";
+if($obj->template){
+$template_=getTemplateID($obj->template,$release);
+if($template_){
+$template=$template_;
+}
+}
+
 
 echo "Creating package \"$obj->code\"... ";
 $sql=array();
-$sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install,localbuild)
+$sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install,localbuild,template)
 values (
 \"$obj->code\",
 \"".addslashes($obj->description)."\",
@@ -786,7 +808,8 @@ values (
 \"".addslashes($obj->configure)."\",
 \"".addslashes($obj->build)."\",
 \"".addslashes($obj->install)."\",
-".addslashes($obj->localbuild)."
+".addslashes($obj->localbuild).",
+".addslashes($template)."
 )";
 
 
@@ -800,6 +823,8 @@ if($obj->id){
 echo "Ok\n";
 }else{
 echo "Error\n";
+var_dump($db->errors,$sql);
+
 exit;
 }
 
