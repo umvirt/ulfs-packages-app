@@ -508,7 +508,7 @@ $db->execute($sql);
 
 foreach($db->dataset as $row){
 //$res=
-echo $row[id];
+//echo $row['id'];
 return $row['id'];
 }
 //return $res;
