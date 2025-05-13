@@ -30,11 +30,9 @@ return $v;
 }
 
 }else{
-//$ -> \$
-$v=str_replace('$','\$',$v['configure']);
-//\r\n\ -> \n
-$v=str_replace("\r\n","\n",$v);
-return $v;
+$res=$v['configure'];
+$res=str_replace("\r\n","\n",$res);
+return $res;
 }
 }
 
@@ -51,11 +49,9 @@ return $v;
 }
 
 }else{
-//$ -> \$
-$v=str_replace('$','\$',$v['build']);
-//\r\n\ -> \n
-$v=str_replace("\r\n","\n",$v);
-return $v;
+$res=$v['build'];
+$res=str_replace("\r\n","\n",$res);
+return $res;
 }
 }
 
@@ -71,11 +67,9 @@ return $v;
 }
 
 }else{
-//$ -> \$
-$v=str_replace('$','\$',$v['install']);
-//\r\n\ -> \n
-$v=str_replace("\r\n","\n",$v);
-return $v;
+$res=$v['install'];
+$res=str_replace("\r\n","\n",$res);
+return $res;
 }
 }
 
