@@ -51,4 +51,4 @@ $ct[]=showct($v);
 
 $ct[]="set foreign_key_checks=1;";
 
-echo join($ct, "\n#SQLDELIMETER\n");
+echo join("\n#SQLDELIMETER\n",$ct);
