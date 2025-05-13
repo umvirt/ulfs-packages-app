@@ -191,6 +191,11 @@ if($x){
 return  $basepath."$release/packages/kde/apps/".$file;
 }
 
+$x=file_exists($config['filespath']."/$release/packages/kde/$file");
+//var_dump($x);
+if($x){
+return  $basepath."$release/packages/kde/".$file;
+}
 
 
 $dir=strtolower($file[0]); 
