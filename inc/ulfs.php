@@ -197,6 +197,13 @@ if($x){
 return  $basepath."$release/packages/kde/".$file;
 }
 
+$x=file_exists($config['filespath']."/$release/packages/lxqt/$file");
+//var_dump($x);
+if($x){
+return  $basepath."$release/packages/lxqt/".$file;
+}
+
+
 
 $dir=strtolower($file[0]); 
 if(file_exists($config['filespath']."/$release/packages/".$dir."/".$file)){
