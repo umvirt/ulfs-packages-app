@@ -433,7 +433,7 @@ echo "#Running install script...\n";
 if($v['sourcefile']){
 
 echo "cat > ulfs_install.sh << EOIS\n";
-echo install_script($v)."\n";
+echo scriptslashes(install_script($v),$release)."\n";
 echo "EOIS\n";
 
 //update linker directories
