@@ -448,7 +448,7 @@ echo "fi\n";
 
 } else {
 
-echo install_script($v['install'])."\n";
+echo install_script($v)."\n";
 
 }
 
