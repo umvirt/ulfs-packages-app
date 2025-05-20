@@ -2,7 +2,9 @@
 
 ## Packages database
 
-Main component is database. ULFS Packages is uses MySQL for storing packages database.
+Main component is database. It used to store packages metadata (metainformation).
+
+ULFS Packages is uses MySQL/MariaDB servers for storing packages database.
 
 ## Objects
 
@@ -307,7 +309,7 @@ This table is contain links list 1:M between packages and packagesfiles.
 
 This table is contain packages templates list. Packages are release specific.
 
-## Relatinal schema
+## Relational schema
 
-![Relational shema from phpMyAdmin](db.png)
+![Relational schema from phpMyAdmin](db.png)
 

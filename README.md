@@ -14,13 +14,17 @@ Source packages license information can be found on source packages files, sites
 
 ### Packages database
 
-Main component is database. ULFS Packages is uses MySQL for storing packages database.
+Main component is database. It used to store packages metadata (metainformation).
 
-More info:  [HTML](DATABASE.html)/[Markdown](DATABASE.md)
+ULFS Packages is uses MySQL/MariaDB servers for storing packages database.
+
+[More info](DATABASE.md)
 
 ### Packages storage
 
 Packages storage is disk space used to store source packages files, addons files, patches files.
+
+[More info](STORAGE.md)
 
 ### Packages app
 
