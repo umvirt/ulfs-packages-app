@@ -290,6 +290,8 @@ echo "wget --no-check-certificate -nc $pat\n";
 }
 }
 
+if($v['sourcefile'] or (!$v['sourcefile'] and $v['sourcedir']=="kernel")){
+
 if($v['sourcefile']){
 
 //echo "if [ -f /sources/.cleanup ]; then\n";
@@ -320,13 +322,28 @@ echo "tar -xf ".$v['sourcefile']."\n";
 echo "#Checking package directory size after unpack...\n";
 echo "du -s ".$v['sourcedir']." | awk 'NR==1 {print $1}' > ".$packagelogdir."unpack.size \n";
 
+}
 
 
+
+if(!$v['sourcefile'] and $v['sourcedir']=="kernel"){
+
+switch ($v['sourcedir']){
+case "kernel":
+
+	echo "#Going to Linux kernel source directory...\n";
+	echo "cd /usr/src/linux-`uname -r`/\n";
+
+break;
+
+}
+
+}else{
 
 echo "#Going to source package directory...\n";
 echo "cd ".$v['sourcedir']."\n";
 
-
+}
 
 if(count($patches)){
 echo "#Applying patches...\n";
@@ -346,7 +363,7 @@ echo "patch -Np".$pat['mode']." -i ../".$pat['filename']."\n";
 echo "#Saving configuration timestamp\n";
 echo "date +%s > ".$packagelogdir."configure.time\n";
 
-if($v['sourcefile']){
+if($v['sourcefile'] or (!$v['sourcefile'] and $v['sourcedir']=="kernel")){
 
 
 echo "#Sleep 1 second\n";
@@ -401,7 +418,7 @@ echo "cat ulfs_configure.sh | bash 2>&1 | tee ".$packagelogdir."configure.log \n
 echo "#Saving build timestamp\n";
 echo "date +%s > ".$packagelogdir."build.time\n";
 
-if($v['sourcefile']){
+if($v['sourcefile'] or (!$v['sourcefile'] and $v['sourcedir']=="kernel")){
 
 echo "#Running build script...\n";
 $build="";
@@ -430,7 +447,7 @@ echo "date +%s > ".$packagelogdir."install.time\n";
 
 echo "#Running install script...\n";
 
-if($v['sourcefile']){
+if($v['sourcefile']  or (!$v['sourcefile'] and $v['sourcedir']=="kernel")){
 
 echo "cat > ulfs_install.sh << EOIS\n";
 echo scriptslashes(install_script($v),$release)."\n";
@@ -465,6 +482,10 @@ echo "du -s ".$v['sourcedir']." | awk 'NR==1 {print $1}' > ".$packagelogdir."ins
 
 echo "echo \"ULFS package installation completed.\"\n";
 
+}
+
+if($v['sourcefile']  or (!$v['sourcefile'] and $v['sourcedir']=="kernel")){
+
 echo "#Producing files list\n";
 echo "echo \"Looking for installed files...\"\n";
 echo "if [  -f ".$packagelogdir."files.txt ]; then\n";
@@ -478,7 +499,7 @@ echo "if [ \"\$USER\" == \"root\" ] ; then \n";
 echo "find /bin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /sbin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /usr -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! path /etc/ld.so.cache >> ".$packagelogdir."files.txt\n";
+echo "find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! -path /etc/ld.so.cache >> ".$packagelogdir."files.txt\n";
 echo "find /opt -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /lib -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "find /lib64 -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
@@ -489,7 +510,7 @@ echo "else\n";
 echo "sudo find /bin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /sbin -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /usr -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
-echo "sudo find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! path /etc/ld.so.cache >> ".$packagelogdir."files.txt\n";
+echo "sudo find /etc -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time \! -path /etc/ld.so.cache >> ".$packagelogdir."files.txt\n";
 echo "sudo find /opt -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /lib -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
 echo "sudo find /lib64 -type f -newer ".$packagelogdir."configure.time \! -newer ".$packagelogdir."finish.time >> ".$packagelogdir."files.txt\n";
@@ -536,10 +557,15 @@ echo "a=`cat ".$packagelogdir."start.time`\n";
 echo "b=`cat ".$packagelogdir."configure.time`\n";
 echo "dp=\$((\$b-\$a))\n";
 
+
+if($v['sourcefile']){
+
 echo "#Calculate download time\n";
 echo "a=`cat ".$packagelogdir."download.time`\n";
 echo "b=`cat ".$packagelogdir."unpack.time`\n";
 echo "dd=\$((\$b-\$a))\n";
+
+}
 
 echo "#Calculate delta time\n";
 echo "a=`cat ".$packagelogdir."configure.time`\n";
@@ -562,7 +588,13 @@ echo "echo \"Build size: \$c\" \n";
 
 }
 echo "echo \"Prepare time: \$dp sec.\" \n";
+
+if($v['sourcefile']){
+
 echo "echo \"Download time: \$dd sec.\" \n";
+
+}
+
 echo "echo \"Build time: \$db sec.\" \n";
 echo "\n#End of script\n";
 
