@@ -51,8 +51,15 @@ Package is object that representing binary package, result of building one or mu
 
 Threre are two types of packages:
 
-* Usual package - Package that contain link to source code package
-* Virtual package - Package that don't contain link to source code package
+* Usual package - Package that have defined source file and source directory.
+* Virtual package - Package that don't have defined source file and source directory
+* Kernel package - Pachage that don't have defined source file but have defined "kernel" source directory.
+
+When installing usual package specific source package file is downloaded and unpacked to source directory where it will be configured and built.
+
+When installing virtual package only dependencies are installed. Source file not needed. Installation script can be executed after last dependency installation.
+
+Kernel package is used to build kernel tools from "/usr/src/linux-%version%" directory.
 
 Packages have few properties:
 
