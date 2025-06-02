@@ -203,6 +203,11 @@ if($x){
 return  $basepath."$release/packages/lxqt/".$file;
 }
 
+$x=file_exists($config['filespath']."/$release/packages/db/$file");
+//var_dump($x);
+if($x){
+return  $basepath."$release/packages/db/".$file;
+}
 
 
 $dir=strtolower($file[0]); 
