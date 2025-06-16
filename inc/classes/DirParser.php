@@ -6,7 +6,7 @@
  *
  * This class is used to get directory tree information
  */
-class dirparser{
+class DirParser{
 
     public $dir;
     public $ignorefiles;

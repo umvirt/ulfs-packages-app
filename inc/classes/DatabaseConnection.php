@@ -8,7 +8,7 @@
 /**
  *  MariaDB database connection
  */
-class db_connection
+class DatabaseConnection
 {
     /**
     * Database server

@@ -12,7 +12,7 @@ $db->execute($sql);
 
 foreach($x as $v){
 echo "Processing release \"".$v['release']."\"... ";
-$dp=new dirparser();
+$dp=new DirParser();
 
 $dp->dir=$config['filespath']."/".$v['release']."/patches";
 $dp->ignorefiles=array('/.md5sum$/');
