@@ -10,13 +10,17 @@
 
 Standardized formatting reduces the cognitive friction when reading code from other authors.
 
-Currently Packages web-application PHP-code is not well formatted but we strive to make it formatted according to [PSR-12](https://www.php-fig.org/psr/psr-12) standard.
+Currently Packages web-application PHP-code is not well formatted but we strive to make it formatted according to [PSR-1](https://www.php-fig.org/psr/psr-1) and [PSR-12](https://www.php-fig.org/psr/psr-12) standards.
 
 #### Code documentation
 
 PHPDoc is used to generate API docunentation.
 
 PHPDoc standard is defined in [PSR-5](https://github.com/php-fig/fig-standards/blob/master/proposed/phpdoc.md)
+
+#### Text documentation
+
+Markdown is a simple markup language for formatting text documentation. It supported by GitHub and GitLab services.
 
 ### Software
 
@@ -47,3 +51,8 @@ In most cases SSH protocol is already supported on remote machine.
 #### GIT
 
 We use [GIT](https://git-scm.com/) as Version Control System (VCS).
+
+#### Doxygen
+
+Doxygen is can be used to generate documentation. It support PHPDoc and Markdown. 
+
