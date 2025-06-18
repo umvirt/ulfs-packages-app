@@ -1,82 +1,90 @@
 #!/usr/bin/env php
 <?php
-//==================
-//Data Loader
-//==================
+/**
+ * ULFS Packages Web-Application
+ *
+ * Database data loader script
+ */
 
+//load application
 include "../inc/main.php";
 
-$shortopts  = "";
-$longopts  = array(
-"path:",
-"release:",
-"format:"
-);
+//define classes
 
-class ARCH{
-public $code;
-public $description;
+//architecture
+class ARCH
+{
+    public $code;
+    public $description;
 }
 
-class TMPL{
-public $code;
-public $description;
-public $configure;
-public $build;
-public $install;
+//package template
+class TMPL
+{
+    public $code;
+    public $description;
+    public $configure;
+    public $build;
+    public $install;
 }
 
-
-class CMD{
-public $name;
-public $commands;
-public $info;
+//command
+class CMD
+{
+    public $name;
+    public $commands;
+    public $info;
 }
 
-class PKG{
-public $code;
-public $description;
-public $sourcefile;
-public $sourcedir;
-public $unpack="";
-public $template="";
-public $configure;
-public $build;
-public $install;
-public $dependances;
-public $patches;
-public $addons;
-public $archpackages;
+//package
+class PKG
+{
+    public $code;
+    public $description;
+    public $sourcefile;
+    public $sourcedir;
+    public $unpack="";
+    public $template="";
+    public $configure;
+    public $build;
+    public $install;
+    public $dependances;
+    public $patches;
+    public $addons;
+    public $archpackages;
 };
 
+//define getopt options
+$shortopts  = "";
+$longopts  = array(
+    "path:",
+    "release:",
+    "format:"
+);
 
-
+//parse command line arguments
 $options = getopt($shortopts, $longopts);
-//var_dump($options);
-/*
-$url="http://umvirt.com/linux/packages";
-$format="json";
-$release="0.1";
-*/
 
-
-
+//packages path
 $path=@$options["path"];
+//data format
 $format=@$options["format"];
+//release
 $release=@$options["release"];
-$outdir="../tmp/$release";
 
 echo "UmVirt LFS Packages data loader\n\n";
 
-if(!$path | !$format | !$release){
-echo "USAGE:\n\n";
-echo "        $argv[0] --path=<dump_path> --release=<release> --format=<xml|json>\n\n";
-exit;
+if(!$path | !$format | !$release)
+{
+    echo "USAGE:\n\n";
+    echo "        $argv[0] --path=<dump_path> --release=<release> --format=<xml|json>\n\n";
+    exit;
 }
 
 //release git commit
 $commit=gitHead($path);
 
+//print arguments
 echo "Packages path: $path\n";
 echo "Release: $release\n";
 echo "Commit: $commit \n";
@@ -87,975 +95,1222 @@ $archs=array();
 $architectures=array();
 $templates=array();
 
-//Commands proccessing
+//======================
+// Commands file parsing
+//======================
+
+//Comands list
 $commands=array();
 echo "Reading commands info... ";
+//load commands file
 $csfile=@file_get_contents("$path/commands.$format");
-if(strlen($csfile)){
+//if commands data is available
+if(strlen($csfile))
+{
+    //if format is XML
+    if($format=="xml")
+    {
+        //open commands document
+        $xcommands=simplexml_load_string ($csfile);
 
-if($format=="xml"){
-$xcommands=simplexml_load_string ($csfile);
-//var_dump($xpackages->commands->command);
-$c=0;
+        //init commands counter
+        $c=0;
 
-$xmlIterator = new SimpleXMLIterator($xcommands->commands->asXML());
-for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
-$commands[]=$xmlIterator->current()->__toString();
-//break;
-}
-}
-if($format=="json"){
-$jcommands=json_decode($csfile);
-//var_dump($xpackages->commands->command);
-$c=0;
-foreach ($jcommands->commands as $jcommand){
-$commands[]=$jcommand;
-}
+        //prepare iterator
+        $xmlIterator = new SimpleXMLIterator($xcommands->commands->asXML());
 
+        //proccess each command
+        for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() )
+        {
+            //add command to list
+            $commands[]=$xmlIterator->current()->__toString();
+        }
+    }
 
+    //if format is JSON
+    if($format=="json")
+    {
+        //open commands document
+        $jcommands=json_decode($csfile);
 
-}
+        //init commands counter
+        $c=0;
 
-//file_put_contents($outdir."/packages.".$format, $packages);
-echo "Ok\n\n";
+        //proccess each command
+        foreach ($jcommands->commands as $jcommand)
+        {
+            //add command to list
+            $commands[]=$jcommand;
+        }
+    }
+    echo "Ok\n\n";
+
+//if commands data not received
 }else{
-echo "Error\n\n";
-exit;
+    //exit
+    echo "Error\n\n";
+    exit;
 }
 
 
-//var_dump($commands);
+//======================
+// Packages file parsing
+//======================
 
-
-
-//exit;
-
-//Packages proccessing
 echo "Reading packages info... ";
+
+//open packages file
 $psfile=@file_get_contents("$path/packages.$format");
-if(strlen($psfile)){
 
-if($format=="xml"){
-$xpackages=simplexml_load_string ($psfile);
-//var_dump($xpackages->packages->package);
-$c=0;
+//if packages data is available
+if(strlen($psfile))
+{
 
-if(@$xpackages->architectures){
-//load architectures
-$xmlIterator = new SimpleXMLIterator($xpackages->architectures->asXML());
-for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
-$architectures[]=$xmlIterator->current();
+    //if format is XML
+    if($format=="xml")
+    {
 
-//break;
-}
+        //open packages document
+        $xpackages=simplexml_load_string ($psfile);
 
-//load templates
-if(@$xpackages->templates){
-	$xmlIterator = new SimpleXMLIterator($xpackages->templates->asXML());
-	for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
-		$templates[]=$xmlIterator->current();
-		//break;
-	}
-}
+        //init packages counter
+        $c=0;
 
+        //if architectures are defined
+        if(@$xpackages->architectures)
+        {
+            //load architectures
 
+            //prepare iterator
+            $xmlIterator = new SimpleXMLIterator($xpackages->architectures->asXML());
 
+            //proccess each architecture
+            for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() )
+            {
+                //add architecture to list
+                $architectures[]=$xmlIterator->current();
+            }
+        }
 
-//var_dump (count($architectures)); exit;
+        //if package templates are defined
+        if(@$xpackages->templates)
+        {
+            //load templates
 
-}
+            //prepare iterator
+            $xmlIterator = new SimpleXMLIterator($xpackages->templates->asXML());
 
-//load packages
-$xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
-for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
-$packages[]=$xmlIterator->current()->__toString();
-//break;
-}
-}
+            //proccess each template
+            for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() )
+            {
+                //add template to list
+                $templates[]=$xmlIterator->current();
+            }
+        }
 
-if($format=="json"){
-$jpackages=json_decode($psfile);
-//var_dump($xpackages->packages->package);
-$c=0;
+        //load packages
 
-//var_dump($jpackages->architectures);exit;
+        //prepare iterator
+        $xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
 
+        //proccess each package
+        for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() )
+        {
+            //add package to list
+            $packages[]=$xmlIterator->current()->__toString();
+        }
+    }
 
-if(@$jpackages->architectures){
-	foreach($jpackages->architectures as $arch) {
-		$architectures[]=array('code'=>$arch->code, 'description'=>$arch->description);
-	}
-}
+    //if format is JSON
+    if($format=="json")
+    {
+        //open packages document
+        $jpackages=json_decode($psfile);
+        //init packages counter
+        $c=0;
 
+        //if architectures are defined
+        if(@$jpackages->architectures)
+        {
+            //load architectures
 
-if(@$jpackages->templates){
-	foreach($jpackages->templates as $tmpl) {
-		$templates[]=array(
-			'code'=>$tmpl->code, 
-			'description'=>$tmpl->description,
-			'configure'=>$tmpl->configure,
-			'build'=>$tmpl->build,
-			'install'=>$tmpl->install
-		);
+            //proccess each architecture
+            foreach($jpackages->architectures as $arch)
+            {
+                //add architecture to list
+                $architectures[]=array('code'=>$arch->code, 'description'=>$arch->description);
+            }
+        }
 
-	}
-}
+        //if package templates are defined
+        if(@$jpackages->templates)
+        {
+            //load templates
 
+            //proccess each template
+            foreach($jpackages->templates as $tmpl)
+            {
+                //add template to list
+                $templates[]=array(
+                    'code'=>$tmpl->code,
+                    'description'=>$tmpl->description,
+                    'configure'=>$tmpl->configure,
+                    'build'=>$tmpl->build,
+                    'install'=>$tmpl->install
+                );
+            }
+        }
 
-foreach ($jpackages->packages as $jpackage){
-$packages[]=$jpackage;
-}
+        //load packages
 
+        //proccess each package
+        foreach ($jpackages->packages as $jpackage)
+        {
+            //add package to list
+            $packages[]=$jpackage;
+        }
+    }
+    echo "Ok\n\n";
 
-}
-//file_put_contents($outdir."/packages.".$format, $packages);
-echo "Ok\n\n";
+//if packages data is not available
 }else{
-echo "Error\n\n";
-exit;
+    echo "Error\n\n";
+    exit;
 }
 
-
-//var_dump($packages,$commands);
-//exit;
+//=====================
+// Database preparation
+//=====================
 
 echo "Creating release...";
 
+//get release
 $sql_="select id from releases where `release`=\"$release\"";
 $db->execute($sql_);
 
-if(count($db->dataset)){
-$release_id=$db->dataset[0]['id'];
+//if release exists
+if(count($db->dataset))
+{
+    //save release id
+    $release_id=$db->dataset[0]['id'];
 
-$sql=array();
-$sql[]="delete from packages where `release`=\"$release_id\"";
-$sql[]="delete from packages_templates where `release`=\"$release_id\"";
-$sql[]="delete from commands where `release`=\"$release_id\"";
-$sql[]="update releases set `commit`=\"$commit\" where id=\"$release_id\" ";
-$db->execute($sql);
+    $sql=array();
+    //delete all release packages
+    $sql[]="delete from packages where `release`=\"$release_id\"";
+    //delete all release packages templates
+    $sql[]="delete from packages_templates where `release`=\"$release_id\"";
+    //delete all release comands
+    $sql[]="delete from commands where `release`=\"$release_id\"";
+    //update commit on release
+    $sql[]="update releases set `commit`=\"$commit\" where id=\"$release_id\" ";
+    $db->execute($sql);
 
 }else{
+    //create new release
 
-
-$sql=array();
-$sql[]="insert into releases (`release`,`commit`) value (\"$release\",\"$commit\")";
-$sql[]="select @@identity";
-$db->execute($sql);
-$release_id=$db->dataset[0]['@@identity'];
+    $sql=array();
+    $sql[]="insert into releases (`release`,`commit`) value (\"$release\",\"$commit\")";
+    $sql[]="select @@identity";
+    $db->execute($sql);
+    $release_id=$db->dataset[0]['@@identity'];
 
 }
 
-if($release_id){
-echo "Ok\n\n";
+//if release is updated or created
+if($release_id)
+{
+    echo "Ok\n\n";
+//if release is not updated or created
 }else{
-echo "Error\n\n";
-exit;
+    //exit
+    echo "Error\n\n";
+    exit;
 }
 
-//var_dump($commands);exit;
+//=================
+// Commands loading
+//=================
+
+//objects list
 $objs=Array();
 
 
-foreach($commands as $command){
-$cfilename="$path/commands/$command.$format";
-$cfile=file_get_contents($cfilename);
-echo "Processing file \"$cfilename\"...\n";
-if(strlen($cfile)){
+foreach($commands as $command)
+{
+    //compose filename
+    $cfilename="$path/commands/$command.$format";
 
+    //open command file
+    $cfile=file_get_contents($cfilename);
 
-if($format=="xml"){
-$xcommand=simplexml_load_string ($cfile);
-$obj=new CMD();
+    echo "Processing file \"$cfilename\"...\n";
 
-$obj->name=$xcommand->name->__toString();
-$obj->commands=base64_decode($xcommand->commands->__toString());
-$obj->info=base64_decode($xcommand->info->__toString());
+    //if command file is not empty
+    if(strlen($cfile))
+    {
+        //if format is XML
+        if($format=="xml")
+        {
+            //open commands document
+            $xcommand=simplexml_load_string ($cfile);
 
+            //create command object
+            $obj=new CMD();
 
-$objs[]=$obj;
+            //fill command object
+            $obj->name=$xcommand->name->__toString();
+            $obj->commands=base64_decode($xcommand->commands->__toString());
+            $obj->info=base64_decode($xcommand->info->__toString());
 
+            //add command object to list
+            $objs[]=$obj;
+        }
+
+        //if format is JSON
+        if($format=="json")
+        {
+            //open commands document
+            $jcommand=json_decode ($cfile);
+
+            //create command object
+            $obj=new CMD();
+
+            //fill command object
+            $obj->name=$jcommand->name;
+            $obj->commands=base64_decode($jcommand->commands);
+            $obj->info=base64_decode($jcommand->info);
+
+            //add command object to list
+            $objs[]=$obj;
+        }
+    }
 }
-
-}
-
-if($format=="json"){
-$jcommand=json_decode ($cfile);
-$obj=new CMD();
-
-$obj->name=$jcommand->name;
-$obj->commands=base64_decode($jcommand->commands);
-$obj->info=base64_decode($jcommand->info);
-
-
-$objs[]=$obj;
-
-}
-
-
-
-
-
-}
-
-
-
 
 echo "Loaded ".count($objs)."/".count($commands)." commands.\n\n";
 
+//===================
+// Commands importing
+//===================
 
 echo "Creating commands...\n\n";
 
+//proccess each command
+foreach($objs as $obj)
+{
+    echo "Creating command \"$obj->name\"... ";
 
-foreach($objs as $obj){
+    //create sql requests array to execute them in transaction
+    $sql=array();
 
+    //create command
+    $sql[]="insert into commands (name,`release`,commands,info)
+    values (
+    \"$obj->name\",
+    \"$release_id\",
+    \"".addslashes($obj->commands)."\",
+    \"".addslashes($obj->info)."\"
+    )";
 
-echo "Creating command \"$obj->name\"... ";
-$sql=array();
-$sql[]="insert into commands (name,`release`,commands,info)
-values (
-\"$obj->name\",
-\"$release_id\",
-\"".addslashes($obj->commands)."\",
-\"".addslashes($obj->info)."\"
-)";
+    //get it id
+    $sql[]="select @@identity";
+    $db->execute($sql);
+    $obj->id=$db->dataset[0]['@@identity'];
 
-
-$sql[]="select @@identity";
-$db->execute($sql);
-$obj->id=$db->dataset[0]['@@identity'];
-
-
-if($obj->id){
-echo "Ok\n";
-}else{
-echo "Error\n";
-exit;
+    //if id received
+    if($obj->id)
+    {
+        echo "Ok\n";
+    //if id not received
+    }else{
+        //exit
+        echo "Error\n";
+        exit;
+    }
 }
 
-}
-
+//======================
+// Architectures loading
+//======================
 
 echo "Loading architectures...\n\n";
 
-foreach($architectures as $architecture){
+//proccess each architecture
+foreach($architectures as $architecture)
+{
+    //if format is XML
+    if($format=="xml")
+    {
 
-if($format=="xml"){
+        //create architecture object
+        $arch=new ARCH;
 
-//var_dump ($architecture);
+        //fill architecture object
+        $arch->code=$architecture->code->__toString();
+        $arch->description=base64_decode($architecture->description->__toString());
 
+        //add architecture object to list
+        $archs[]=$arch;
 
-$arch=new ARCH;
+        echo $arch->code."\n";
+    }
 
-//$architecture=simplexml_load_string ($architecture_);
-//var_dump ($architecture);
+    //if format is JSON
+    if($format=="json")
+    {
+        //create architecture object
+        $arch=new ARCH;
 
-$arch->code=$architecture->code->__toString();
-$arch->description=base64_decode($architecture->description->__toString());
-$archs[]=$arch;
+        //fill architecture object
+        $arch->code=$architecture['code'];
+        $arch->description=base64_decode($architecture['description']);
 
-echo $arch->code."\n";
+        //add architecture object to list
+        $archs[]=$arch;
 
+        echo $arch->code."\n";
+    }
 }
 
-if($format=="json"){
-
-$arch=new ARCH;
-$arch->code=$architecture['code'];
-$arch->description=base64_decode($architecture['description']);
-
-$archs[]=$arch;
-
-echo $arch->code."\n";
-
-}
-
-
-}
-
-//var_dump (count($archs)); exit;
-
-//exit;
-
-
-// Packages templates
-
+//===========================
+// Packages templates loading
+//===========================
 
 echo "Loading packages templates...\n\n";
 
-foreach($templates as $template){
+//proccess each template
+foreach($templates as $template)
+{
+    //if format is XML
+    if($format=="xml")
+    {
 
-if($format=="xml"){
+        //create template object
+        $tmpl=new TMPL;
 
-//var_dump ($architecture);
+        //fill template object
+        $tmpl->code=$template->code->__toString();
+        $tmpl->description=base64_decode($template->description->__toString());
+        $tmpl->configure=base64_decode($template->configure->__toString());
+        $tmpl->build=base64_decode($template->build->__toString());
+        $tmpl->install=base64_decode($template->install->__toString());
 
+        //add templates to list
+        $tmpls[]=$tmpl;
 
-$tmpl=new TMPL;
+        echo $tmpl->code."\n";
+    }
+    //if format is JSON
+    if($format=="json")
+    {
 
-//$architecture=simplexml_load_string ($architecture_);
-//var_dump ($architecture);
+        //create template object
+        $tmpl=new TMPL;
 
-$tmpl->code=$template->code->__toString();
-$tmpl->description=base64_decode($template->description->__toString());
-$tmpl->configure=base64_decode($template->configure->__toString());
-$tmpl->build=base64_decode($template->build->__toString());
-$tmpl->install=base64_decode($template->install->__toString());
+        //fill template object
+        $tmpl->code=$template['code'];
+        $tmpl->description=base64_decode($template['description']);
+        $tmpl->configure=base64_decode($template['configure']);
+        $tmpl->build=base64_decode($template['build']);
+        $tmpl->install=base64_decode($template['install']);
 
-$tmpls[]=$tmpl;
+        //add templates to list
+        $tmpls[]=$tmpl;
 
-echo $tmpl->code."\n";
-
+        echo $tmpl->code."\n";
+    }
 }
 
-if($format=="json"){
-
-$tmpl=new TMPL;
-$tmpl->code=$template['code'];
-$tmpl->description=base64_decode($template['description']);
-$tmpl->configure=base64_decode($template['configure']);
-$tmpl->build=base64_decode($template['build']);
-$tmpl->install=base64_decode($template['install']);
-
-$tmpls[]=$tmpl;
-
-echo $tmpl->code."\n";
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-$objs=array();
-
-foreach($packages as $package){
-$pfilename="$path/packages/$package.$format";
-$pfile=file_get_contents($pfilename);
-echo "Processing file \"$pfilename\"...\n";
-if(strlen($pfile)){
-
-
-if($format=="xml"){
-
-$xpackage=simplexml_load_string ($pfile);
-$obj=new PKG();
-
-$obj->code=$xpackage->code->__toString();
-$obj->description=base64_decode($xpackage->description->__toString());
-$obj->sourcefile=$xpackage->sourcefile->__toString();
-$obj->sourcedir=$xpackage->sourcedir->__toString();
-$obj->configure=base64_decode($xpackage->configure->__toString());
-$obj->build=base64_decode($xpackage->build->__toString());
-$obj->install=base64_decode($xpackage->install->__toString());
-$obj->addons=array();
-$obj->patches=array();
-$obj->dependances=array();
-$obj->nestings=array();
-$obj->comments=array();
-$obj->archpackages=array();
-
-
-if(@$xpackage->localbuild->__toString()=="1"){
-$obj->localbuild=1;
-}else{
-$obj->localbuild=0;
-}
-
-if(@$xpackage->unpack->__toString()){
-$obj->unpack=base64_decode($xpackage->unpack->__toString());
-}
-
-if(@$xpackage->template->__toString()){
-$obj->template=$xpackage->template->__toString();
-}
-
-
-
-//addons
-$xmlIterator2 = new SimpleXMLIterator($xpackage->addons->asXML());
-for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
-$obj->addons[]=$xmlIterator2->current()->__toString();
-}
-
-//patches
-$xmlIterator2 = new SimpleXMLIterator($xpackage->patches->asXML());
-for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
-$obj->patches[]=array(
-"filename"=>$xmlIterator2->current()->filename->__toString(),
-"mode"=>$xmlIterator2->current()->mode->__toString()
-);
-}
-
-//dependaces
-$xmlIterator2 = new SimpleXMLIterator($xpackage->dependances->asXML());
-$w=0;
-for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
-$w++;
-$obj->dependances[]=array("code"=>$xmlIterator2->current()->code->__toString(), "weight"=>$w);
-}
-
-
-//nestings
-$xmlIterator2 = new SimpleXMLIterator($xpackage->nestings->asXML());
-for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
-$obj->nestings[]=$xmlIterator2->current()->__toString();
-}
-
-//comments
-$xmlIterator2 = new SimpleXMLIterator($xpackage->comments->asXML());
-for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
-$obj->comments[]=base64_decode($xmlIterator2->current()->__toString());
-}
-
-
-//archpackages
-if($xpackage->archpackages){
-$xmlIterator2 = new SimpleXMLIterator($xpackage->archpackages->asXML());
-$w=0;
-for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
-//$w++;
-$apkg=array(
-"arch"=>$xmlIterator2->current()->arch->__toString(), 
-"configure"=>base64_decode($xmlIterator2->current()->configure->__toString()),
-"build"=>base64_decode($xmlIterator2->current()->build->__toString()),
-"install"=>base64_decode($xmlIterator2->current()->install->__toString())
-);
-
-$apkg['dependances']=array();
-if(@$xmlIterator2->current()->dependances){
-//$apkg['dependances']=$xmlIterator2->current()->dependances;
-foreach($xmlIterator2->current()->dependances as $dep){
-
-
-//var_dump('xxx',$dep);
-//var_dump($xmlIterator2->current()->dependances);
-
-$xmlIterator3 = $xmlIterator2->current()->dependances->dependance;
-
-//var_dump($xmlIterator3);
-for( $xmlIterator3->rewind(); $xmlIterator3->valid(); $xmlIterator3->next() ) {
-//var_dump($xmlIterator3->current()->dependance);
-
-
-
-$apkg['dependances'][]=array(
-'code'=>$xmlIterator3->current()->code->__toString(), 
-'arch'=>$xmlIterator3->current()->arch->__toString(), 
-'weight'=>$xmlIterator3->current()->weight->__toString());
-
-}
-
-}
-
-
-//foreach($xmlIterator2->current()->dependances as $dep){
-//var_dump($dep->current());
-//$apkg['dependances'][]=array('code'=>$dep->current()->code->__toString());
-//}
-
-
-
-}
-
-$obj->archpackages[]=$apkg;
-
-
-}
-}
-
-//if($obj->code=='Xlibs'){
-//var_dump($obj);//exit;
-//}
-
-$objs[]=$obj;
-
-
-//var_dump($xpackage, $obj);
-//break;
-
-}
-//}
-
-
-
-if($format=="json"){
-$jpackage=json_decode($pfile);
-$obj=new PKG();
-
-$obj->code=$jpackage->code;
-$obj->description=base64_decode($jpackage->description);
-$obj->sourcefile=$jpackage->sourcefile;
-$obj->sourcedir=$jpackage->sourcedir;
-$obj->configure=base64_decode($jpackage->configure);
-$obj->build=base64_decode($jpackage->build);
-$obj->install=base64_decode($jpackage->install);
-$obj->addons=array();
-$obj->patches=array();
-$obj->dependances=array();
-$obj->nestings=array();
-$obj->comments=array();
-
-if(@$jpackage->localbuild=="1"){
-$obj->localbuild=1;
-}else{
-$obj->localbuild=0;
-}
-
-
-if(@$jpackage->unpack){
-$obj->unpack=base64_decode($jpackage->unpack);
-}
-
-if(@$jpackage->template){
-$obj->template=$jpackage->template;
-}
-
-
-
-
-foreach ($jpackage->addons as $jaddon){
-$obj->addons[]=$jaddon;
-}
-
-foreach ($jpackage->patches as $jpatch){
-$obj->patches[]=array("filename"=>$jpatch->filename,"mode"=>$jpatch->mode);
-}
-
-$w=0;
-foreach ($jpackage->dependances as $jdep){
-$w++;
-$obj->dependances[]=array("code"=>$jdep->code,"weight"=>$w);
-}
-
-
-foreach ($jpackage->nestings as $jn){
-$obj->nestings[]=$jn;
-}
-
-foreach ($jpackage->comments as $cm){
-$obj->comments[]=$cm;
-}
-
-if(@$jpackage->archpackages){
-$obj->archpackages=array();
-
-foreach($jpackage->archpackages as $jarchpackage){
-
-$apkg=array(
-"arch"=>$jarchpackage->arch,
-"configure"=>base64_decode($jarchpackage->configure),
-"build"=>base64_decode($jarchpackage->build),
-"install"=>base64_decode($jarchpackage->install)
-);
-
-$apkg['dependances']=array();
-if(@$jarchpackage->dependances){
-
-foreach($jarchpackage->dependances as $adep){
-
-$apkg['dependances'][]=array(
-'code'=>$adep->code,
-'arch'=>$adep->arch,
-'weight'=>$adep->weight
-);
-}
-
-
-}
-
-
-
-
-
-$obj->archpackages[]=$apkg;
-
-}
-
-}
-
-
-//var_dump($jpackage,$obj);
-//exit;
-
-$objs[]=$obj;
-
-
-}
-}
-
-
+//=================
+// Packages loading
+//=================
+
+//objects list
+$objs=Array();
+
+foreach($packages as $package)
+{
+    //compose filename
+    $pfilename="$path/packages/$package.$format";
+
+    //open package file
+    $pfile=file_get_contents($pfilename);
+
+    echo "Processing file \"$pfilename\"...\n";
+
+     //if package file is not empty
+    if(strlen($pfile))
+    {
+
+        //if format is XML
+        if($format=="xml")
+        {
+            //open package document
+            $xpackage=simplexml_load_string ($pfile);
+
+            //create package object
+            $obj=new PKG();
+
+            //fill package object
+            $obj->code=$xpackage->code->__toString();
+            $obj->description=base64_decode($xpackage->description->__toString());
+            $obj->sourcefile=$xpackage->sourcefile->__toString();
+            $obj->sourcedir=$xpackage->sourcedir->__toString();
+            $obj->configure=base64_decode($xpackage->configure->__toString());
+            $obj->build=base64_decode($xpackage->build->__toString());
+            $obj->install=base64_decode($xpackage->install->__toString());
+            $obj->addons=array();
+            $obj->patches=array();
+            $obj->dependances=array();
+            $obj->nestings=array();
+            $obj->comments=array();
+            $obj->archpackages=array();
+
+
+            //if local build value defined and equal "1"
+            if(@$xpackage->localbuild->__toString()=="1")
+            {
+                //pass it
+                $obj->localbuild=1;
+            }else{
+                //pass default value
+                $obj->localbuild=0;
+            }
+
+            //if unpack is defined
+            if(@$xpackage->unpack->__toString())
+            {
+                //pass it
+                $obj->unpack=base64_decode($xpackage->unpack->__toString());
+            }
+
+            //if template is defined
+            if(@$xpackage->template->__toString())
+            {
+                //pass it
+                $obj->template=$xpackage->template->__toString();
+            }
+
+            //add addons
+
+            //prepare iterator
+            $xmlIterator2 = new SimpleXMLIterator($xpackage->addons->asXML());
+
+            //proccess each add-on
+            for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() ) {
+                //add add-on
+                $obj->addons[]=$xmlIterator2->current()->__toString();
+            }
+
+            //add patches
+
+            //prepare iterator
+            $xmlIterator2 = new SimpleXMLIterator($xpackage->patches->asXML());
+
+            //proccess each patch
+            for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() )
+            {
+                //add patch
+                $obj->patches[]=array(
+                    "filename"=>$xmlIterator2->current()->filename->__toString(),
+                    "mode"=>$xmlIterator2->current()->mode->__toString()
+                );
+            }
+
+            //add dependaces
+
+            //prepare iterator
+            $xmlIterator2 = new SimpleXMLIterator($xpackage->dependances->asXML());
+
+            //dependency weight init
+            $w=0;
+
+            //proccess each dependency
+            for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() )
+            {
+                //increase weight
+                $w++;
+                //add dependency
+                $obj->dependances[]=array("code"=>$xmlIterator2->current()->code->__toString(), "weight"=>$w);
+            }
+
+            //add nestings
+            $xmlIterator2 = new SimpleXMLIterator($xpackage->nestings->asXML());
+
+            //proccess each nesting
+            for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() )
+            {
+                //add nesting
+                $obj->nestings[]=$xmlIterator2->current()->__toString();
+            }
+
+            //add comments
+
+            //prepare iterator
+            $xmlIterator2 = new SimpleXMLIterator($xpackage->comments->asXML());
+
+            //proccess each comment
+            for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next() )
+            {
+                //add comment
+                $obj->comments[]=base64_decode($xmlIterator2->current()->__toString());
+            }
+
+            //add archpackages
+            if($xpackage->archpackages)
+            {
+                //create archpackages array
+                $obj->archpackages=array();
+
+                //prepare iterator
+                $xmlIterator2 = new SimpleXMLIterator($xpackage->archpackages->asXML());
+
+                //proccess each archpackage
+                for( $xmlIterator2->rewind(); $xmlIterator2->valid(); $xmlIterator2->next())
+                {
+                    //create archpackage
+                    $apkg=array(
+                        "arch"=>$xmlIterator2->current()->arch->__toString(),
+                        "configure"=>base64_decode($xmlIterator2->current()->configure->__toString()),
+                        "build"=>base64_decode($xmlIterator2->current()->build->__toString()),
+                        "install"=>base64_decode($xmlIterator2->current()->install->__toString())
+                    );
+
+                    //init archpackage dependencies
+                    $apkg['dependances']=array();
+
+                    //if archpackage dependencies is defined
+                    if(@$xmlIterator2->current()->dependances)
+                    {
+                        //proccess each archpackage dependencies
+                        foreach($xmlIterator2->current()->dependances as $dep)
+                        {
+
+                            //prepare iterator
+                            $xmlIterator3 = $xmlIterator2->current()->dependances->dependance;
+
+                            //proccess each archpackage dependencies dependency
+                            for( $xmlIterator3->rewind(); $xmlIterator3->valid(); $xmlIterator3->next() )
+                            {
+                                //add archpackage dependency
+                                $apkg['dependances'][]=array(
+                                    'code'=>$xmlIterator3->current()->code->__toString(),
+                                    'arch'=>$xmlIterator3->current()->arch->__toString(),
+                                    'weight'=>$xmlIterator3->current()->weight->__toString()
+                                );
+                            }
+                        }
+                    }
+                    //add arch package
+                    $obj->archpackages[]=$apkg;
+                }
+            }
+            //add package
+            $objs[]=$obj;
+        }
+
+        //if format is JSON
+        if($format=="json")
+        {
+            //open package document
+            $jpackage=json_decode($pfile);
+
+            //create package object
+            $obj=new PKG();
+
+            //fill package object
+            $obj->code=$jpackage->code;
+            $obj->description=base64_decode($jpackage->description);
+            $obj->sourcefile=$jpackage->sourcefile;
+            $obj->sourcedir=$jpackage->sourcedir;
+            $obj->configure=base64_decode($jpackage->configure);
+            $obj->build=base64_decode($jpackage->build);
+            $obj->install=base64_decode($jpackage->install);
+            $obj->addons=array();
+            $obj->patches=array();
+            $obj->dependances=array();
+            $obj->nestings=array();
+            $obj->comments=array();
+
+            //if local build value defined and equal "1"
+            if(@$jpackage->localbuild=="1")
+            {
+                //pass it
+                $obj->localbuild=1;
+            }else{
+                //pass default value
+                $obj->localbuild=0;
+            }
+
+            //if unpack is defined
+            if(@$jpackage->unpack)
+            {
+                //pass it
+                $obj->unpack=base64_decode($jpackage->unpack);
+            }
+
+            //if template is defined
+            if(@$jpackage->template)
+            {
+                //pass it
+                $obj->template=$jpackage->template;
+            }
+
+            //add addons
+
+             //proccess each add-on
+            foreach ($jpackage->addons as $jaddon)
+            {
+                //add add-on
+                $obj->addons[]=$jaddon;
+            }
+
+            //add patches
+
+            //proccess each patch
+            foreach ($jpackage->patches as $jpatch)
+            {
+                 //add patch
+                $obj->patches[]=array("filename"=>$jpatch->filename,"mode"=>$jpatch->mode);
+            }
+
+            //add dependaces
+
+            //dependency weight init
+            $w=0;
+
+            foreach ($jpackage->dependances as $jdep)
+            {
+                 //increase weight
+                $w++;
+                //add dependency
+                $obj->dependances[]=array("code"=>$jdep->code,"weight"=>$w);
+            }
+
+            //add nestings
+
+            //proccess each nesting
+            foreach ($jpackage->nestings as $jn)
+            {
+                //add nesting
+                $obj->nestings[]=$jn;
+            }
+
+            //add comments
+
+            //proccess each comment
+            foreach ($jpackage->comments as $cm)
+            {
+                //add comment
+                $obj->comments[]=$cm;
+            }
+
+            //add archpackages
+            if(@$jpackage->archpackages)
+            {
+                //create archpackages array
+                $obj->archpackages=array();
+
+                //proccess each archpackage
+                foreach($jpackage->archpackages as $jarchpackage)
+                {
+                    //create archpackage
+                    $apkg=array(
+                        "arch"=>$jarchpackage->arch,
+                        "configure"=>base64_decode($jarchpackage->configure),
+                        "build"=>base64_decode($jarchpackage->build),
+                        "install"=>base64_decode($jarchpackage->install)
+                    );
+
+                    //init archpackage dependencies
+                    $apkg['dependances']=array();
+
+                    //if archpackage dependencies is defined
+                    if(@$jarchpackage->dependances)
+                    {
+                        //proccess each archpackage dependencies dependency
+                        foreach($jarchpackage->dependances as $adep)
+                        {
+
+                            //add archpackage dependency
+                            $apkg['dependances'][]=array(
+                                'code'=>$adep->code,
+                                'arch'=>$adep->arch,
+                                'weight'=>$adep->weight
+                            );
+                        }
+                    }
+                    //add arch package
+                    $obj->archpackages[]=$apkg;
+                }
+            }
+            //add package
+            $objs[]=$obj;
+        }
+    }
 }
 
 echo "Loaded ".count($objs)."/".count($packages)." packages.\n\n";
 
-
-
+//=====================
+// Architectures import
+//=====================
 
 echo "Creating architectures...\n\n";
-foreach($archs as $arch){
-$sql=array();
-$sql[]="insert into architectures (code,`description`)
-values (
-\"$arch->code\",
-\"".addslashes($arch->description)."\")";
+//proccess each architecture
+foreach($archs as $arch)
+{
+    //create sql requests array to execute them in transaction
+    $sql=array();
 
-$sql[]="select @@identity";
-try{
-$db->execute($sql);
-$arch->id=$db->dataset[0]['@@identity'];
+    //create architecture
+    $sql[]="insert into architectures (code,`description`)
+    values (
+    \"$arch->code\",
+    \"".addslashes($arch->description)."\")";
 
-$arch_ids[$arch->code]=$arch->id;
+    //get it id
+    $sql[]="select @@identity";
 
-echo "Creating \"$arch->code\"... ";
+    try{
+        $db->execute($sql);
+        $arch->id=$db->dataset[0]['@@identity'];
 
-if($arch->id){
-echo "Ok\n";
-}else{
-echo "Error\n";
-//exit;
-}
+        $arch_ids[$arch->code]=$arch->id;
 
-}catch (Exception $e) {
-echo "Skiping\n";
-}
+        echo "Creating \"$arch->code\"... ";
 
-
+        //if id received
+        if($arch->id)
+        {
+            echo "Ok\n";
+        //if id not received
+        }else{
+            echo "Error\n";
+        //exit;
+        }
+    }catch (Exception $e) {
+        echo "Skiping\n";
+    }
 }
 
 echo "\n";
 
-
-// templates
+//==========================
+// Packages templates import
+//==========================
 
 echo "Creating templates...\n\n";
-foreach($tmpls as $tmpl){
-$sql=array();
-$sql[]="insert into packages_templates (code,`release`,`description`,`configure`,`build`,`install`)
-values (
-\"$tmpl->code\",
-$release_id,
-\"".addslashes($tmpl->description)."\",
-\"".addslashes($tmpl->configure)."\",
-\"".addslashes($tmpl->build)."\",
-\"".addslashes($tmpl->install)."\"
-)";
 
-$sql[]="select @@identity";
-try{
-$db->execute($sql);
-$tmpl->id=$db->dataset[0]['@@identity'];
+//proccess each template
+foreach($tmpls as $tmpl)
+{
+    //create sql requests array to execute them in transaction
+    $sql=array();
 
-$tmpl_ids[$tmpl->code]=$tmpl->id;
+    //create template
+    $sql[]="insert into packages_templates (code,`release`,`description`,`configure`,`build`,`install`)
+    values (
+    \"$tmpl->code\",
+    $release_id,
+    \"".addslashes($tmpl->description)."\",
+    \"".addslashes($tmpl->configure)."\",
+    \"".addslashes($tmpl->build)."\",
+    \"".addslashes($tmpl->install)."\"
+    )";
 
-echo "Creating \"$tmpl->code\"... ";
+    //get it id
+    $sql[]="select @@identity";
 
-if($tmpl->id){
-echo "Ok\n";
-}else{
-echo "Error\n";
+    try
+    {
+        $db->execute($sql);
+        $tmpl->id=$db->dataset[0]['@@identity'];
 
-echo $db->errors[0]."\n";
-//exit;
+        $tmpl_ids[$tmpl->code]=$tmpl->id;
 
+        echo "Creating \"$tmpl->code\"... ";
+
+        //if id received
+        if($tmpl->id)
+        {
+            echo "Ok\n";
+        //if id not received
+        }else{
+            echo "Error\n";
+            //echo $db->errors[0]."\n";
+            //exit;
+        }
+
+    }catch (Exception $e) {
+        echo "Skiping\n";
+    }
 }
-
-}catch (Exception $e) {
-echo "Skiping\n";
-}
-
-
-}
-
-
-
-
-
 
 echo "\n";
+
+//================
+// Packages import
+//================
+
 
 echo "Creating packages...\n\n";
 
+//proccess each package
+foreach($objs as $obj)
+{
+    //set default template
+    $template="null";
+    //if template is defined
+    if($obj->template)
+    {
+        //get template id
+        $template_=getTemplateID($obj->template,$release);
+        //if id was received
+        if($template_)
+        {
+            //use it as template
+            $template=$template_;
+        }
+    }
 
-foreach($objs as $obj){
 
-$template="null";
-if($obj->template){
-$template_=getTemplateID($obj->template,$release);
-if($template_){
-$template=$template_;
+    echo "Creating package \"$obj->code\"... ";
+
+    //create sql requests array to execute them in transaction
+    $sql=array();
+
+    //create package
+    $sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install,localbuild,template)
+    values (
+    \"$obj->code\",
+    \"".addslashes($obj->description)."\",
+    \"$release_id\",
+    \"$obj->sourcefile\",
+    \"$obj->sourcedir\",
+    \"".addslashes($obj->unpack)."\",
+    \"".addslashes($obj->configure)."\",
+    \"".addslashes($obj->build)."\",
+    \"".addslashes($obj->install)."\",
+    ".addslashes($obj->localbuild).",
+    ".addslashes($template)."
+    )";
+
+    //get it id
+    $sql[]="select @@identity";
+
+    $db->execute($sql);
+
+    $obj->id=$db->dataset[0]['@@identity'];
+
+    $pkg_ids[$obj->code]=$obj->id;
+
+    if($obj->id)
+    {
+        echo "Ok\n";
+    }else{
+        echo "Error\n";
+        var_dump($db->errors,$sql);
+        exit;
+    }
 }
-}
 
-
-echo "Creating package \"$obj->code\"... ";
-$sql=array();
-$sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install,localbuild,template)
-values (
-\"$obj->code\",
-\"".addslashes($obj->description)."\",
-\"$release_id\",
-\"$obj->sourcefile\",
-\"$obj->sourcedir\",
-\"".addslashes($obj->unpack)."\",
-\"".addslashes($obj->configure)."\",
-\"".addslashes($obj->build)."\",
-\"".addslashes($obj->install)."\",
-".addslashes($obj->localbuild).",
-".addslashes($template)."
-)";
-
-
-$sql[]="select @@identity";
-$db->execute($sql);
-$obj->id=$db->dataset[0]['@@identity'];
-
-$pkg_ids[$obj->code]=$obj->id;
-
-if($obj->id){
-echo "Ok\n";
-}else{
-echo "Error\n";
-var_dump($db->errors,$sql);
-
-exit;
-}
-
-
-
-}
-
+//=============================
+// Packages dependencies import
+//=============================
 
 echo "\nCreating dependances:\n\n";
-foreach($objs as $obj){
-$sql=array();
-if(count($obj->dependances)){
-echo "Creating dependances for package \"$obj->code\"...";
-$c=0;
-foreach($obj->dependances as $dep){
-$c++;
-$sql[]="insert into dependances (package,dependance,weight) values (
-".$obj->id.",
-".$pkg_ids[$dep['code']].",
-$c)";
-}
-//var_dump($sql,$pkg_ids);
 
-$db->execute($sql);
-//var_dump($db->error);
+//process each package
+foreach($objs as $obj)
+{
+    $sql=array();
+    //if dependencies assigned
+    if(count($obj->dependances))
+    {
+        //create sql requests array to execute them in transaction
+        echo "Creating dependances for package \"$obj->code\"...";
+        //init weight
+        $c=0;
 
-if(!$db->error){
-echo "Ok\n";
-}else{
-echo "Error: $db->error\n";
-exit;
+        //proccess each dependency
+        foreach($obj->dependances as $dep)
+        {
+            $c++;
+            $sql[]="insert into dependances (package,dependance,weight) values (
+            ".$obj->id.",
+            ".$pkg_ids[$dep['code']].",
+            $c)";
+        }
+        //var_dump($sql,$pkg_ids);
+
+        $db->execute($sql);
+        //var_dump($db->error);
+
+        if(!$db->error)
+        {
+            echo "Ok\n";
+        }else{
+            echo "Error: $db->error\n";
+            exit;
+        }
+    }
 }
-}
-}
+
+//===============
+// Patches import
+//===============
+
 
 echo "\nCreating patches:\n\n";
-foreach($objs as $obj){
-$sql=array();
-if(count($obj->patches)){
-echo "Creating patches for package \"$obj->code\"... ";
-foreach($obj->patches as $patch){
-$c++;
-$sql[]="insert into patches (package,filename,mode) values (
-".$obj->id.",
-\"".$patch['filename']."\",\"".$patch['mode']."\")";
+
+//process each package
+foreach($objs as $obj)
+{
+    $sql=array();
+    //if patches assigned
+    if(count($obj->patches))
+    {
+        echo "Creating patches for package \"$obj->code\"... ";
+
+        //proccess each patch
+        foreach($obj->patches as $patch)
+        {
+            //$c++;
+            $sql[]="insert into patches (package,filename,mode) values (
+            ".$obj->id.",
+            \"".$patch['filename']."\",\"".$patch['mode']."\")";
+        }
+
+        $db->execute($sql);
+        //var_dump($db->error);
+
+        if(!$db->error)
+        {
+            echo "Ok\n";
+        }else{
+            echo "Error: $db->error\n";
+            exit;
+        }
+    }
 }
 
-$db->execute($sql);
-//var_dump($db->error);
-
-
-if(!$db->error){
-echo "Ok\n";
-}else{
-echo "Error: $db->error\n";
-exit;
-}
-}
-}
-
-
+//===============
+// Add-ons import
+//===============
 
 echo "\nCreating addons:\n\n";
-foreach($objs as $obj){
-$sql=array();
-if(count($obj->addons)){
-echo "Creating addons for package \"$obj->code\"... ";
-foreach($obj->addons as $addon){
-$c++;
-$sql[]="insert into addons (package,filename) values (
-".$obj->id.",
-\"".$addon."\")";
 
+//process each package
+foreach($objs as $obj)
+{
+    $sql=array();
+    //if add-ons assigned
+    if(count($obj->addons))
+    {
+        echo "Creating addons for package \"$obj->code\"... ";
+
+        //proccess each add-on
+        foreach($obj->addons as $addon)
+        {
+            //$c++;
+            $sql[]="insert into addons (package,filename) values (
+            ".$obj->id.",
+            \"".$addon."\")";
+
+        }
+        $db->execute($sql);
+        //var_dump($db->error);
+
+        if(!$db->error)
+        {
+            echo "Ok\n";
+        }else{
+            echo "Error: $db->error\n";
+            exit;
+        }
+    }
 }
-$db->execute($sql);
-//var_dump($db->error);
 
-if(!$db->error){
-echo "Ok\n";
-}else{
-echo "Error: $db->error\n";
-exit;
-}
-}
-}
-
-
-//var_dump($release_id);
-
-
-
-
-
+//================
+// Nestings import
+//================
 
 echo "\nCreating nestings:\n\n";
-foreach($objs as $obj){
-$sql=array();
-if(count($obj->nestings)){
-echo "Creating nestings for package \"$obj->code\"... ";
-$c=0;
-foreach($obj->nestings as $dep){
-$sql[]="insert into nestings (parent,child) values (
-".$obj->id.",
-".$pkg_ids[$dep].")";
+
+//process each package
+foreach($objs as $obj)
+{
+    $sql=array();
+
+    //if nestings assigned
+    if(count($obj->nestings))
+    {
+        echo "Creating nestings for package \"$obj->code\"... ";
+
+        //proccess each nestings
+        foreach($obj->nestings as $dep)
+        {
+            $sql[]="insert into nestings (parent,child) values (
+            ".$obj->id.",
+            ".$pkg_ids[$dep].")";
+        }
+
+        $db->execute($sql);
+        //var_dump($db->error);
+
+        if(!$db->error)
+        {
+            echo "Ok\n";
+        }else{
+            echo "Error: $db->error\n";
+            exit;
+        }
+    }
 }
 
-$db->execute($sql);
-//var_dump($db->error);
-
-if(!$db->error){
-echo "Ok\n";
-}else{
-echo "Error: $db->error\n";
-exit;
-}
-}
-}
-
-
-
+//================
+// Comments import
+//================
 
 echo "\nCreating comments:\n\n";
-foreach($objs as $obj){
-$sql=array();
-if(count($obj->comments)){
-echo "Creating comments for package \"$obj->code\"... ";
-$c=0;
-foreach($obj->comments as $dep){
-$sql[]="insert into comments (package,text) values (
-".$obj->id.",
-\"".addslashes($dep)."\")";
+
+//process each package
+foreach($objs as $obj)
+{
+    $sql=array();
+    //if comments assigned
+    if(count($obj->comments))
+    {
+        echo "Creating comments for package \"$obj->code\"... ";
+        //$c=0;
+
+        //proccess each comment
+        foreach($obj->comments as $dep)
+        {
+            $sql[]="insert into comments (package,text) values (
+            ".$obj->id.",
+            \"".addslashes($dep)."\")";
+        }
+
+        $db->execute($sql);
+        //var_dump($db->error)
+
+        if(!$db->error)
+        {
+            echo "Ok\n";
+        }else{
+            echo "Error: $db->error\n";
+            exit;
+        }
+    }
 }
 
-$db->execute($sql);
-//var_dump($db->error)
-
-
-if(!$db->error){
-echo "Ok\n";
-}else{
-echo "Error: $db->error\n";
-exit;
-}
-}
-}
+//====================
+// Archpackages import
+//====================
 
 echo "\nCreating archpackages:\n\n";
-foreach($objs as $obj){
-$sql=array();
-if(count($obj->archpackages)){
-echo "Creating archpackages for package \"$obj->code\"... ";
-$c=0;
-foreach($obj->archpackages as $archpackage){
-$sql[]="insert into architectures_packages (package,architecture,configure,build,install) values (".$obj->id.",".getArchId($archpackage['arch']).",
-\"".addslashes($archpackage['configure'])."\",
-\"".addslashes($archpackage['build'])."\",
-\"".addslashes($archpackage['install'])."\"
-)";
+
+//process each package
+foreach($objs as $obj)
+{
+    $sql=array();
+
+    //if archpackages assigned
+    if(count($obj->archpackages))
+    {
+        echo "Creating archpackages for package \"$obj->code\"... ";
+
+        //$c=0;
+
+        //proccess each archpackage
+        foreach($obj->archpackages as $archpackage)
+        {
+            $sql[]="insert into architectures_packages (package,architecture,configure,build,install) values (".$obj->id.",".getArchId($archpackage['arch']).",
+            \"".addslashes($archpackage['configure'])."\",
+            \"".addslashes($archpackage['build'])."\",
+            \"".addslashes($archpackage['install'])."\"
+            )";
+        }
+
+        //$db->execute($sql);
+        //var_dump($db->error)
+
+        $sql[]="select @@identity";
+        $db->execute($sql);
+
+        //get id
+        $obj->id=$db->dataset[0]['@@identity'];
+
+        //store archpackage id
+        $apkg_ids[$obj->code.":".$archpackage['arch']]=$obj->id;
+
+        if(!$db->error)
+        {
+            echo "Ok\n";
+        }else{
+            echo "Error: $db->error\n";
+            exit;
+        }
+    }
 }
 
-//$db->execute($sql);
-//var_dump($db->error)
-
-$sql[]="select @@identity";
-$db->execute($sql);
-$obj->id=$db->dataset[0]['@@identity'];
-
-$apkg_ids[$obj->code.":".$archpackage['arch']]=$obj->id;
-
-
-
-
-if(!$db->error){
-echo "Ok\n";
-}else{
-echo "Error: $db->error\n";
-exit;
-}
-}
-}
-
-
-
+//=================================
+// Archpackages dependencies import
+//=================================
 
 //var_dump($apkg_ids);
 echo "\nCreating archpackages dependances:\n\n";
-foreach($objs as $obj){
-$sql=array();
-if(count($obj->archpackages)){
-echo "Creating dependance for archpackage \"".$obj->code.':'.$archpackage['arch']."\"... \n";
-$c=0;
-foreach($obj->archpackages as $archpackage){
 
-$sql=array();
+//process each package
+foreach($objs as $obj)
+{
 
+    $sql=array();
 
-if(@$archpackage['dependances']){
-//var_dump(count($archpackage['dependances']));
-//echo $obj->code.':'.$archpackage['arch'];
+    //if archpackages assigned
+    if(count($obj->archpackages))
+    {
+        echo "Creating dependance for archpackage \"".$obj->code.':'.$archpackage['arch']."\"... \n";
 
-//var_dump($archpackage['dependances']);
+        //$c=0;
 
-$c=0;
-foreach($archpackage['dependances'] as $dep){
-//echo $dep['code'].':'.$dep['arch']."-> ".$apkg_ids[$dep['code'].':'.$dep['arch']]."\n";
+        foreach($obj->archpackages as $archpackage)
+        {
 
-//$c++;
-$sql[]="insert into architectures_dependances (package,dependance,weight) values (
-".$obj->id.",
-".$apkg_ids[$dep['code'].':'.$dep['arch']].",".
-$dep['weight'].")";
+            $sql=array();
 
-}
+            //proccess each archpackage
+            if(@$archpackage['dependances'])
+            {
+                //var_dump(count($archpackage['dependances']));
+                //echo $obj->code.':'.$archpackage['arch'];
 
+                //var_dump($archpackage['dependances']);
 
-//var_dump($sql);
-try{
-$db->execute($sql);
-}catch (Exception $e) {
-echo $e->getMessage()."\n\n";
-var_dump($sql);
-echo $dep['code'].':'.$dep['arch']."-> ".$apkg_ids[$dep['code'].':'.$dep['arch']]."\n";
-}
+                //weight init
+                //$c=0;
 
+                foreach($archpackage['dependances'] as $dep)
+                {
+                    //echo $dep['code'].':'.$dep['arch']."-> ".$apkg_ids[$dep['code'].':'.$dep['arch']]."\n";
 
+                    //$c++;
+                    $sql[]="insert into architectures_dependances (package,dependance,weight) values (
+                    ".$obj->id.",
+                    ".$apkg_ids[$dep['code'].':'.$dep['arch']].",".
+                    $dep['weight'].")";
+                }
 
-
-}
-
-}
-
-}
-
+                //var_dump($sql);
+                try{
+                    $db->execute($sql);
+                }catch (Exception $e) {
+                    echo $e->getMessage()."\n\n";
+                    var_dump($sql);
+                    echo $dep['code'].':'.$dep['arch']."-> ".$apkg_ids[$dep['code'].':'.$dep['arch']]."\n";
+                }
+            }
+        }
+    }
 }

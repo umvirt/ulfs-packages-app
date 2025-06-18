@@ -1,129 +1,184 @@
 #!/usr/bin/env php
 <?php
-//=======================
-//Generate local scripts
-//=======================
+/**
+ * ULFS Packages Web-Application
+ *
+ * Local packages installation scripts generator
+ */
 
-
+//define getopt options
 $shortopts  = "";
 $longopts  = array(
-"url:",
-"release:",
-"format:"
-);
+    "url:",
+    "release:",
+    "format:"
+    );
 
+//parse command line arguments
 $options = getopt($shortopts, $longopts);
-//var_dump($options);
-/*
-$url="http://umvirt.com/linux/packages";
-$format="json";
-$release="0.1";
-*/
 
-
-
+//instance URL
 $url=@$options["url"];
+//data format
 $format=@$options["format"];
+//release
 $release=@$options["release"];
+
+//output directory path
 $outdir="../tmp/$release";
 
-echo "UmVirt LFS Local Scripts Generator\n\n";
+echo "UmVirt LFS Packages local packages installation scripts generator\n\n";
 
-if(!$url | !$format | !$release){
-echo "USAGE:\n\n";
-echo "        $argv[0] --url=<instance_url> --release=<release> --format=<xml|json>\n\n";
-exit;
+if(!$url | !$format | !$release)
+{
+    echo "USAGE:\n\n";
+    echo "        $argv[0] --url=<instance_url> --release=<release> --format=<xml|json>\n\n";
+    exit;
 }
 
+//print arguments
 echo "Instance URL: $url\n";
 echo "Release: $release\n";
 echo "Format: $format\n\n";
 
-//exit;
 //Create directories
 mkdir($outdir);
 mkdir($outdir."/scripts/");
 echo "Downloading packages info... ";
+//load packages data
 $packages=file_get_contents("$url/packages/$format/$release");
-if(strlen($packages)){
-file_put_contents($outdir."/packages.".$format, $packages);
-echo "Ok\n\n";
-}else{
-echo "Error\n\n";
-exit;
-}
 
-/*
-echo "Dumping commands info... ";
-$commands=file_get_contents("$url/assistant/$format/$release");
-if(strlen($packages)){
-file_put_contents($outdir."/commands.".$format, $commands);
-echo "Ok\n\n";
+//if packages data is available
+if(strlen($packages))
+{
+    //save it
+    file_put_contents($outdir."/packages.".$format, $packages);
+    echo "Ok\n\n";
+
+//if packages data is not available
 }else{
-echo "Error\n\n";
-exit;
+    //exit
+    echo "Error\n\n";
+    exit;
 }
-*/
 
 echo "Generating scripts...\n";
 
-if($format=="xml"){
-$xpackages=simplexml_load_string ($packages);
-//var_dump($xpackages->packages->package);
-$c=0;
+//if format is XML
+if($format=="xml")
+{
 
-$xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
-for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
-$package=$xmlIterator->current();
+    //open packages document
+    $xpackages=simplexml_load_string ($packages);
 
-echo "Generating script for package \"$package\"... ";
-//foreach($xpackages->packages as $package){
-$data=file_get_contents("$url/packages/$release/$package/localinstall");
-if(strlen($data)){
-file_put_contents($outdir."/scripts/$package.sh",$data);
-$c++;
-echo "Ok\n";
-sleep(1);
+    //init packages counter
+    $c=0;
+
+    //prepare iterator
+    $xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
+
+    //proccess each package
+    for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() )
+    {
+        //get current object
+        $package=$xmlIterator->current();
+
+        echo "Generating script for package \"$package\"... ";
+
+        //load package data
+        $data=file_get_contents("$url/packages/$release/$package/localinstall");
+
+        //if package data was received
+        if(strlen($data))
+        {
+            //save package data
+            file_put_contents($outdir."/scripts/$package.sh",$data);
+
+
+            $c++;
+
+            //increase packages counter
+            echo "Ok\n";
+
+            //sleep if needed
+            if(@$config['dumpsleep'])
+            {
+                //sleep
+                sleep($config['dumpsleep']);
+            }
+         //if package data not received
+        }else{
+            //exit
+            echo "Error\n";
+            break;
+        }
+    }
+}
+
+//if format is JSON
+if($format=="json")
+{
+    //open packages document
+    $jpackages=json_decode($packages);
+
+    //init packages counter
+    $c=0;
+
+    //proccess each package
+    foreach($jpackages->packages as $package)
+    {
+        echo "Generating script for package \"$package\"... ";
+
+        //load package data
+        $data=file_get_contents("$url/packages/$release/$package/localinstall");
+
+        //if package data was received
+        if(strlen($data))
+        {
+            //save package data
+            file_put_contents($outdir."/scripts/$package.sh",$data);
+
+            //increase packages counter
+            $c++;
+
+            echo "Ok\n";
+
+            //sleep if needed
+            if(@$config['dumpsleep'])
+            {
+                //sleep
+                sleep($config['dumpsleep']);
+            }
+         //if package data not received
+        }else{
+            //exit
+            echo "Error\n";
+            break;
+        }
+    }
+}
+
+//if format is XML
+if($format=="xml")
+{
+    //count packages in xml document
+    $count=$xpackages->packages->children()->count();
+}
+//if format is JSON
+if($format=="json")
+{
+    //count packages in json document
+    $count=count($jpackages->packages);
+}
+
+//If imported packages count less than defined in packages document
+if($c<$count)
+{
+    //assign aborted status
+    $status="aborted";
 }else{
-echo "Error\n";
-break;
-}
-}
-}
-
-if($format=="json"){
-$jpackages=json_decode($packages);
-$c=0;
-
-//echo $packages;
-//var_dump($jpackages);
-foreach($jpackages->packages as $package){
-echo "Generating script for package \"$package\"... ";
-//foreach($xpackages->packages as $package){
-$data=file_get_contents("$url/packages/$release/$package/localinstall");
-if(strlen($data)){
-file_put_contents($outdir."/scripts/$package.sh",$data);
-$c++;
-echo "Ok\n";
-sleep(1);
-}else{
-echo "Error\n";
-break;
-}
-}
-}
-
-if($format=="xml"){
-$count=$xpackages->packages->children()->count();
-}
-if($format=="json"){
-$count=count($jpackages->packages);
-}
-
-if($c<$count){
-$status="aborted";
-}else{
-$status="completed";
+    //assign comlited status
+    $status="completed";
 }
 echo "\nGeneration $status: $c/$count packages.\n\n";
 

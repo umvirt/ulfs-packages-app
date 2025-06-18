@@ -1,14 +1,30 @@
 #!/usr/bin/env php
 <?php
+/**
+ * ULFS Packages Web-Application
+ *
+ * Database installer (only structure)
+ *
+ * SQL-dump file created by dump_sql script is used to restore
+ */
+
+//load application
 include "../inc/main.php";
+
+//load SQL-dump file
 $data=file_get_contents('../sql/database.sql');
-//echo $data;
+
+//split to SQL-requests
 $sql=explode ("\n#SQLDELIMETER\n", $data);
 
-foreach($sql as $v){
-echo "Executing SQL query: $v\n";
-$db->execute($v);
-if($db->error){
-echo "Error: ".$db->error."\n";
-}
+foreach($sql as $v)
+{
+    echo "Executing SQL query: $v\n";
+    $db->execute($v);
+    //if error
+    if($db->error)
+    {
+        //print it
+        echo "Error: ".$db->error."\n";
+    }
 }

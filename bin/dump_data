@@ -1,216 +1,331 @@
 #!/usr/bin/env php
 <?php
-//==================
-//Data Dumper
-//==================
+/**
+ * ULFS Packages Web-Application
+ *
+ * Database data dump script
+ */
+
+//load application
 include "../inc/main.php";
 
+//define getopt options
 $shortopts  = "";
 $longopts  = array(
-"url:",
-"release:",
-"format:"
+    "url:",
+    "release:",
+    "format:"
 );
 
+//parse command line arguments
 $options = getopt($shortopts, $longopts);
-//var_dump($options);
-/*
-$url="http://umvirt.com/linux/packages";
-$format="json";
-$release="0.1";
-*/
 
-
-
+//instance URL
 $url=@$options["url"];
+//data format
 $format=@$options["format"];
+//release
 $release=@$options["release"];
+
+//output directory path
 $outdir="../tmp/$release";
 
-echo "UmVirt LFS Packages data dumper\n\n";
+echo "UmVirt LFS Packages data dump script\n\n";
 
-if(!$url | !$format | !$release){
-echo "USAGE:\n\n";
-echo "        $argv[0] --url=<instance_url> --release=<release> --format=<xml|json>\n\n";
-exit;
+if(!$url | !$format | !$release)
+{
+    echo "USAGE:\n\n";
+    echo "        $argv[0] --url=<instance_url> --release=<release> --format=<xml|json>\n\n";
+    exit;
 }
 
+//print arguments
 echo "Instance URL: $url\n";
 echo "Release: $release\n";
 echo "Format: $format\n\n";
 
-//exit;
+
 //Create directories
 mkdir($outdir);
 mkdir($outdir."/packages/");
 mkdir($outdir."/commands/");
+
 echo "Dumping packages info... ";
+
+//load packages data
 $packages=file_get_contents("$url/packages/$format/$release");
-if(strlen($packages)){
-file_put_contents($outdir."/packages.".$format, $packages);
-echo "Ok\n\n";
+
+//if packages data is available
+if(strlen($packages))
+{
+    //save it
+    file_put_contents($outdir."/packages.".$format, $packages);
+    echo "Ok\n\n";
+
+//if packages data is not available
 }else{
-echo "Error\n\n";
-exit;
+    //exit
+    echo "Error\n\n";
+    exit;
 }
 
 echo "Dumping commands info... ";
+
+//load commands data
 $commands=file_get_contents("$url/assistant/$format/$release");
-if(strlen($packages)){
-file_put_contents($outdir."/commands.".$format, $commands);
-echo "Ok\n\n";
+
+//if commands data is available
+if(strlen($commands))
+{
+    //save it
+    file_put_contents($outdir."/commands.".$format, $commands);
+    echo "Ok\n\n";
+
+//if commands data is not available
 }else{
-echo "Error\n\n";
-exit;
+    //exit
+    echo "Error\n\n";
+    exit;
 }
 
 echo "Dumping packages...\n";
 
-if($format=="xml"){
-$xpackages=simplexml_load_string ($packages);
-//var_dump($xpackages->packages->package);
-$c=0;
+//if format is XML
+if($format=="xml")
+{
+    //open packages document
+    $xpackages=simplexml_load_string ($packages);
 
-$xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
-for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
-$package=$xmlIterator->current();
+    //init packages counter
+    $c=0;
 
-echo "Dumping package \"$package\"... ";
-//foreach($xpackages->packages as $package){
-$data=file_get_contents("$url/packages/$format/$release/$package");
-if(strlen($data)){
-file_put_contents($outdir."/packages/$package.$format",$data);
-$c++;
-echo "Ok\n";
+    //prepare iterator
+    $xmlIterator = new SimpleXMLIterator($xpackages->packages->asXML());
 
-//sleep if needed
-if(@$config['dumpsleep']){
-sleep($config['dumpsleep']);
+    //proccess each package
+    for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() )
+    {
+        //get current object
+        $package=$xmlIterator->current();
+
+        echo "Dumping package \"$package\"... ";
+
+        //load package data
+        $data=file_get_contents("$url/packages/$format/$release/$package");
+
+        //if package data was received
+        if(strlen($data))
+        {
+            //save package data
+            file_put_contents($outdir."/packages/$package.$format",$data);
+
+            //increase packages counter
+            $c++;
+
+            echo "Ok\n";
+
+            //sleep if needed
+            if(@$config['dumpsleep'])
+            {
+                //sleep
+                sleep($config['dumpsleep']);
+            }
+        //if package data not received
+        }else{
+            //exit
+            echo "Error\n";
+            break;
+        }
+    }
 }
 
+//if format is JSON
+if($format=="json")
+{
+    //open packages document
+    $jpackages=json_decode($packages);
+
+    //init packages counter
+    $c=0;
+
+    //proccess each package
+    foreach($jpackages->packages as $package)
+    {
+
+        echo "Dumping package \"$package\"... ";
+
+        //load package data
+        $data=file_get_contents("$url/packages/$format/$release/$package");
+
+        //if package data was received
+        if(strlen($data))
+        {
+            //save package data
+            file_put_contents($outdir."/packages/$package.$format",$data);
+
+            //increase packages counter
+            $c++;
+
+            echo "Ok\n";
+
+            //sleep if needed
+            if(@$config['dumpsleep'])
+            {
+                //sleep
+                sleep($config['dumpsleep']);
+            }
+
+
+        }else{
+            echo "Error\n";
+            break;
+        }
+    }
+}
+
+//if format is XML
+if($format=="xml")
+{
+    //count packages in xml document
+    $count=$xpackages->packages->children()->count();
+}
+
+//if format is JSON
+if($format=="json")
+{
+    //count packages in json document
+    $count=count($jpackages->packages);
+}
+
+//If imported packages count less than defined in packages document
+if($c<$count)
+{
+    //assign aborted status
+    $status="aborted";
 }else{
-echo "Error\n";
-break;
-}
-}
-}
-
-if($format=="json"){
-$jpackages=json_decode($packages);
-$c=0;
-
-//echo $packages;
-//var_dump($jpackages);
-foreach($jpackages->packages as $package){
-echo "Dumping package \"$package\"... ";
-//foreach($xpackages->packages as $package){
-$data=file_get_contents("$url/packages/$format/$release/$package");
-if(strlen($data)){
-file_put_contents($outdir."/packages/$package.$format",$data);
-$c++;
-echo "Ok\n";
-
-//sleep if needed
-if(@$config['dumpsleep']){
-sleep($config['dumpsleep']);
-}
-
-
-}else{
-echo "Error\n";
-break;
-}
-}
-}
-
-if($format=="xml"){
-$count=$xpackages->packages->children()->count();
-}
-if($format=="json"){
-$count=count($jpackages->packages);
-}
-
-if($c<$count){
-$status="aborted";
-}else{
-$status="completed";
+    //assign comlited status
+    $status="completed";
 }
 echo "\nDump $status: $c/$count packages.\n\n";
 
 
-#-------------
 echo "Dumping commands...\n";
 
-if($format=="xml"){
-$xcommands=simplexml_load_string ($commands);
-//var_dump($xcommands->commands->command);
-$c=0;
+//if format is XML
+if($format=="xml")
+{
+    //open commands document
+    $xcommands=simplexml_load_string ($commands);
 
-$xmlIterator = new SimpleXMLIterator($xcommands->commands->asXML());
-for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() ) {
-$command=$xmlIterator->current();
+    //init commands counter
+    $c=0;
 
-echo "Dumping command \"$command\"... ";
-//foreach($xpackages->packages as $package){
-$data=file_get_contents("$url/assistant/$format/$release/$command");
-if(strlen($data)){
-file_put_contents($outdir."/commands/$command.$format",$data);
-$c++;
-echo "Ok\n";
+    //prepare iterator
+    $xmlIterator = new SimpleXMLIterator($xcommands->commands->asXML());
 
-//sleep if needed 
-if(@$config['dumpsleep']){
-sleep($config['dumpsleep']);
+    //proccess each command
+    for( $xmlIterator->rewind(); $xmlIterator->valid(); $xmlIterator->next() )
+    {
+        //get current object
+        $command=$xmlIterator->current();
+
+        echo "Dumping command \"$command\"... ";
+
+        //load command data
+        $data=file_get_contents("$url/assistant/$format/$release/$command");
+
+        //if command data was received
+        if(strlen($data))
+        {
+            //save command data
+            file_put_contents($outdir."/commands/$command.$format",$data);
+
+            //increase commands counter
+            $c++;
+
+            echo "Ok\n";
+
+            //sleep if needed
+            if(@$config['dumpsleep'])
+            {
+                //sleep
+                sleep($config['dumpsleep']);
+            }
+        //if command data not received
+        }else{
+            //exit
+            echo "Error\n";
+            break;
+        }
+    }
 }
 
+//if format is JSON
+if($format=="json")
+{
+    //open commands document
+    $jcommands=json_decode($commands);
 
+    //init commands counter
+    $c=0;
+
+    //proccess each command
+    foreach($jcommands->commands as $command)
+    {
+        echo "Dumping command \"$command\"... ";
+
+        //load command data
+        $data=file_get_contents("$url/assistant/$format/$release/$command");
+
+        //if command data was received
+        if(strlen($data))
+        {
+            //save command data
+            file_put_contents($outdir."/commands/$command.$format",$data);
+
+            //increase commands counter
+            $c++;
+
+            echo "Ok\n";
+
+            //sleep if needed
+            if(@$config['dumpsleep'])
+            {
+                //sleep
+                sleep($config['dumpsleep']);
+            }
+        //if command data not received
+        }else{
+            //exit
+            echo "Error\n";
+            break;
+        }
+    }
+}
+
+//if format is XML
+if($format=="xml")
+{
+    //count commands in xml document
+    $count=$xcommands->commands->children()->count();
+}
+//if format is JSON
+if($format=="json")
+{
+    //count commands in json document
+    $count=count($jcommands->commands);
+}
+
+//If imported comands count less than defined in commands document
+if($c<$count)
+{
+    //assign aborted status
+    $status="aborted";
 }else{
-echo "Error\n";
-break;
-}
-}
+    //assign comlited status
+    $status="completed";
 }
 
-if($format=="json"){
-$jcommands=json_decode($commands);
-$c=0;
-
-//echo $packages;
-//var_dump($jpackages);
-foreach($jcommands->commands as $command){
-echo "Dumping command \"$command\"... ";
-//foreach($xpackages->packages as $package){
-$data=file_get_contents("$url/assistant/$format/$release/$command");
-if(strlen($data)){
-file_put_contents($outdir."/commands/$command.$format",$data);
-$c++;
-echo "Ok\n";
-
-//sleep if needed
-if(@$config['dumpsleep']){
-sleep($config['dumpsleep']);
-}
-
-
-}else{
-echo "Error\n";
-break;
-}
-}
-}
-
-if($format=="xml"){
-$count=$xcommands->commands->children()->count();
-}
-if($format=="json"){
-$count=count($jcommands->commands);
-}
-
-if($c<$count){
-$status="aborted";
-}else{
-$status="completed";
-}
 echo "\nDump $status: $c/$count commands.\n\n";
 
 

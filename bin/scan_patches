@@ -1,35 +1,56 @@
 #!/usr/bin/env php
 <?php
+/**
+ * ULFS Packages Web-Application
+ *
+ * Script to scan filesystem storage for patches
+ */
 
+//load application
 include "../inc/main.php";
+
+//create sql-request to get releases
 $sql="select id, `release` from releases";
+
+//execute sql-request
 $db->execute($sql);
+
+//get dataset
 $x=$db->dataset;
 
+//create sql-request for reset packagespatchesfiles table
 $sql="truncate packagespatchesfiles";
 //echo $sql;
 $db->execute($sql);
 
-foreach($x as $v){
-echo "Processing release \"".$v['release']."\"... ";
-$dp=new DirParser();
+//for each release
+foreach($x as $v)
+{
+    echo "Processing release \"".$v['release']."\"... ";
 
-$dp->dir=$config['filespath']."/".$v['release']."/patches";
-$dp->ignorefiles=array('/.md5sum$/');
-$files=$dp->getFiles();
+     //create DirParser object
+    $dp=new DirParser();
 
-echo count($files);
+    //define root directory
+    $dp->dir=$config['filespath']."/".$v['release']."/patches";
 
-foreach($files as $file){
-$sql="insert into packagespatchesfiles (`release`, filename,path, size, mtime, md5_current, md5_stored) values (
-".$v['id'].",\"".$file['name']."\",\"".$file['path']."\", ".$file['size'].", ".$file['mtime'].", \"".$file['md5']."\",\"".$file['md5_']."\")";
-//var_dump($sql); 
-$db->execute($sql);
-//var_dump($db->error);
-//exit;
-}
+    //define ignored files
+    $dp->ignorefiles=array('/.md5sum$/');
 
+    //parse root directory
+    $files=$dp->getFiles();
 
+    //print files counter
+    echo count($files);
+
+    //insert each file data in database
+    foreach($files as $file)
+    {
+        $sql="insert into packagespatchesfiles (`release`, filename,path, size, mtime, md5_current, md5_stored) values (
+        ".$v['id'].",\"".$file['name']."\",\"".$file['path']."\", ".$file['size'].", ".$file['mtime'].", \"".$file['md5']."\",\"".$file['md5_']."\")";
+        //var_dump($sql);
+        $db->execute($sql);
+    }
 }
 
 

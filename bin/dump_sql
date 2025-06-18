@@ -1,54 +1,79 @@
 #!/usr/bin/env php
 <?php
+/**
+ * ULFS Packages Web-Application
+ *
+ * Database structure SQL-dump script
+ */
+
+//load application
 include "../inc/main.php";
 
-function showct($table){
-global $db;
-$sql="show create table $table";
+/**
+ * Get CREATE TABLE SQL-request for specific table
+ *
+ * @param string $table A table name
+ * @return string
+ */
+function showct($table)
+{
+    global $db;
 
-$db->execute($sql);
-$x=$db->dataset;
-if(count($x)){
-//var_dump($x);
-foreach($x as $v){
+    $sql="show create table $table";
 
-$ct=$v["Create Table"];
-$string ='A AUTO_INCREMENT=100 B';
-$pattern = '/AUTO_INCREMENT=(\d+)/i';
-$replacement = '';
-$ct=preg_replace($pattern, $replacement, $ct);
+    $db->execute($sql);
+    $x=$db->dataset;
+    if(count($x))
+    {
+        foreach($x as $v)
+        {
+            $ct=$v["Create Table"];
 
-return $ct.";";
+            //delete AUTO_INCREMENT from SQL-request
+            $string ='A AUTO_INCREMENT=100 B';
+            $pattern = '/AUTO_INCREMENT=(\d+)/i';
+            $replacement = '';
+            $ct=preg_replace($pattern, $replacement, $ct);
+
+            return $ct.";";
+        }
+    }
 }
-}
-}
 
+//tables to dump
 $tables=array(
-'architectures',
-'architectures_packages',
-'architectures_dependances',
-'releases',
-'packages',
-'patches',
-'addons',
-'dependances',
-'commands',
-'comments',
-'nestings',
-'packagespatchesfiles',
-'packagesfiles',
-'packagesfiles_packages',
-'packages_templates'
+    'architectures',
+    'architectures_packages',
+    'architectures_dependances',
+    'releases',
+    'packages',
+    'patches',
+    'addons',
+    'dependances',
+    'commands',
+    'comments',
+    'nestings',
+    'packagespatchesfiles',
+    'packagesfiles',
+    'packagesfiles_packages',
+    'packages_templates'
 );
 
+//SQL-requests
 $ct=array();
 
+//disable foreign key checks
 $ct[]="set foreign_key_checks=0;";
 
-foreach ($tables as $v){
-$ct[]=showct($v);
+//for each table
+foreach ($tables as $v)
+{
+    //get CREATE TABLE SQL-request
+    $ct[]=showct($v);
 }
 
+//enable foreign key checks
 $ct[]="set foreign_key_checks=1;";
 
+//print SQL-requests
 echo join("\n#SQLDELIMETER\n",$ct);
