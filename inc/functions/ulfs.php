@@ -253,86 +253,40 @@ function getpath($release,$file,$basepath)
 {
     global $config;
 
-    $x=file_exists($config['filespath']."/$release/packages/python-modules/$file");
-    //var_dump($x);
-    if($x){
-    return $basepath."$release/packages/python-modules/".$file;
-    }
-    $x=file_exists($config['filespath']."/$release/packages/perl-modules/$file");
-    //var_dump($x);
-    if($x){
-    return $basepath."$release/packages/perl-modules/".$file;
-    }
-    $x=file_exists($config['filespath']."/$release/packages/Xorg/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/Xorg/".$file;
-    }
-    $x=file_exists($config['filespath']."/$release/packages/Xorg/lib/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/Xorg/lib/".$file;
+    //search files in specialized directories
+
+    $directories=array(
+      'python-modules',
+      'perl-modules',
+      'Xorg',
+      'Xorg/lib',
+      'Xorg/app',
+      'Xorg/font',
+      'games',
+      'kde',
+      'kde/kf',
+      'kde/plasma',
+      'kde/apps',
+      'lxqt',
+      'db'
+    );
+
+    foreach($directories as $directory) {
+        $x=file_exists($config['filespath']."/$release/packages/$directory/$file");
+        //var_dump($x);
+        if($x){
+            return $basepath."$release/packages/$directory/".$file;
+        }
     }
 
-    $x=file_exists($config['filespath']."/$release/packages/Xorg/app/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/Xorg/app/".$file;
-    }
-
-    $x=file_exists($config['filespath']."/$release/packages/Xorg/font/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/Xorg/font/".$file;
-    }
-
-    $x=file_exists($config['filespath']."/$release/packages/games/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/games/".$file;
-    }
-
-    $x=file_exists($config['filespath']."/$release/packages/kde/kf/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/kde/kf/".$file;
-    }
-
-    $x=file_exists($config['filespath']."/$release/packages/kde/plasma/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/kde/plasma/".$file;
-    }
-
-    $x=file_exists($config['filespath']."/$release/packages/kde/apps/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/kde/apps/".$file;
-    }
-
-    $x=file_exists($config['filespath']."/$release/packages/kde/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/kde/".$file;
-    }
-
-    $x=file_exists($config['filespath']."/$release/packages/lxqt/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/lxqt/".$file;
-    }
-
-    $x=file_exists($config['filespath']."/$release/packages/db/$file");
-    //var_dump($x);
-    if($x){
-    return  $basepath."$release/packages/db/".$file;
-    }
-
+    //search files in alphabetical directories
 
     $dir=strtolower($file[0]);
     if(file_exists($config['filespath']."/$release/packages/".$dir."/".$file)){
     return $basepath."$release/packages/".$dir."/".$file;
     }
+
+    //return empy string
 
     return "";
 }
