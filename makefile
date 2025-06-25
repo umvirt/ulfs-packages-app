@@ -4,4 +4,6 @@ docs:
 	markdown STORAGE.md > STORAGE.html
 	markdown API.md > API.html
 	markdown CODING.md > CODING.html
+	markdown ENV.md > ENV.html
+
 
