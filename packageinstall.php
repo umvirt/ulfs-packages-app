@@ -197,6 +197,19 @@ foreach ($x as $k=>$v)
 
     echo "\n";
 
+    echo "downloadFile()\n";
+    echo "{\n";
+    echo "local filename=$1\n";
+    echo "echo \"Downloading \$filename ...\"\n";
+    echo "if [[ \"\$ULFS_DOWNLOAD_APP\" == \"curl\" ]]; then \n";
+    echo "curl -k -O \$filename \n";
+    echo "else\n";
+    echo "wget --no-check-certificate -nc \$filename \n";
+    echo "fi\n";
+
+    echo "}\n";
+    echo "\n";
+
 
     /*
     echo "#default values\n";
@@ -240,7 +253,12 @@ foreach ($x as $k=>$v)
             {
                 echo "           cat $localpath/packages/$release/$dep.sh | bash\n";
             }else{
+                echo "if [[ \"\$ULFS_DOWNLOAD_APP\" == \"curl\" ]]; then \n";
+                echo "           curl $installurl/$release/$dep/install -k | bash\n";
+                echo "else\n";
                 echo "           wget --no-check-certificate $installurl/$release/$dep/install -O - | bash\n";
+                echo "fi\n";
+
             }
             echo "           if [ ! -f $packagesdir/$dep ]; then\n";
             echo "	             echo \"Dependance \\\"$dep\\\" is not installed. Exiting...\"\n";
@@ -263,8 +281,8 @@ foreach ($x as $k=>$v)
             echo "cp $filepath . \n";
         }else{
             echo "#Downloading source package archive...\n";
-            echo "wget --no-check-certificate -nc $url.md5sum\n";
-            echo "wget --no-check-certificate -nc $url\n";
+            echo "downloadFile $url.md5sum\n";
+            echo "downloadFile $url\n";
         }
 
         echo "#Checking source package file existance\n";
@@ -307,8 +325,8 @@ foreach ($x as $k=>$v)
                 echo "cp $addn .\n";
             }else{
                 echo "#Downloadning add-on  \"$addfile\"...\n";
-                echo "wget --no-check-certificate -nc $addn.md5sum\n";
-                echo "wget --no-check-certificate -nc $addn\n";
+                echo "downloadFile $addn.md5sum\n";
+                echo "downloadFile $addn\n";
             }
 
             echo "#Checking addon file existance\n";
@@ -342,7 +360,7 @@ foreach ($x as $k=>$v)
                 echo "cp $pat .\n";
             }else{
                 echo "#Downloadning patches...\n";
-                echo "wget --no-check-certificate -nc $pat\n";
+                echo "downloadFile $pat\n";
             }
         }
     }
