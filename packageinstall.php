@@ -627,7 +627,7 @@ foreach ($x as $k=>$v)
     echo "touch $packagesdir/".$package."\n";
     foreach($nestings as $nesting)
     {
-        echo "touch $packagesdir/".$package."\n";
+        echo "touch $packagesdir/".$nesting."\n";
     }
 
     echo "else\n";
@@ -635,7 +635,7 @@ foreach ($x as $k=>$v)
     echo "sudo touch $packagesdir/".$package."\n";
     foreach($nestings as $nesting)
     {
-            echo "sudo touch $packagesdir/".$package."\n";
+            echo "sudo touch $packagesdir/".$nesting."\n";
     }
 
     echo "fi\n";
