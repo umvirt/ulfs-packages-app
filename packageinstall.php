@@ -392,6 +392,8 @@ foreach ($x as $k=>$v)
             {
                 echo "#Extracting source package with previously defined commands...\n";
                 echo unpack_script($v['unpack'])."\n";
+                echo "#Going to source directory...\n";
+                echo "cd /sources\n";
             }else{
 
                 if(preg_match("/zip$/",$v['sourcefile']))

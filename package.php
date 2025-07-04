@@ -176,7 +176,7 @@ foreach ($x as $k=>$v)
     if($v['unpack'])
     {
         echo "Unpack script:
-        <br><pre>".configuration_script($v['unpack'])."</pre><br>";
+        <br><pre>".val2html($v['unpack'])."</pre><br>";
     }
     echo "Configuration script:
     <br><pre>".val2html(configuration_script($v))."</pre><br>";
