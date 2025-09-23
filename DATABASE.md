@@ -68,6 +68,7 @@ Packages have few properties:
 * Source file
 * Source directory
 * Unpack script
+* Preparation script
 * Configure script
 * Build script
 * Install script
@@ -119,6 +120,19 @@ Bash script which used to extract Source file.
 This field is optional and can be omitted to use default value:
 
         tar -xf %sourcefile%
+
+#### Preparation script
+
+Optional bash script to prepare system to install package and it dependencies.
+
+Very useful to install a sets with many packages within one environment like "KDE Frameworks 6" (KF6).
+
+Usual operations:
+
+- create users & groups
+- create create files, directories and directories tree 
+
+This script is launched before installing dependencies and package unpacking.
 
 #### Configure script
 

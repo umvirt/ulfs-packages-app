@@ -45,6 +45,7 @@ class PKG
     public $sourcedir;
     public $unpack="";
     public $template="";
+    public $preparation="";
     public $configure;
     public $build;
     public $install;
@@ -590,6 +591,14 @@ foreach($packages as $package)
                 $obj->template=$xpackage->template->__toString();
             }
 
+            //if preparation is defined
+            if(@$xpackage->preparation->__toString())
+            {
+                //pass it
+                $obj->preparation=base64_decode($xpackage->preparation->__toString());
+            }
+
+
             //add addons
 
             //prepare iterator
@@ -753,6 +762,13 @@ foreach($packages as $package)
             {
                 //pass it
                 $obj->template=$jpackage->template;
+            }
+
+            //if preparation is defined
+            if(@$jpackage->preparation)
+            {
+                //pass it
+                $obj->preparation=base64_decode($jpackage->preparation);
             }
 
             //add addons

@@ -17,7 +17,7 @@ $release=@addslashes($_REQUEST['release']);
 //get package from $_REQUEST
 $package=@addslashes($_REQUEST['package']);
 
-$sql="select p.id, r.`release`, unpack, p.code, sourcefile, sourcedir, p.configure, p.build, p.install,
+$sql="select p.id, r.`release`, unpack, p.code, sourcefile, sourcedir, p.preparation, p.configure, p.build, p.install,
 p.description,r.commit releasedbcommit,
 p.template template_id, t.code template, t.configure template_configure, t.build template_build, t.install template_install,
 pf.id packagefile, pf.size packagefile_size, md5_stored packagefile_md5 
@@ -178,6 +178,14 @@ foreach ($x as $k=>$v)
         echo "Unpack script:
         <br><pre>".val2html($v['unpack'])."</pre><br>";
     }
+
+    if($v['preparation'])
+    {
+        echo "System preparation script:
+        <br><pre>".val2html($v['preparation'])."</pre><br>";
+    }
+
+
     echo "Configuration script:
     <br><pre>".val2html(configuration_script($v))."</pre><br>";
     echo "Build script:

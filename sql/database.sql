@@ -48,6 +48,7 @@ CREATE TABLE `packages` (
   `sourcefile` varchar(255) CHARACTER SET latin1 NOT NULL,
   `sourcedir` varchar(255) CHARACTER SET latin1 NOT NULL,
   `unpack` varchar(1024) NOT NULL,
+  `preparation` varchar(4096) DEFAULT NULL,
   `configure` varchar(10240) CHARACTER SET latin1 NOT NULL,
   `build` varchar(10240) CHARACTER SET latin1 NOT NULL,
   `install` varchar(10240) CHARACTER SET latin1 NOT NULL,

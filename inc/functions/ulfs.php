@@ -150,6 +150,19 @@ function unpack_script($v="")
     return $v;
 }
 
+/**
+ * Preparation script formatter
+ * 
+ * @param string $v A source value
+ * @return string
+ */
+function preparation_script($v="")
+{  
+    $v=str_replace("\r\n","\n",$v);
+    return $v;
+}
+
+
 
 /**
  * Archpackage configuration script selector

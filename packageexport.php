@@ -18,7 +18,7 @@ $package=@addslashes($_REQUEST['package']);
 $format=@addslashes($_REQUEST['format']);
 
 
-$sql="select p.id, r.`release`, p.code, p.unpack, p.sourcefile, p.sourcedir, p.configure, p.build, p.install, p.description,p.localbuild,
+$sql="select p.id, r.`release`, p.code, p.unpack, p.preparation, p.sourcefile, p.sourcedir, p.configure, p.build, p.install, p.description,p.localbuild,
 p.template template_id, t.code template
 from packages p
 left join releases r on p.release=r.id
@@ -65,9 +65,16 @@ foreach ($x as $k=>$v)
                 $arr['localbuild']=$v['localbuild'];
         }
 
+
         if($v['template'])
         {
                 $arr['template']=$v['template'];
+        }
+
+
+        if($v['preparation'])
+        {
+                $arr['preparation']=base64_encode($v['preparation']);
         }
 
         //Architecture specific instructions
@@ -141,6 +148,12 @@ foreach ($x as $k=>$v)
         if($v['template'])
         {
             $localbuild = $dom->createElement('template',$v['template']);
+            $root->appendChild($localbuild);
+        }
+
+        if($v['preparation'])
+        {
+            $localbuild = $dom->createElement('preparation',base64_encode($v['preparation']));
             $root->appendChild($localbuild);
         }
 

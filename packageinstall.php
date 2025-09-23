@@ -45,7 +45,7 @@ if($arch)
 {
     //generate SQL-request for archpackage
     $sql="
-    select p.id, r.`release`, r.`commit` releasedbcommit,p.code, p.sourcefile, p.sourcedir, p.unpack, ap.configure, ap.build, ap.install
+    select p.id, r.`release`, r.`commit` releasedbcommit,p.code, p.sourcefile, p.sourcedir, p.unpack, p.preparation, ap.configure, ap.build, ap.install
     from packages p
     left join releases r on p.release=r.id
     left join architectures_packages ap on ap.package=p.id
@@ -54,7 +54,7 @@ if($arch)
 //if architecture is not defined
 }else{
     //generate SQL-request for package
-    $sql="select p.id, r.`release`, r.`commit` releasedbcommit, p.code, p.sourcefile, p.sourcedir, p.configure, p.unpack, p.build, p.install,p.localbuild,
+    $sql="select p.id, r.`release`, r.`commit` releasedbcommit, p.code, p.sourcefile, p.sourcedir, p.configure, p.unpack, p.preparation, p.build, p.install,p.localbuild,
     p.template template_id, t.code template, t.configure template_configure, t.build template_build, t.install template_install
     from packages p
     left join releases r on p.release=r.id
@@ -231,6 +231,14 @@ foreach ($x as $k=>$v)
     echo "cd /sources\n";
 
     //echo "checking installation...";
+
+    //If system preparation is defined
+    if($v['preparation'])
+            {
+                echo "#Preparing system to install package and it dependencies...\n";
+                echo preparation_script($v['preparation'])."\n";
+            }
+
 
     //if package have dependencies
     if(count($dependances))
