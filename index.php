@@ -134,11 +134,13 @@ if(!$release)
 
     //get packages list dataset for specific release
     $sql="select p.id, p.code, sourcefile, c.comments, p.description, p.configure, p.build, p.install,
-    p.template template_id, t.code template, t.configure template_configure, t.build template_build, t.install template_install
+    p.template template_id, t.code template, t.configure template_configure, t.build template_build, t.install template_install,
+    pf.filename pf_filename, pf.md5_current, pf.md5_stored
     from packages p
     inner join releases r on r.id=p.`release`
     left join packages_templates t on t.id=p.template
     left join (select count(id) comments, package from comments group by package) as c on c.package=p.id
+    left join packagesfiles pf on pf.filename=p.sourcefile and pf.`release`=p.`release`
     where r.`release`=\"".$release."\"
     order by p.id asc";
     //echo $sql;
@@ -332,8 +334,33 @@ if(!$release)
 
             $tmpl=$tmpl.':'.$mod_c.$mod_b.$mod_i;
 
+            $fileclass='';
+
+            //if filesystem validation is enabled
+            if(@$config['fs_validation'])
+            {
+                //if file is not found
+                if(!$v['pf_filename'])
+                {
+                    $fileclass='error';
+                //if file is found
+                }else{
+                    //if MD5-checksum is provided in .md5sum file
+                    if($v['md5_stored'])
+                    {
+                        //if current checksum value is wrong
+                        if($v['md5_current']!=$v['md5_stored'])
+                        {
+                           $fileclass='error';
+                        //if current checksum value is valid
+                        }else{
+			    $fileclass='ok';
+                        }
+                    }
+                }
+            }
             //add item "package table item"
-            $pkgs[]="<tr><td>".$v['id']."</td><td>".$s."</td><td>".$v['sourcefile']."</td><td>$tmpl</td></tr>";
+            $pkgs[]="<tr><td>".$v['id']."</td><td>".$s."</td><td class=$fileclass>".$v['sourcefile']."</td><td>$tmpl</td></tr>";
         }
 
     }
@@ -349,7 +376,7 @@ if(!$release)
     //if format is empty or have other value
     }else{
         //print package items as table
-        echo "Available packages: <table>".strjoin ($pkgs)."</table>";
+        echo "Available packages: <table class=packages>".strjoin ($pkgs)."</table>";
     }
 
 }

@@ -16,6 +16,10 @@ ob_end_clean();
 <html>
 <head><title>UmVirt LFS Packages</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+table.packages td.error {color:#900;}
+table.packages td.ok {color:#060;}
+</style>
 </head>
 <body>
 <?php echo $content;?>
