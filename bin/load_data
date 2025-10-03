@@ -989,6 +989,16 @@ foreach($objs as $obj)
         }
     }
 
+    //set default value for preparation script
+    $preparation="null";
+    //if preparation script is defined
+    if($obj->preparation)
+    {
+        $preparation="\"".addslashes($obj->preparation)."\"";
+    }
+
+
+
 
     echo "Creating package \"$obj->code\"... ";
 
@@ -996,7 +1006,7 @@ foreach($objs as $obj)
     $sql=array();
 
     //create package
-    $sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install,localbuild,template)
+    $sql[]="insert into packages (code,`description`,`release`,sourcefile,sourcedir,unpack,configure,build,install,localbuild,template,preparation)
     values (
     \"$obj->code\",
     \"".addslashes($obj->description)."\",
@@ -1008,7 +1018,8 @@ foreach($objs as $obj)
     \"".addslashes($obj->build)."\",
     \"".addslashes($obj->install)."\",
     ".addslashes($obj->localbuild).",
-    ".addslashes($template)."
+    ".addslashes($template).",
+    $preparation
     )";
 
     //get it id
