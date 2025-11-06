@@ -19,6 +19,16 @@ $package=@addslashes($_REQUEST['package']);
 //get architecture from $_REQUEST
 $arch=@addslashes($_REQUEST['arch']);
 
+//installwithchimp mode
+//default: 0
+$installwithchimp=0;
+//get installwithchimp from $_REQUEST
+if($_REQUEST['installwithchimp'])
+{
+    $installwithchimp=@addslashes($_REQUEST['installwithchimp']);
+}
+
+
 //extract arch from packagename
 if(strpos($package,':'))
 {
@@ -195,6 +205,8 @@ foreach ($x as $k=>$v)
         echo "echo \"Architecture: $arch\" \n";
     }
 
+    echo "echo \"Install with chimp: ".($installwithchimp ? "YES" : "NO")."\"\n";
+
     echo "\n";
 
     echo "downloadFile()\n";
@@ -257,16 +269,25 @@ foreach ($x as $k=>$v)
             echo "      #Checking $dep...\n";
             echo "      if [ ! -f $packagesdir/$dep ]; then\n";
             echo "           echo \"Dependance \\\"$dep\\\" not found. Trying to install...\";\n";
+
             if($localinstall)
             {
                 echo "           cat $localpath/packages/$release/$dep.sh | bash\n";
             }else{
-                echo "if [[ \"\$ULFS_DOWNLOAD_APP\" == \"curl\" ]]; then \n";
-                echo "           curl $installurl/$release/$dep/install -k | bash\n";
-                echo "else\n";
-                echo "           wget --no-check-certificate $installurl/$release/$dep/install -O - | bash\n";
-                echo "fi\n";
 
+
+                if ($installwithchimp)
+                {
+                    echo "           \n";
+                    echo "           chimp install $dep\n";
+                    echo "           \n";
+                }else{
+                    echo "if [[ \"\$ULFS_DOWNLOAD_APP\" == \"curl\" ]]; then \n";
+                    echo "           curl $installurl/$release/$dep/install -k | bash\n";
+                    echo "else\n";
+                    echo "           wget --no-check-certificate $installurl/$release/$dep/install -O - | bash\n";
+                    echo "fi\n";
+                }
             }
             echo "           if [ ! -f $packagesdir/$dep ]; then\n";
             echo "	             echo \"Dependance \\\"$dep\\\" is not installed. Exiting...\"\n";
