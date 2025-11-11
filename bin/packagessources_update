@@ -1,0 +1,109 @@
+#!/usr/bin/env php
+<?php
+/**
+ * ULFS Packages Web-Application
+ *
+ * Packages sources update script
+ * Read data from files and write it to database 
+ */
+
+//load application
+include "../inc/main.php";
+
+
+
+function truncatetables(){
+global $db;
+
+$sql[]="delete from packagessources_packages_files";
+$sql[]="delete from packagessources_packages";
+$sql[]="delete from packagessources";
+$db->execute($sql);
+//var_dump($db->error);
+}
+
+
+function processfile($file,$dir){
+global $db;
+$sql=array();
+$sql[]="insert into packagessources (code) values (\"".basename($file,'.xml')."\")";
+$sql[]="select @@identity";
+$db->execute($sql);
+$id=$db->dataset[0]['@@identity'];
+//var_dump($db->error, $db->dataset, $id);
+
+
+$xml=simplexml_load_file($dir.'/'.$file,'SimpleXMLElement',LIBXML_DTDLOAD);
+
+$packages=$xml->package;
+
+//var_dump($xml);
+//exit;
+
+
+foreach($packages as $package)
+{
+//$code=$xml->code->__toString();
+
+echo "Processing package: \"".$package->code."\"  ...\n";
+
+$sql=array();
+$sql[]="insert into packagessources_packages (code,source) values (\"".$package->code."\", $id)";
+$sql[]="select @@identity";
+$db->execute($sql);
+
+$packageid=$db->dataset[0]['@@identity'];
+
+//var_dump($db->error,$sql, $packageid);
+//exit;
+
+$files=$package->files->file;
+
+//var_dump($xml);
+//exit;
+
+
+foreach($files as $xfile)
+{
+
+$sql=array();
+$sql[]="insert into packagessources_packages_files (package, filename,link,md5) values (\"".$packageid."\", \"".$xfile->filename."\",\"".$xfile->link."\",\"".$xfile->md5."\")";
+$sql[]="select @@identity";
+$db->execute($sql);
+//var_dump($db->error,$sql);
+
+}
+
+
+
+
+
+}
+
+
+
+}
+
+
+$dir="../tmp/sources";
+
+truncatetables();
+
+
+//read each file in source directory
+if (is_dir($dir)) {
+    if ($dh = opendir($dir)) {
+        while (($file = readdir($dh)) !== false) {
+        if(!in_array($file,array('.','..')) and !preg_match('/.cmd$/',$file))
+            {
+                echo "Processing file: $file ...\n";
+
+		processfile($file, $dir);
+
+	    }
+        }
+        closedir($dh);
+    }
+}
+
+

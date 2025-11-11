@@ -56,7 +56,12 @@ $tables=array(
     'packagespatchesfiles',
     'packagesfiles',
     'packagesfiles_packages',
-    'packages_templates'
+    'packages_templates',
+    'releases_packagessources',
+    'releases_tree',
+    'packagessources',
+    'packagessources_packages',
+    'packagessources_packages_files'
 );
 
 //SQL-requests

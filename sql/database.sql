@@ -165,4 +165,48 @@ CREATE TABLE `packages_templates` (
   CONSTRAINT `release_fk_package_templates` FOREIGN KEY (`release`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 #SQLDELIMETER
+CREATE TABLE `releases_packagessources` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `release` int(10) unsigned NOT NULL,
+  `source` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `releases_packagessources_fk_release` (`release`),
+  CONSTRAINT `releases_packagessources_fk_release` FOREIGN KEY (`release`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+#SQLDELIMETER
+CREATE TABLE `releases_tree` (
+  `parent` int(10) unsigned NOT NULL,
+  `child` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`parent`,`child`),
+  KEY `releases_tree_fk_child` (`child`),
+  CONSTRAINT `releases_tree_fk_child` FOREIGN KEY (`child`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `releases_tree_fk_parent` FOREIGN KEY (`parent`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+#SQLDELIMETER
+CREATE TABLE `packagessources` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+#SQLDELIMETER
+CREATE TABLE `packagessources_packages` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(100) NOT NULL,
+  `source` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `source` (`source`),
+  CONSTRAINT `packagessources_packages_source` FOREIGN KEY (`source`) REFERENCES `packagessources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+#SQLDELIMETER
+CREATE TABLE `packagessources_packages_files` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `package` int(10) unsigned NOT NULL,
+  `filename` varchar(100) NOT NULL,
+  `link` varchar(1024) NOT NULL,
+  `md5` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `packagessources_packages_files_package` (`package`),
+  CONSTRAINT `packagessources_packages_files_package` FOREIGN KEY (`package`) REFERENCES `packagessources_packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+#SQLDELIMETER
 set foreign_key_checks=1;
