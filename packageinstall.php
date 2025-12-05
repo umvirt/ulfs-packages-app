@@ -109,7 +109,7 @@ foreach ($x as $k=>$v)
             $purl=patch_url($release,$pat['filename']);
         }
 
-        $pats[]=$purl;
+        $pats[$pat['filename']]=$purl;
     }
 
     //get add-ons for package
@@ -127,7 +127,7 @@ foreach ($x as $k=>$v)
             $aurl=download_url($release,$addn);
         }
 
-        $addns[]=$aurl;
+        $addns[$addn]=$aurl;
     }
 
     //Use packagename from database instead from user request in order to avoid mess
@@ -343,24 +343,26 @@ foreach ($x as $k=>$v)
         }
 
         //download or copy each add-on
-        foreach ($addns as $addn)
+        foreach ($addns as $afile=>$addn)
         {
-            $addfile=basename($addn);
-
-            if($localinstall)
+            $addfile=$afile;
+            if($addn)
             {
-                echo "#Copying add-on \"$addfile\"...\n";
-                echo "cp $addn.md5sum .\n";
-                echo "cp $addn .\n";
-            }else{
-                echo "#Downloadning add-on  \"$addfile\"...\n";
-                echo "downloadFile $addn.md5sum\n";
-                echo "downloadFile $addn\n";
+                if($localinstall)
+                {
+                    echo "#Copying add-on \"$addfile\"...\n";
+                    echo "cp $addn.md5sum .\n";
+                    echo "cp $addn .\n";
+                }else{
+                    echo "#Downloadning add-on  \"$addfile\"...\n";
+                    echo "downloadFile $addn.md5sum\n";
+                    echo "downloadFile $addn\n";
+                }
             }
 
             echo "#Checking addon file existance\n";
             echo "if [ ! -f $addfile ]; then\n";
-            echo "echo \"Error: Can't find $addfile. Exiting!\"\n";
+            echo "echo -e \"Error: Can't find add-on \\\"$addfile\\\". Exiting!\"\n";
             echo "exit\n";
             echo "fi\n";
 
@@ -381,17 +383,32 @@ foreach ($x as $k=>$v)
     if(count($patches))
     {
         //download or copy each patch
-        foreach ($pats as $pat)
+        foreach ($pats as $pfile=>$pat)
         {
-            if($localinstall)
+
+            if($pat)
             {
-                echo "#Copying patches...\n";
-                echo "cp $pat .\n";
-            }else{
-                echo "#Downloadning patches...\n";
-                echo "downloadFile $pat\n";
+                if($localinstall)
+                {
+                    echo "#Copying patches...\n";
+                    echo "cp $pat .\n";
+                }else{
+                    echo "#Downloadning patches...\n";
+                    echo "downloadFile $pat\n";
+                }
             }
-        }
+
+
+            echo "#Checking patch file existance\n";
+            echo "if [ ! -f $pfile ]; then\n";
+            echo "echo -e \"Error: Can't find patch \\\"$pfile\\\". Exiting!\"\n";
+            echo "exit\n";
+            echo "fi\n";
+
+
+
+
+       }
     }
 
     //if package is usual or kernel package
