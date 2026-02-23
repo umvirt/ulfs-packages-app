@@ -24,7 +24,7 @@ mariadb-admin -u root password
 
 mariadb-admin -p shutdown
 
-#Apache httpd configuration 
+#Apache httpd configuration
 
 sed -i 's@php/includes"@&\ninclude_path = ".:/usr/lib/php"@' \
     /etc/php.ini
@@ -42,6 +42,7 @@ echo \
 cat > /srv/www/p.php << EOF
 <?php
 phpinfo();
+EOF
 
 #BLFS systemd services install
 
