@@ -6,7 +6,6 @@
 
 #edit httpd default config
 sed -e 's|#LoadModule rewrite_module|LoadModule rewrite_module|' -i /etc/httpd/httpd.conf
-sed -e 's|DirectoryIndex index.html|DirectoryIndex index.php index.html|' -i /etc/httpd/httpd.conf
 sed -e 's|AllowOverride None|AllowOverride All|' -i /etc/httpd/httpd.conf
 systemctl restart httpd
 
@@ -23,6 +22,9 @@ mkdir linux
 
 #go to linux directory
 cd linux
+
+#create symlic link to directory with packages files
+ln -s /mnt/storage/data/ downloads
 
 #clone ulfs-packages-app
 git clone https://gitlab.com/umvirt/ulfs-packages-app packages
@@ -54,4 +56,15 @@ cd ../bin
 #test
 links -dump http://127.0.0.1/linux/packages/0.2.4
 
-#list of packages should appear
+# 1. list of packages should appear
+# 2. packages files and add-ons files should be downloadable
+# 3. bash script should be generated properly
+
+#clone ulfs-packages-assistant
+git clone https://gitlab.com/umvirt/ulfs-packages-assistant assistant
+
+#go to packages directory
+cd assistant
+
+#create config file
+cp inc/config.php.sample inc/config.php
