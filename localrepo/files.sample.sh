@@ -30,6 +30,12 @@ mkdir 0.2.4
 #go to this directory
 cd 0.2.4
 
+#download LFS sources
+wget --no-check-certificate http://umvirt.com/linux/downloads/0.2.4/src.tar
+
+#download LFS sources checksum
+wget --no-check-certificate http://umvirt.com/linux/downloads/0.2.4/src.tar.md5sum
+
 #create directories
 mkdir packages
 mkdir patches
