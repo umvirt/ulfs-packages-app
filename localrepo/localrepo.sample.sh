@@ -7,6 +7,18 @@
 #edit httpd default config
 sed -e 's|#LoadModule rewrite_module|LoadModule rewrite_module|' -i /etc/httpd/httpd.conf
 sed -e 's|AllowOverride None|AllowOverride All|' -i /etc/httpd/httpd.conf
+
+#set directory index value for apps
+cat >> /etc/httpd/httpd.conf << "EOF"
+ <Directory "/srv/www/linux/packages">
+ DirectoryIndex index.php
+</Directory>
+ <Directory "/srv/www/linux/assistant">
+ DirectoryIndex index.php
+</Directory>
+EOF
+
+
 systemctl restart httpd
 
 #create database and user
