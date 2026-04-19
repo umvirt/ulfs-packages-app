@@ -11,7 +11,9 @@
 include "../inc/main.php";
 
 
-
+/**
+ * Truncate packagessources tables in database
+ */
 function truncatetables(){
 global $db;
 
@@ -22,33 +24,22 @@ $db->execute($sql);
 //var_dump($db->error);
 }
 
-
-function processfile($file,$dir){
-global $db;
-$sql=array();
-$sql[]="insert into packagessources (code) values (\"".basename($file,'.xml')."\")";
-$sql[]="select @@identity";
-$db->execute($sql);
-$id=$db->dataset[0]['@@identity'];
-//var_dump($db->error, $db->dataset, $id);
-
-
-$xml=simplexml_load_file($dir.'/'.$file,'SimpleXMLElement',LIBXML_DTDLOAD);
-
-$packages=$xml->package;
-
-//var_dump($xml);
-//exit;
-
-
-foreach($packages as $package)
+/**
+ * Process package
+ *
+ * @param int $id A packages source package id
+ * @param string $code A packages source package code
+ * @param string $code A packages source package code in file
+ * @return string
+ */
+function processrecord($id,$code, $package)
 {
-//$code=$xml->code->__toString();
+global $db;
 
-echo "Processing package: \"".$package->code."\"  ...\n";
+echo "Processing package: \"".$code."\"  ...\n";
 
 $sql=array();
-$sql[]="insert into packagessources_packages (code,source) values (\"".$package->code."\", $id)";
+$sql[]="insert into packagessources_packages (code,source) values (\"".$code."\", $id)";
 $sql[]="select @@identity";
 $db->execute($sql);
 
@@ -76,7 +67,59 @@ $db->execute($sql);
 
 
 
+}
 
+/**
+ * Process packages source file
+ *
+ * @param string $file A file name
+ * @param string $dir A path to file directory
+ * @return string
+ */
+function processfile($file,$dir){
+global $db;
+$sql=array();
+$sql[]="insert into packagessources (code) values (\"".basename($file,'.xml')."\")";
+$sql[]="select @@identity";
+$db->execute($sql);
+$id=$db->dataset[0]['@@identity'];
+//var_dump($db->error, $db->dataset, $id);
+
+
+$xml=simplexml_load_file($dir.'/'.$file,'SimpleXMLElement',LIBXML_DTDLOAD);
+
+$packages=$xml->package;
+
+//var_dump($xml);
+//exit;
+
+
+foreach($packages as $package)
+{
+//$code=$xml->code->__toString();
+
+//add package with blfs name
+//processrecord($package->code, $package);
+
+$pkgname="";
+
+$files=$package->files->file;
+foreach($files as $xfile)
+{
+$pkgname=pkgname($xfile->filename);
+//echo $pkgname."\n";
+break;
+}
+
+if($pkgname){
+if(strtolower($pkgname)!=strtolower($package->code)){
+//echo strtolower($pkgname).'!='.strtolower($package->code)."\n";
+processrecord($id,$pkgname, $package);
+}
+
+processrecord($id,$package->code, $package);
+
+}
 
 }
 

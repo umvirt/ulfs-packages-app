@@ -8,6 +8,18 @@
  */
 
 /**
+ * Create package name from source package file name
+ * @param string $val A source package file name
+ * @return string
+ */
+function pkgname($s)
+{
+$a=explode('-',$s);
+unset($a[count($a)-1]);
+return join('-',$a);
+}
+
+/**
  * Convert value to HTML-code
  *
  * @param string $val A source value
