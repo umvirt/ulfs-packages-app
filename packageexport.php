@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ULFS Packages Web-Application
  *
@@ -11,14 +12,14 @@
 include "inc/main.php";
 
 //get release from $_REQUEST
-$release=@addslashes($_REQUEST['release']);
+$release = @addslashes($_REQUEST['release']);
 //get package from $_REQUEST
-$package=@addslashes($_REQUEST['package']);
+$package = @addslashes($_REQUEST['package']);
 //get format from $_REQUEST
-$format=@addslashes($_REQUEST['format']);
+$format = @addslashes($_REQUEST['format']);
 
 
-$sql="select p.id, r.`release`, p.code, p.unpack, p.preparation, p.sourcefile, p.sourcedir, p.configure, p.build, p.install, p.description,p.localbuild,
+$sql = "select p.id, r.`release`, p.code, p.unpack, p.preparation, p.sourcefile, p.sourcedir, p.configure, p.build, p.install, p.description,p.localbuild,
 p.template template_id, t.code template
 from packages p
 left join releases r on p.release=r.id
@@ -28,106 +29,96 @@ where r.`release`=\"$release\" and p.code=\"$package\"";
 //var_dump($sql);
 $db->execute($sql);
 
-$x=$db->dataset;
+$x = $db->dataset;
 
-$pkgs=array();
-foreach ($x as $k=>$v)
-{
-    $dependances=dependances($release, $v['code']);
-    $patches=patches($release,$v['code']);
-    $addons=addons($release,$v['code']);
-    $nestings=nestings($release,$v['code']);
-    $comments=comments($release,$v['code']);
-    $archpackages=pkgarchpackages($release,$package);
+$pkgs = [];
+foreach ($x as $k => $v) {
+    $dependances = dependances($release, $v['code']);
+    $patches = patches($release, $v['code']);
+    $addons = addons($release, $v['code']);
+    $nestings = nestings($release, $v['code']);
+    $comments = comments($release, $v['code']);
+    $archpackages = pkgarchpackages($release, $package);
 
-    if($format=="json")
-    {
-        $arr=array
-        (
-            'code'=>$package,
-            'description'=>base64_encode($v['description']),
-            'release'=>$release,
-            'sourcefile'=>$v['sourcefile'],
-            'sourcedir'=>$v['sourcedir'],
-            'unpack'=>base64_encode($v['unpack']),
-            'configure'=>base64_encode($v['configure']),
-            'build'=>base64_encode($v['build']),
-            'install'=>base64_encode($v['install']),
-            'dependances'=>$dependances,
-            'patches'=>$patches,
-            'addons'=>$addons,
-            'nestings'=>$nestings,
-            'comments'=>$comments,
-        );
+    if ($format == "json") {
+        $arr
+        = [
+            'code' => $package,
+            'description' => base64_encode($v['description']),
+            'release' => $release,
+            'sourcefile' => $v['sourcefile'],
+            'sourcedir' => $v['sourcedir'],
+            'unpack' => base64_encode($v['unpack']),
+            'configure' => base64_encode($v['configure']),
+            'build' => base64_encode($v['build']),
+            'install' => base64_encode($v['install']),
+            'dependances' => $dependances,
+            'patches' => $patches,
+            'addons' => $addons,
+            'nestings' => $nestings,
+            'comments' => $comments,
+        ];
 
-        if($release!="0.1")
-        {
-                $arr['localbuild']=$v['localbuild'];
+        if ($release != "0.1") {
+            $arr['localbuild'] = $v['localbuild'];
         }
 
 
-        if($v['template'])
-        {
-                $arr['template']=$v['template'];
+        if ($v['template']) {
+            $arr['template'] = $v['template'];
         }
 
 
-        if($v['preparation'])
-        {
-                $arr['preparation']=base64_encode($v['preparation']);
+        if ($v['preparation']) {
+            $arr['preparation'] = base64_encode($v['preparation']);
         }
 
         //Architecture specific instructions
-        if(count($archpackages))
-        {
-            $arr['archpackages']=array();
+        if (count($archpackages)) {
+            $arr['archpackages'] = [];
 
-            foreach($archpackages as $archpackage)
-            {
-                $architem=array(
-                'arch'=>$archpackage['arch'],
-                'configure'=>base64_encode($archpackage['configure']),
-                'build'=>base64_encode($archpackage['build']),
-                'install'=>base64_encode($archpackage['install'])
-                );
-                $adependances=archpkgdependances($release,$archpackage['arch'],$v['code']);
+            foreach ($archpackages as $archpackage) {
+                $architem = [
+                    'arch' => $archpackage['arch'],
+                    'configure' => base64_encode($archpackage['configure']),
+                    'build' => base64_encode($archpackage['build']),
+                    'install' => base64_encode($archpackage['install']),
+                ];
+                $adependances = archpkgdependances($release, $archpackage['arch'], $v['code']);
 
-                if(count($adependances))
-                {
-                    $architem['dependances']=array();
-                    foreach ($adependances as $adep)
-                    {
-                        $architem['dependances'][]=array(
-                        'code'=>$adep['code'],
-                        'arch'=>$adep['arch'],
-                        'weight'=>$adep['weight']
-                        );
+                if (count($adependances)) {
+                    $architem['dependances'] = [];
+                    foreach ($adependances as $adep) {
+                        $architem['dependances'][] = [
+                            'code' => $adep['code'],
+                            'arch' => $adep['arch'],
+                            'weight' => $adep['weight'],
+                        ];
                     }
                 }
 
-                $arr['archpackages'][]=$architem;
+                $arr['archpackages'][] = $architem;
             }
         }
 
-        $result=json_encode($arr);
+        $result = json_encode($arr);
     }
 
-    if($format=="xml")
-    {
+    if ($format == "xml") {
         //header("Content-type: text/xml");
         $dom = new DOMDocument('1.0', 'utf-8');
-        $dom->formatOutput=true;
+        $dom->formatOutput = true;
         $root = $dom->createElement('package');
-        $release_ = $dom->createElement('release',$release);
-        $code = $dom->createElement('code',$package);
-        $description = $dom->createElement('description',base64_encode($v['description']));
+        $release_ = $dom->createElement('release', $release);
+        $code = $dom->createElement('code', $package);
+        $description = $dom->createElement('description', base64_encode($v['description']));
 
-        $sourcefile = $dom->createElement('sourcefile',$v['sourcefile']);
-        $sourcedir = $dom->createElement('sourcedir',$v['sourcedir']);
-        $unpack = $dom->createElement('unpack',base64_encode($v['unpack']));
-        $configure = $dom->createElement('configure',base64_encode($v['configure']));
-        $build = $dom->createElement('build',base64_encode($v['build']));
-        $install = $dom->createElement('install',base64_encode($v['install']));
+        $sourcefile = $dom->createElement('sourcefile', $v['sourcefile']);
+        $sourcedir = $dom->createElement('sourcedir', $v['sourcedir']);
+        $unpack = $dom->createElement('unpack', base64_encode($v['unpack']));
+        $configure = $dom->createElement('configure', base64_encode($v['configure']));
+        $build = $dom->createElement('build', base64_encode($v['build']));
+        $install = $dom->createElement('install', base64_encode($v['install']));
 
         $root->appendChild($release_);
         $root->appendChild($code);
@@ -139,21 +130,18 @@ foreach ($x as $k=>$v)
         $root->appendChild($build);
         $root->appendChild($install);
 
-        if($release!="0.1")
-        {
-            $localbuild = $dom->createElement('localbuild',$v['localbuild']);
+        if ($release != "0.1") {
+            $localbuild = $dom->createElement('localbuild', $v['localbuild']);
             $root->appendChild($localbuild);
         }
 
-        if($v['template'])
-        {
-            $localbuild = $dom->createElement('template',$v['template']);
+        if ($v['template']) {
+            $localbuild = $dom->createElement('template', $v['template']);
             $root->appendChild($localbuild);
         }
 
-        if($v['preparation'])
-        {
-            $localbuild = $dom->createElement('preparation',base64_encode($v['preparation']));
+        if ($v['preparation']) {
+            $localbuild = $dom->createElement('preparation', base64_encode($v['preparation']));
             $root->appendChild($localbuild);
         }
 
@@ -161,23 +149,21 @@ foreach ($x as $k=>$v)
         //Dependances
         //test: mc
         $dependances_element = $dom->createElement('dependances');
-        foreach($dependances as $dep)
-        {
-            $dependance_element=$dom->createElement('dependance');
-            $dependance_element->appendChild($dom->createElement('code',$dep['code']));
-            $dependance_element->appendChild($dom->createElement('weight',$dep['weight']));
+        foreach ($dependances as $dep) {
+            $dependance_element = $dom->createElement('dependance');
+            $dependance_element->appendChild($dom->createElement('code', $dep['code']));
+            $dependance_element->appendChild($dom->createElement('weight', $dep['weight']));
             $dependances_element->appendChild($dependance_element);
         }
         $root->appendChild($dependances_element);
         //Patches
         //test: glib
         $patches_element = $dom->createElement('patches');
-        foreach($patches as $pat)
-        {
-            $patch_element=$dom->createElement('patch');
-            $filename_element=$dom->createElement('filename',$pat['filename']);
+        foreach ($patches as $pat) {
+            $patch_element = $dom->createElement('patch');
+            $filename_element = $dom->createElement('filename', $pat['filename']);
             $patch_element->appendChild($filename_element);
-            $mode_element=$dom->createElement('mode',$pat['mode']);
+            $mode_element = $dom->createElement('mode', $pat['mode']);
             $patch_element->appendChild($mode_element);
             $patches_element->appendChild($patch_element);
         }
@@ -185,72 +171,65 @@ foreach ($x as $k=>$v)
         //Addons
         //test: llvm
         $addons_element = $dom->createElement('addons');
-        foreach($addons as $addon)
-        {
-            $addon_element=$dom->createElement('addon',$addon);
+        foreach ($addons as $addon) {
+            $addon_element = $dom->createElement('addon', $addon);
             $addons_element->appendChild($addon_element);
         }
         $root->appendChild($addons_element);
         //Nestings
         $nestings_element = $dom->createElement('nestings');
-        foreach($nestings as $nesting)
-        {
-            $nesting_element=$dom->createElement('nesting',$nesting);
+        foreach ($nestings as $nesting) {
+            $nesting_element = $dom->createElement('nesting', $nesting);
             $nestings_element->appendChild($nesting_element);
         }
         $root->appendChild($nestings_element);
 
         //Comments
         $comments_element = $dom->createElement('comments');
-        foreach($comments as $comment)
-        {
-            $comment_element=$dom->createElement('comment',$comment);
+        foreach ($comments as $comment) {
+            $comment_element = $dom->createElement('comment', $comment);
             $comments_element->appendChild($comment_element);
         }
         $root->appendChild($comments_element);
 
         //Architecture specific instructions
-        if(count($archpackages))
-        {
+        if (count($archpackages)) {
             $archpackages_element = $dom->createElement('archpackages');
-            foreach($archpackages as $archpackage)
-            {
+            foreach ($archpackages as $archpackage) {
                 //main container init
-                $archpackage_element=$dom->createElement('archpackage');
+                $archpackage_element = $dom->createElement('archpackage');
 
                 //arch
-                $arch_element=$dom->createElement('arch',$archpackage['arch']);
+                $arch_element = $dom->createElement('arch', $archpackage['arch']);
                 $archpackage_element->appendChild($arch_element);
 
                 //configure script
-                $arch_element=$dom->createElement('configure',base64_encode($archpackage['configure']));
+                $arch_element = $dom->createElement('configure', base64_encode($archpackage['configure']));
                 $archpackage_element->appendChild($arch_element);
 
                 //build script
-                $arch_element=$dom->createElement('build',base64_encode($archpackage['build']));
+                $arch_element = $dom->createElement('build', base64_encode($archpackage['build']));
                 $archpackage_element->appendChild($arch_element);
 
                 //install script
-                $arch_element=$dom->createElement('install',base64_encode($archpackage['install']));
+                $arch_element = $dom->createElement('install', base64_encode($archpackage['install']));
                 $archpackage_element->appendChild($arch_element);
 
                 //arch dependances
-                $adependances=archpkgdependances($release,$archpackage['arch'],$v['code']);
+                $adependances = archpkgdependances($release, $archpackage['arch'], $v['code']);
                 //var_dump($adependances);exit;
-                if(count($adependances))
-                {
-                    $arch_element=$dom->createElement('dependances');
-                    foreach ($adependances as $adep)
-                    {
-                        $dep_element=$dom->createElement('dependance');
+                if (count($adependances)) {
+                    $arch_element = $dom->createElement('dependances');
+                    foreach ($adependances as $adep) {
+                        $dep_element = $dom->createElement('dependance');
                         //code
-                        $depcode_element=$dom->createElement('code',$adep['code']);
+                        $depcode_element = $dom->createElement('code', $adep['code']);
                         $dep_element->appendChild($depcode_element);
                         //arch
-                        $depcode_element=$dom->createElement('arch',$adep['arch']);
+                        $depcode_element = $dom->createElement('arch', $adep['arch']);
                         $dep_element->appendChild($depcode_element);
                         //weight
-                        $depcode_element=$dom->createElement('weight',$adep['weight']);
+                        $depcode_element = $dom->createElement('weight', $adep['weight']);
                         $dep_element->appendChild($depcode_element);
 
                         $arch_element->appendChild($dep_element);
@@ -264,20 +243,17 @@ foreach ($x as $k=>$v)
             $root->appendChild($archpackages_element);
         }
         $dom->appendChild($root);
-        $result=$dom->saveXML();
+        $result = $dom->saveXML();
     }
 }
 
 
-if($format=="xml")
-{
+if ($format == "xml") {
     header("Content-type: text/xml");
     echo $result;
 }
 
-if($format=="json")
-{
+if ($format == "json") {
     header("Content-type: text/plain");
     echo $result;
 }
-

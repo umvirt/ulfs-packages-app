@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ULFS Packages Web-Application
  *
@@ -11,17 +12,17 @@
 include "inc/main.php";
 
 //lines stroke styles
-$styles=array(
+$styles = [
     "dashed",
     "dotted",
-    "solid"
-);
+    "solid",
+];
 
 //lines stroke number
-$lsn=0;
+$lsn = 0;
 
 //colors list
-$colors=array(
+$colors = [
     "red",
     "black",
     "gray",
@@ -32,10 +33,10 @@ $colors=array(
     "yellow",
     "purple",
     "orange",
-);
+];
 
 //color number
-$cn=0;
+$cn = 0;
 
 /**
  * Get childs for package.
@@ -46,17 +47,16 @@ $cn=0;
  *
  * @return array
  */
-function getChilds($parent=null)
+function getChilds($parent = null)
 {
     global $db;
-    $sql="select id package, code from packages p
+    $sql = "select id package, code from packages p
     left join dependances d on d.package=p.id";
 
-    if($parent)
-    {
-        $sql.=" where dependance = ".$parent['package'];
-    }else{
-        $sql.=" where dependance is null";
+    if ($parent) {
+        $sql .= " where dependance = " . $parent['package'];
+    } else {
+        $sql .= " where dependance is null";
     }
 
     $db->execute($sql);
@@ -73,7 +73,7 @@ function getChilds($parent=null)
 function getAll($release)
 {
     global $db;
-    $sql="select p.id package, p.code, r.`release` from packages p left join releases r on r.id=p.`release` where r.release=\"$release\"";
+    $sql = "select p.id package, p.code, r.`release` from packages p left join releases r on r.id=p.`release` where r.release=\"$release\"";
     $db->execute($sql);
     return $db->dataset;
 }
@@ -85,32 +85,30 @@ function getAll($release)
  * @param object $parent A parent package node object
  * @param object $child A child package node object
  */
-function addEdge($gv,$parent,$child)
+function addEdge($gv, $parent, $child)
 {
     global $colors;
     global $styles;
     global $cn;
     global $lsn;
 
-    if($cn>=count($colors))
-    {
-        $cn=0;
+    if ($cn >= count($colors)) {
+        $cn = 0;
         $lsn++;
     }
 
-    if($lsn>=count($styles))
-    {
-        $lsn=0;
+    if ($lsn >= count($styles)) {
+        $lsn = 0;
     }
 
     $gv->addEdge(
-        array(
-        $parent['package'] => $child['package']
-        ),
-        array(
-        'color' => $colors[$cn],
-        'style' => $styles[$lsn]
-        )
+        [
+            $parent['package'] => $child['package'],
+        ],
+        [
+            'color' => $colors[$cn],
+            'style' => $styles[$lsn],
+        ],
     );
 
     $cn++;
@@ -122,54 +120,51 @@ function addEdge($gv,$parent,$child)
  * @param object $gv A graph object
  * @param array $node A package dataset item
  */
-function addNode($gv,$node)
+function addNode($gv, $node)
 {
     //add specific node
     $gv->addNode(
         $node['package'],
-        array(
-        'URL'   => '/linux/packages/'.$node['release'].'/'.$node['code'],
-        'label' => $node['code'],
-        'shape' => 'box'
-        )
+        [
+            'URL'   => '/linux/packages/' . $node['release'] . '/' . $node['code'],
+            'label' => $node['code'],
+            'shape' => 'box',
+        ],
     );
 
     //get chils for node
-    $childs=getChilds($node);
+    $childs = getChilds($node);
 
     //each child
-    foreach($childs as $cnode)
-    {
+    foreach ($childs as $cnode) {
         //add it to graph
-        addEdge($gv,$node,$cnode);
+        addEdge($gv, $node, $cnode);
     }
 }
 
 //Main
 
 //get reease value
-$release=addslashes($_REQUEST['release']);
+$release = addslashes($_REQUEST['release']);
 
 //cache file
-$file='tmp/depmap_'.($release).'.svg';
+$file = 'tmp/depmap_' . ($release) . '.svg';
 
 //if cache file not exists
-if(!file_exists($file))
-{
+if (!file_exists($file)) {
     //render it
     require_once 'Image/GraphViz.php';
 
     //get all roots (packages) for release
-    $roots=getAll($release);
+    $roots = getAll($release);
 
     //new graph
-    $gv = new Image_GraphViz(true,array(),"ULFS Packages Dependencies Map");
+    $gv = new Image_GraphViz(true, [], "ULFS Packages Dependencies Map");
 
 
     //add root nodes
-    foreach($roots as $node)
-    {
-        addNode($gv,$node);
+    foreach ($roots as $node) {
+        addNode($gv, $node);
     }
 
     //start buffer
@@ -177,15 +172,13 @@ if(!file_exists($file))
     //render graph to buffer
     $gv->image();
     //save buffer
-    $content=ob_get_contents();
+    $content = ob_get_contents();
     //stop buffer
     ob_end_clean();
 
-    file_put_contents($file,$content);
+    file_put_contents($file, $content);
     //show graph
     echo $content;
-}else{
+} else {
     echo(file_get_contents($file));
 }
-
-

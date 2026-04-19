@@ -10,7 +10,31 @@
 
 Standardized formatting reduces the cognitive friction when reading code from other authors.
 
-Currently Packages web-application PHP-code is not well formatted but we strive to make it formatted according to [PSR-1](https://www.php-fig.org/psr/psr-1) and [PSR-12](https://www.php-fig.org/psr/psr-12) standards.
+We strive to make Packages web-application PHP-code formatted according to [PSR-1](https://www.php-fig.org/psr/psr-1) and [PSR-12](https://www.php-fig.org/psr/psr-12) standards.
+
+There are many tools to fix code formatting.
+
+We use a "php-cs-fixer" utility.
+
+"php-cs-fixer" utility code is not stored in ULFS Packages service directory because it is optional.
+
+##### php-cs-fixer installation
+
+Deploy php-cs-fixer in some directory with command:
+
+    composer require --dev friendsofphp/php-cs-fixer
+
+Then copy 'composer.json' file and 'vendor' directory to ULFS Packages service root directory.
+
+##### php-cs-fixer running
+
+To check code formatting in PHP-files run:
+
+    vendor/bin/php-cs-fixer check
+
+To fix code formatting in PHP-files run:
+
+    vendor/bin/php-cs-fixer fix
 
 #### Code documentation
 
@@ -56,3 +80,8 @@ We use [GIT](https://git-scm.com/) as Version Control System (VCS).
 
 Doxygen is can be used to generate documentation. It support PHPDoc and Markdown. 
 
+### Links
+
+- [PHP Standard Recommendation (PSR) standards Wiki-page](https://en.wikipedia.org/wiki/PHP_Standard_Recommendation)
+- [PHP Standard Recommendation (PSR) standards site](https://www.php-fig.org/psr/)
+- [PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer)

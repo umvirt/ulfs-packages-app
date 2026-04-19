@@ -1,4 +1,7 @@
 inc/config.php
+.php-cs-fixer.cache
+composer.json
+vendor
 tmp
 README.html
 DATABASE.html

@@ -8,7 +8,7 @@
  */
 
 //get output buffer contents
-$content=ob_get_contents();
+$content = ob_get_contents();
 //stop output buffering
 ob_end_clean();
 //render web-page

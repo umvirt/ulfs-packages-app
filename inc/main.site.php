@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ULFS Packages Web-Application
  *
@@ -13,4 +14,3 @@ ob_start();
 session_start();
 //load main startup file
 include "main.php";
-

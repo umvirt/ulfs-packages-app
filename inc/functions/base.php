@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ULFS Packages Web-Application
  *
@@ -15,8 +16,8 @@
  */
 function gitHead($path)
 {
-    $ref=trim(file_get_contents("$path/.git/HEAD"));
-    $file=str_replace('ref: ','',$ref);
+    $ref = trim(file_get_contents("$path/.git/HEAD"));
+    $file = str_replace('ref: ', '', $ref);
     //echo $file;
     return trim(file_get_contents("$path/.git/$file"));
 }
@@ -25,12 +26,11 @@ function gitHead($path)
 /**
  * version safe join function
  */
-function strjoin($array, $delimeter="")
+function strjoin($array, $delimeter = "")
 {
-    if (version_compare(PHP_VERSION, '8.0.0') >= 0)
-    {
+    if (version_compare(PHP_VERSION, '8.0.0') >= 0) {
         return join($delimeter, $array);
-    }else{
+    } else {
         return join($array, $delimeter);
     }
 }
@@ -72,8 +72,7 @@ function parse_size($size)
     if ($unit) {
         // Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
         return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
-    }
-    else {
+    } else {
         return round($size);
     }
 }

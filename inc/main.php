@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ULFS Packages Web-Application
  *
@@ -11,32 +12,28 @@
 include "functions/base.php";
 
 //define base constants (uses only system functions to define)
-DEFINE('APPDIR',dirname(dirname(__file__)).'/');
-DEFINE('INCDIR',APPDIR.'/inc/');
+DEFINE('APPDIR', dirname(dirname(__file__)) . '/');
+DEFINE('INCDIR', APPDIR . '/inc/');
 
 //define additional constant (uses base functions to define)
-DEFINE('APPCOMMIT',gitHead(APPDIR));
+DEFINE('APPCOMMIT', gitHead(APPDIR));
 
 //load classes
-include INCDIR."classes/DirParser.php";
-include INCDIR."classes/DatabaseConnection.php";
+include INCDIR . "classes/DirParser.php";
+include INCDIR . "classes/DatabaseConnection.php";
 
 //load application functions
-include INCDIR."functions/ulfs.php";
+include INCDIR . "functions/ulfs.php";
 
 //load configuration
-include INCDIR."config.php";
+include INCDIR . "config.php";
 
 //if debugging is needed
-if(@$config['debug'])
-{
+if (@$config['debug']) {
     //override PHP settings
-    ini_set('display_errors',1);
-    ini_set('error_reporting',E_ALL);
+    ini_set('display_errors', 1);
+    ini_set('error_reporting', E_ALL);
 }
 
 //init database driver
-$db=new DatabaseConnection($db_config);
-
-
-
+$db = new DatabaseConnection($db_config);
